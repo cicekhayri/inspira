@@ -1,0 +1,11 @@
+from pyblaze.decorators.http_methods import get
+from pyblaze.responses import JsonResponse
+
+
+class {{controller_name}}Controller:
+
+    @get("/")
+    async def index(self, request):
+        context = {"variable": "value"}
+
+        return JsonResponse(context)
