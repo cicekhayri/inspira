@@ -59,7 +59,7 @@ async def test_set_cookie(app):
 
     expected_headers = {
         "content-type": TEXT_PLAIN,
-        'set-cookie': 'my_cookie=my_cookie_value; Path=/'
+        "set-cookie": "my_cookie=my_cookie_value; Path=/",
     }
 
     assert headers_dict == expected_headers
@@ -82,7 +82,7 @@ async def test_set_multiple_cookie(app):
 
     expected_header = {
         "content-type": TEXT_PLAIN,
-        'set-cookie': 'my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/'
+        "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/",
     }
 
     assert headers_dict == expected_header

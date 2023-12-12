@@ -10,7 +10,7 @@ from httpx import AsyncClient
 from pyblaze.config import Config
 from pyblaze.enums import HttpMethod
 from pyblaze.requests import Request, RequestContext
-from pyblaze.responses import TemplateResponse, JsonResponse
+from pyblaze.responses import JsonResponse, TemplateResponse
 
 
 class PyBlaze:

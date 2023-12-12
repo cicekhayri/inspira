@@ -46,4 +46,3 @@ def create_controller_file(name):
         output_file.write(content)
 
     click.echo(f"Controller '{singularize_name}' created successfully.")
-    
