@@ -18,20 +18,20 @@ def create_src_directory():
 
 def create_controller_file(name):
     src_directory = "src"
-    resource_directory = os.path.join(src_directory, name)
+    controller_directory = os.path.join(src_directory, name)
     singularize_name = singularize(name.lower())
     # Create the resource directory
-    os.makedirs(resource_directory)
+    os.makedirs(controller_directory)
 
     # Create __init__.py in the resource directory
-    init_file = os.path.join(resource_directory, "__init__.py")
+    init_file = os.path.join(controller_directory, "__init__.py")
 
     with open(init_file, "w"):
         pass
 
     # Create the controller file
     controller_file = os.path.join(
-        resource_directory, f"{singularize_name}_controller.py"
+        controller_directory, f"{singularize_name}_controller.py"
     )
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "controller_template.txt"
@@ -45,4 +45,4 @@ def create_controller_file(name):
         )
         output_file.write(content)
 
-    click.echo(f"Controller '{singularize_name}' created successfully.")
+    click.echo(f"Module '{singularize_name}' created successfully.")

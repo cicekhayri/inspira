@@ -14,9 +14,9 @@ def test_resource_command(
     teardown_app_file, teardown_src_directory, setup_database_file
 ):
     runner = CliRunner()
-    result = runner.invoke(cli, ["new", "resource", "example"])
+    result = runner.invoke(cli, ["new", "module", "example"])
     assert result.exit_code == 0
-    assert "Controller 'example' created successfully." in result.output
+    assert "Module 'example' created successfully." in result.output
 
 
 def test_database_command(teardown_database_file):

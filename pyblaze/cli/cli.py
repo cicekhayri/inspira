@@ -21,13 +21,13 @@ def new():
 
 @new.command()
 @click.argument("name")
-def resource(name):
+def module(name):
     if not name:
-        click.echo("Please provide a name for the controller")
+        click.echo("Please provide a name for the module")
         return
     if not database_file_exists():
         click.echo(
-            "Database file doesn't exists, please generate one before generating resources"
+            "Database file doesn't exists, please generate one before generating modules"
         )
         return
 
