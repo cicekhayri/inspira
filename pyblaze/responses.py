@@ -1,0 +1,200 @@
+import datetime
+import json
+import mimetypes
+import os
+from http import HTTPStatus
+
+from jinja2 import Environment, FileSystemLoader
+
+from pyblaze.constants import APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN, UTF8
+
+
+class HttpResponse:
+    def __init__(
+        self,
+        content=None,
+        status_code=HTTPStatus.OK,
+        content_type=TEXT_PLAIN,
+        headers=None,
+    ):
+        self.content = content
+        self.status_code = status_code
+        self.content_type = content_type
+        self.headers = dict(headers or {})
+
+    def set_cookie(
+        self,
+        key,
+        value,
+        max_age=None,
+        expires=None,
+        path="/",
+        domain=None,
+        secure=False,
+        httponly=False,
+        samesite=None,
+    ):
+        cookie_str = f"{key}={value}"
+
+        if max_age is not None:
+            cookie_str += f"; Max-Age={max_age}"
+        elif expires is not None and isinstance(expires, (int, float)):
+            expires_dt = datetime.datetime.utcfromtimestamp(expires)
+            expires_str = expires_dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            cookie_str += f"; Expires={expires_str}"
+
+        if path:
+            cookie_str += f"; Path={path}"
+        if domain:
+            cookie_str += f"; Domain={domain}"
+        if secure:
+            cookie_str += "; Secure"
+        if httponly:
+            cookie_str += "; HttpOnly"
+        if samesite:
+            cookie_str += f"; SameSite={samesite}"
+
+        # Append the cookie to the headers dictionary
+        self.headers.setdefault("set-cookie", []).append(cookie_str)
+
+    async def __call__(self, scope, receive, send):
+        headers = [
+            (b"content-type", self.content_type.encode(UTF8)),
+        ]
+
+        for key, value_list in self.headers.items():
+            if isinstance(value_list, list):
+                for value in value_list:
+                    if isinstance(value, str):
+                        value = value.encode(UTF8)
+                    headers.append((key.encode(UTF8), value))
+            else:
+                headers.append((key.encode(UTF8), value_list))
+
+        await send(
+            {
+                "type": "http.response.start",
+                "status": self.status_code,
+                "headers": headers,
+            }
+        )
+
+        # Serialize content based on content type
+        if self.content is not None:
+            if isinstance(self.content, bytes):
+                body = self.content
+            elif self.content_type == APPLICATION_JSON:
+                body = json.dumps(self.content).encode(UTF8)
+            else:
+                body = str(self.content).encode(UTF8)
+        else:
+            body = b""
+
+        await send(
+            {
+                "type": "http.response.body",
+                "body": body,
+                "more_body": False,
+            }
+        )
+
+
+class JsonResponse(HttpResponse):
+    def __init__(self, content=None, status_code=HTTPStatus.OK, headers=None):
+        super().__init__(content, status_code, APPLICATION_JSON, headers)
+
+
+class TemplateResponse(HttpResponse):
+    def __init__(
+        self,
+        template_name,
+        context=None,
+        template_dir=None,
+        static_dir="static",
+    ):
+        super().__init__(None, HTTPStatus.OK, TEXT_HTML)
+        self.template_name = template_name
+        self.context = context or {}
+        self.static_dir = static_dir
+        self.template_dir = template_dir or "templates"
+
+    async def __call__(self, scope, receive, send):
+        path_info = scope.get("path", "").lstrip("/") or scope.get(
+            "raw_path", b""
+        ).decode(UTF8).lstrip("/")
+
+        if path_info.startswith("static/"):
+            await self.handle_static_file(scope, receive, send)
+        else:
+            await self.render_template(scope, receive, send)
+
+    async def render_template(self, scope, receive, send):
+        # Check if the template directory exists
+        if not os.path.exists(self.template_dir):
+            print("Template directory not found:", self.template_dir)
+            not_found_response = JsonResponse(
+                {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
+            )
+            await not_found_response(scope, receive, send)
+
+        template_env = Environment(loader=FileSystemLoader(self.template_dir))
+        template = template_env.get_template(self.template_name)
+        content = template.render(**self.context)
+
+        self.content = content.encode(UTF8)
+        await super().__call__(scope, receive, send)
+
+    async def handle_static_file(self, scope, receive, send):
+        path_info = scope.get("path", "").lstrip("/") or scope.get(
+            "raw_path", b""
+        ).decode(UTF8).lstrip("/")
+        static_prefix = "static/"
+
+        if path_info.startswith(static_prefix):
+            relative_path = path_info[len(static_prefix) :]
+            file_path = os.path.join(self.static_dir, relative_path)
+
+            if os.path.isfile(file_path):
+                content_type, _ = mimetypes.guess_type(file_path)
+                headers = [(b"content-type", content_type.encode(UTF8))]
+
+                with open(file_path, "rb") as file:
+                    body = file.read()
+
+                await send(
+                    {
+                        "type": "http.response.start",
+                        "status": HTTPStatus.OK,
+                        "headers": headers,
+                    }
+                )
+
+                await send(
+                    {
+                        "type": "http.response.body",
+                        "body": body,
+                        "more_body": False,
+                    }
+                )
+            else:
+                print("File not found:", file_path)
+
+                # Return a 404 response for non-existing static files
+                not_found_response = JsonResponse(
+                    {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
+                )
+                await not_found_response(scope, receive, send)
+        else:
+            print("Unexpected path:", path_info)
+
+            # Return a 404 response for unexpected paths
+            not_found_response = JsonResponse(
+                {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
+            )
+            await not_found_response(scope, receive, send)
+
+
+class HttpResponseRedirect(HttpResponse):
+    def __init__(self, url: str, status_code=HTTPStatus.FOUND, headers=None):
+        super().__init__(content=None, status_code=status_code, headers=headers or {})
+        self.headers["Location"] = url
