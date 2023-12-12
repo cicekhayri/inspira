@@ -74,17 +74,17 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 ```
 
-## Generating Resources
+## Generating Modules
 
-To generate necessary resource for your project, run the following command:
+To generate necessary resources for your project, run the following command:
 
 ```bash
-pyblaze new resource orders
+pyblaze new module orders
 ```
 
 ## Generated Directory Structure
 
-After running the command to generate a new resource (`pyblaze new resource orders`), the directory structure of your project should look like the following:
+After running the command to generate a new module (`pyblaze new module orders`), the directory structure of your project should look like the following:
 
 ```bash
 ├── app.py
