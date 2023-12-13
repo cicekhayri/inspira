@@ -29,7 +29,9 @@ def module(name, skip_repository, skip_model):
         return
 
     if not (skip_model or skip_repository) and not database_file_exists():
-        click.echo("Database file doesn't exist. Please generate one before generating modules")
+        click.echo(
+            "Database file doesn't exist. Please generate one before generating modules"
+        )
         return
 
     create_module_files(name, skip_repository, skip_model)
