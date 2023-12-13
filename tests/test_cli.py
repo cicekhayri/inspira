@@ -15,6 +15,7 @@ def test_resource_command(
 ):
     runner = CliRunner()
     result = runner.invoke(cli, ["new", "module", "example"])
+    print(result.output)
     assert result.exit_code == 0
     assert "Module 'example' created successfully." in result.output
 

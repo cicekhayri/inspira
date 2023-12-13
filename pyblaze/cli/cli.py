@@ -21,21 +21,30 @@ def new():
 
 @new.command()
 @click.argument("name")
-def module(name):
+@click.option("--skip-repository", "skip_repository", is_flag=True, required=False)
+@click.option("--skip-model", "skip_model", is_flag=True, required=False)
+def module(name, skip_repository, skip_model):
     if not name:
         click.echo("Please provide a name for the module")
         return
-    if not database_file_exists():
-        click.echo(
-            "Database file doesn't exists, please generate one before generating modules"
-        )
+
+    if not (skip_model or skip_repository) and not database_file_exists():
+        click.echo("Database file doesn't exist. Please generate one before generating modules")
         return
 
+    create_module_files(name, skip_repository, skip_model)
+    add_route_to_app(name)
+
+
+def create_module_files(name, skip_repository, skip_model):
     create_src_directory()
     create_controller_file(name)
-    generate_model_file(name)
-    generate_repository_file(name)
-    add_route_to_app(name)
+
+    if not skip_model:
+        generate_model_file(name)
+
+    if not skip_repository:
+        generate_repository_file(name)
 
 
 @new.command()
