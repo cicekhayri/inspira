@@ -1,13 +1,9 @@
 import base64
 import datetime
 import hashlib
-
-from http.cookies import SimpleCookie
-
-
-
 import json
 from datetime import datetime
+from http.cookies import SimpleCookie
 
 
 class DateTimeEncoder(json.JSONEncoder):

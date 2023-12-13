@@ -11,7 +11,7 @@ from pyblaze.config import Config
 from pyblaze.enums import HttpMethod
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import JsonResponse, TemplateResponse
-from pyblaze.sessions import get_or_create_session, encode_session_data
+from pyblaze.sessions import encode_session_data, get_or_create_session
 
 
 class PyBlaze:
@@ -74,7 +74,9 @@ class PyBlaze:
         RequestContext.set_request(request)
 
         if self.session_type:
-            session = get_or_create_session(request, self.secret_key, session_type=self.session_type)
+            session = get_or_create_session(
+                request, self.secret_key, session_type=self.session_type
+            )
             request.session = session
 
         method = scope["method"]
