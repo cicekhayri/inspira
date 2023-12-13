@@ -105,6 +105,47 @@ After generating your app and setting up the necessary resources, start the serv
 uvicorn app:app --reload
 ```
 
+
+## Sessions
+
+Inside `app.py`, after initializing PyBlaze instance:
+
+
+```python
+app.session_type = "cookie"
+```
+
+Example 1: Setting a Session
+```python
+@get("/")
+async def set_session_data(request):
+    context = {"variable": "value"}
+    request.set_session("key", 23)
+
+    return JsonResponse(context)
+```
+
+Example 2: Retrieving Session Data
+```python
+@get("/")
+async def get_session_data(request):
+    context = {"variable": "value"}
+    request.get_session("key")
+
+    return JsonResponse(context)
+```
+
+Example 3: Removing Session Data
+```python
+@get("/")
+async def remove_session_data(request):
+    context = {"variable": "value"}
+    request.remove_session("key")
+
+    return JsonResponse(context)
+```
+
+
 ## License
 
 This project is licensed under the terms of the MIT license.
