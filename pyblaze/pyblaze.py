@@ -11,10 +11,11 @@ from pyblaze.config import Config
 from pyblaze.enums import HttpMethod
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import JsonResponse, TemplateResponse
+from pyblaze.sessions import get_or_create_session, encode_session_data
 
 
 class PyBlaze:
-    def __init__(self, logger_name="pyblaze", secret_key=None):
+    def __init__(self, logger_name="pyblaze", secret_key=None, session_type=None):
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
@@ -24,6 +25,7 @@ class PyBlaze:
         self.configure_logging()
         self.config = Config()
         self.secret_key = secret_key
+        self.session_type = session_type
 
     def configure(self, config_dict):
         for key, value in config_dict.items():
@@ -71,6 +73,10 @@ class PyBlaze:
         request = Request(scope, receive)
         RequestContext.set_request(request)
 
+        if self.session_type:
+            session = get_or_create_session(request, self.secret_key, session_type=self.session_type)
+            request.session = session
+
         method = scope["method"]
         path = scope["path"]
 
@@ -84,6 +90,14 @@ class PyBlaze:
             try:
                 handler = self.routes[method][path]
                 response = await self.invoke_handler(handler, request, scope)
+
+                if self.session_type:
+                    encoded_and_signed_data = encode_session_data(
+                        request.session, self.secret_key
+                    )
+                    response.set_cookie(
+                        "session", encoded_and_signed_data, secure=True, httponly=True
+                    )
 
                 await response(scope, receive, send)
             except Exception as exc:
