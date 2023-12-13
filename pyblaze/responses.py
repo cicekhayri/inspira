@@ -107,16 +107,16 @@ class JsonResponse(HttpResponse):
 class TemplateResponse(HttpResponse):
     def __init__(
         self,
-        template_name,
+        template_name=None,
         context=None,
-        template_dir=None,
+        template_dir="templates",
         static_dir="static",
     ):
         super().__init__(None, HTTPStatus.OK, TEXT_HTML)
         self.template_name = template_name
         self.context = context or {}
         self.static_dir = static_dir
-        self.template_dir = template_dir or "templates"
+        self.template_dir = template_dir
 
     async def __call__(self, scope, receive, send):
         path_info = scope.get("path", "").lstrip("/") or scope.get(
@@ -129,9 +129,18 @@ class TemplateResponse(HttpResponse):
             await self.render_template(scope, receive, send)
 
     async def render_template(self, scope, receive, send):
-        # Check if the template directory exists
-        if not os.path.exists(self.template_dir):
-            print("Template directory not found:", self.template_dir)
+        if self.template_name is None:
+            print("Template name is not provided.")
+            not_found_response = JsonResponse(
+                {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
+            )
+            await not_found_response(scope, receive, send)
+            return
+
+        template_path = os.path.join(self.template_dir, self.template_name)
+
+        if not os.path.exists(template_path):
+            print("Template not found:", template_path)
             not_found_response = JsonResponse(
                 {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
             )

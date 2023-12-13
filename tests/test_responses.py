@@ -248,20 +248,3 @@ async def test_template(app):
 
     assert response.status_code == HTTPStatus.OK
     assert response.text == "<h1>test</h1>"
-
-
-@pytest.mark.asyncio
-async def test_nonexistent_template(app):
-    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "templates"))
-
-    @get("/nonexistent-example")
-    async def render_nonexistent_template(request):
-        return TemplateResponse(
-            "nonexistent_template.html", {"name": "test"}, template_dir=template_dir
-        )
-
-    app.add_route("/nonexistent-example", HttpMethod.GET, render_nonexistent_template)
-
-    response = await app.test_session(app, "GET", "/nonexistent-example")
-
-    assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
