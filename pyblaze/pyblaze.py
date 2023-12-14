@@ -74,18 +74,39 @@ class PyBlaze:
         if not hasattr(cls, "__path__"):
             return
 
-        instance = cls()
+        dependencies = self.resolve_dependencies_automatic(cls)
+        instance = cls(*dependencies) if dependencies is not None else cls()
+
         path_prefix = getattr(cls, "__path__", "")
+
         for name, method in inspect.getmembers(instance, inspect.ismethod):
             if (
-                hasattr(method, "__is_handler__")
-                and hasattr(method, "__method__")
-                and hasattr(method, "__path__")
+                    hasattr(method, "__is_handler__")
+                    and hasattr(method, "__method__")
+                    and hasattr(method, "__path__")
             ):
                 http_method = getattr(method, "__method__")
                 route = getattr(method, "__path__")
                 full_route = path_prefix + route
                 self.add_route(full_route, http_method, method)
+
+    def resolve_dependencies_automatic(self, cls):
+        dependencies = []
+
+        # Get the constructor parameters, if available
+        init_method = getattr(cls, "__init__", None)
+        if init_method and init_method != object.__init__:
+            constructor_params = inspect.signature(init_method).parameters.values()
+            for param in constructor_params:
+                if param.name != "self":  # Exclude 'self' parameter
+                    param_type = param.annotation
+                    dependency = self.resolve_dependency(param_type)
+                    dependencies.append(dependency)
+
+        return dependencies if dependencies else None
+
+    def resolve_dependency(self, dependency_type):
+        return dependency_type() if dependency_type else None
 
     def _file_path_to_module(self, file_path: str):
         rel_path = os.path.relpath(file_path, os.getcwd())
