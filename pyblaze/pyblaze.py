@@ -112,7 +112,8 @@ class PyBlaze:
         ) and self._parse_controller_decorators(file_path)
 
     async def __call__(self, scope, receive, send):
-        request = await self._create_and_set_request_context(receive, scope)
+        request = await self.create_request(receive, scope)
+        RequestContext.set_request(request)
 
         await self.set_request_session(request)
 
@@ -169,10 +170,8 @@ class PyBlaze:
         for middleware in self.middleware:
             request = await middleware(request)
 
-    async def _create_and_set_request_context(self, receive, scope):
-        request = Request(scope, receive)
-        RequestContext.set_request(request)
-        return request
+    async def create_request(self, receive, scope):
+        return Request(scope, receive)
 
     async def set_request_session(self, request):
         if self.session_type:
