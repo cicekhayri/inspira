@@ -283,10 +283,11 @@ async def test_encoded_headers():
         (b"content-type", TEXT_PLAIN.encode(UTF8)),
         (b"Key1", "Value1"),
         (b"Key2", b"Value2a"),
-        (b"Key2", b"Value2b")
+        (b"Key2", b"Value2b"),
     ]
 
     assert result == expected_result
+
 
 @pytest.mark.asyncio
 async def test_set_cookie():
