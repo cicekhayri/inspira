@@ -9,7 +9,6 @@ from typing import Callable, Dict, List
 
 from httpx import AsyncClient
 
-from pyblaze.config import Config
 from pyblaze.enums import HttpMethod
 from pyblaze.helpers import format_not_found_exception, format_server_exception
 from pyblaze.requests import Request, RequestContext
@@ -18,29 +17,15 @@ from pyblaze.sessions import encode_session_data, get_or_create_session
 
 
 class PyBlaze:
-    def __init__(self, logger_name="pyblaze", secret_key=None, session_type=None):
+    def __init__(self, secret_key=None, session_type=None):
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
         self.error_handler = self.default_error_handler
         self.middleware: List[Callable] = []
-        self.logger = logging.getLogger(logger_name)
-        self.configure_logging()
-        self.config = Config()
         self.secret_key = secret_key
         self.session_type = session_type
         self.discover_controllers()
-
-    def configure(self, config_dict):
-        for key, value in config_dict.items():
-            self.config.set(key, value)
-
-    def configure_logging(self):
-        logging.basicConfig(level=logging.INFO)
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(formatter)
-        self.logger.addHandler(stream_handler)
 
     def add_route(self, path: str, method: HttpMethod, handler: Callable):
         if path in self.routes[method.value]:
