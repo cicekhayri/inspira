@@ -44,7 +44,7 @@ def decode_session_data(session_id):
     return json.loads(decoded_payload)
 
 
-def get_or_create_session(request, secret_key, session_type):
+def get_or_create_session(request, secret_key):
     cookies = SimpleCookie(request.get_headers().get("cookie", ""))
     session_id = cookies.get("session")
     session_data = ""

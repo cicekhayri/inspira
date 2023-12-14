@@ -65,7 +65,7 @@ def test_get_or_create_session():
     secret_key = "your_secret_key"
     mock_request = MockRequest(f"session={session_id}")
 
-    actual_result = get_or_create_session(mock_request, secret_key, None)
+    actual_result = get_or_create_session(mock_request, secret_key)
 
     decoded_session_data = decode_session_data(session_id)
     assert actual_result == decoded_session_data == expected_result
