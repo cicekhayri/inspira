@@ -112,64 +112,78 @@ class PyBlaze:
         ) and self._parse_controller_decorators(file_path)
 
     async def __call__(self, scope, receive, send):
-        request = Request(scope, receive)
-        RequestContext.set_request(request)
+        request = await self._create_and_set_request_context(receive, scope)
 
-        if self.session_type:
-            session = get_or_create_session(
-                request, self.secret_key, session_type=self.session_type
-            )
-            request.session = session
+        await self.set_request_session(request)
 
         method = scope["method"]
         path = scope["path"]
 
+        await self.process_middlewares(request)
+
+        if path.startswith("/static"):
+            await self._handle_static_files(scope, receive, send, request)
+        elif path in self.routes[method]:
+            await self.handle_route(method, path, receive, request, scope, send)
+        else:
+            await self.handle_dynamic_route(method, path, request, scope, receive, send)
+
+    async def handle_dynamic_route(self, method, path, request, scope, receive, send):
+        for route_path, handler in self.routes[method].items():
+            if "{" in route_path and "}" in route_path:
+                route_pattern = route_path.replace("{", "(?P<").replace(
+                    "}", ">[^/]+)"
+                )
+                match = re.fullmatch(route_pattern, path)
+                if match:
+                    try:
+                        params = match.groupdict()
+                        response = await self.invoke_handler(
+                            handler, request, scope, params
+                        )
+                        await response(scope, receive, send)
+                        return
+                    except Exception as exc:
+                        error_response = await self.error_handler(exc)
+                        await error_response(scope, receive, send)
+        # If no matching route is found, return a 404 response
+        await self.handle_not_found(scope, receive, send)
+
+    async def handle_route(self, method, path, receive, request, scope, send):
+        try:
+            handler = self.routes[method][path]
+            response = await self.invoke_handler(handler, request, scope)
+
+            if self.session_type:
+                encoded_and_signed_data = encode_session_data(
+                    request.session, self.secret_key
+                )
+                response.set_cookie(
+                    "session", encoded_and_signed_data, secure=True, httponly=True
+                )
+
+            await response(scope, receive, send)
+        except Exception as exc:
+            error_response = await self.error_handler(exc)
+            await error_response(scope, receive, send)
+
+    async def process_middlewares(self, request):
         for middleware in self.middleware:
             request = await middleware(request)
 
-        if path.startswith("/static"):
-            # Handle static files using TemplateResponse
-            await self.handle_static_files(scope, receive, send, request)
-        elif path in self.routes[method]:
-            try:
-                handler = self.routes[method][path]
-                response = await self.invoke_handler(handler, request, scope)
+    async def _create_and_set_request_context(self, receive, scope):
+        request = Request(scope, receive)
+        RequestContext.set_request(request)
+        return request
 
-                if self.session_type:
-                    encoded_and_signed_data = encode_session_data(
-                        request.session, self.secret_key
-                    )
-                    response.set_cookie(
-                        "session", encoded_and_signed_data, secure=True, httponly=True
-                    )
+    async def set_request_session(self, request):
+        if self.session_type:
+            session = get_or_create_session(
+                request, self.secret_key
+            )
+            request.session = session
 
-                await response(scope, receive, send)
-            except Exception as exc:
-                error_response = await self.error_handler(exc)
-                await error_response(scope, receive, send)
-        else:
-            # Check for routes with dynamic parameters
-            for route_path, handler in self.routes[method].items():
-                if "{" in route_path and "}" in route_path:
-                    route_pattern = route_path.replace("{", "(?P<").replace(
-                        "}", ">[^/]+)"
-                    )
-                    match = re.fullmatch(route_pattern, path)
-                    if match:
-                        try:
-                            params = match.groupdict()
-                            response = await self.invoke_handler(
-                                handler, request, scope, params
-                            )
-                            await response(scope, receive, send)
-                            return
-                        except Exception as exc:
-                            error_response = await self.error_handler(exc)
-                            await error_response(scope, receive, send)
-            # If no matching route is found, return a 404 response
-            await self.handle_not_found(scope, receive, send)
-
-    async def handle_static_files(self, scope, receive, send, request):
+    async def _handle_static_files(self, scope, receive, send, request):
         template_response = TemplateResponse(request, scope["path"])
         await template_response(scope, receive, send)
 
