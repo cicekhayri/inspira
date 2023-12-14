@@ -11,7 +11,7 @@ from httpx import AsyncClient
 
 from pyblaze.config import Config
 from pyblaze.enums import HttpMethod
-from pyblaze.helpers import format_server_exception, format_not_found_exception
+from pyblaze.helpers import format_not_found_exception, format_server_exception
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
