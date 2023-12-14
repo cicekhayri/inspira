@@ -131,9 +131,7 @@ class PyBlaze:
     async def handle_dynamic_route(self, method, path, request, scope, receive, send):
         for route_path, handler in self.routes[method].items():
             if "{" in route_path and "}" in route_path:
-                route_pattern = route_path.replace("{", "(?P<").replace(
-                    "}", ">[^/]+)"
-                )
+                route_pattern = route_path.replace("{", "(?P<").replace("}", ">[^/]+)")
                 match = re.fullmatch(route_pattern, path)
                 if match:
                     try:
@@ -178,9 +176,7 @@ class PyBlaze:
 
     async def set_request_session(self, request):
         if self.session_type:
-            session = get_or_create_session(
-                request, self.secret_key
-            )
+            session = get_or_create_session(request, self.secret_key)
             request.session = session
 
     async def _handle_static_files(self, scope, receive, send, request):
