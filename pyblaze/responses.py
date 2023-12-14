@@ -6,7 +6,7 @@ from http import HTTPStatus
 
 from jinja2 import Environment, FileSystemLoader
 
-from pyblaze.constants import APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN, UTF8
+from pyblaze.constants import APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN, UTF8, NOT_FOUND
 
 
 class HttpResponse:
@@ -132,7 +132,7 @@ class TemplateResponse(HttpResponse):
         if self.template_name is None:
             print("Template name is not provided.")
             not_found_response = JsonResponse(
-                {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
+                {"error": NOT_FOUND}, status_code=HTTPStatus.NOT_FOUND
             )
             await not_found_response(scope, receive, send)
             return
@@ -142,7 +142,7 @@ class TemplateResponse(HttpResponse):
         if not os.path.exists(template_path):
             print("Template not found:", template_path)
             not_found_response = JsonResponse(
-                {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
+                {"error": NOT_FOUND}, status_code=HTTPStatus.NOT_FOUND
             )
             await not_found_response(scope, receive, send)
 

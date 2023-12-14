@@ -12,9 +12,6 @@ def singularize(word):
 def pluralize_word(word):
     p = inflect.engine()
 
-    # if word.endswith("s"):
-    #     return word
-
     return p.plural(word) or word
 
 

@@ -55,7 +55,6 @@ def get_or_create_session(request, secret_key, session_type):
             return session_data
         except ValueError:
             print("Invalid session")
-            pass  # Invalid session ID, create a new one
     else:
         print("No session in cookies")
 
