@@ -36,3 +36,10 @@ def setup_database_file(teardown_database_file):
         # You can write content to the file if needed
         file.write("Hello, this is a new file!")
     yield
+
+
+@pytest.fixture
+def mock_scope():
+    return {
+        "headers": [(b"content-type", b"application/json")],
+    }

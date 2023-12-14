@@ -5,20 +5,18 @@ import pytest
 from pyblaze.requests import Request, RequestContext
 
 
-def test_set_request():
-    scope = {"headers": [(b"content-type", b"application/json")]}
+def test_set_request(mock_scope):
     receive = AsyncMock()
-    request = Request(scope, receive)
+    request = Request(mock_scope, receive)
     RequestContext.set_request(request)
 
     assert RequestContext.get_request() == request
 
 
 @pytest.mark.asyncio
-async def test_json_with_valid_json():
-    scope = {"headers": [(b"content-type", b"application/json")]}
+async def test_json_with_valid_json(mock_scope):
     receive = AsyncMock()
-    request = Request(scope, receive)
+    request = Request(mock_scope, receive)
 
     receive.side_effect = [
         {"body": b'{"key": "value"}', "more_body": False},
@@ -30,10 +28,9 @@ async def test_json_with_valid_json():
 
 
 @pytest.mark.asyncio
-async def test_json_with_empty_body():
-    scope = {"headers": [(b"content-type", b"application/json")]}
+async def test_json_with_empty_body(mock_scope):
     receive = AsyncMock()
-    request = Request(scope, receive)
+    request = Request(mock_scope, receive)
 
     receive.side_effect = [
         {"body": b"", "more_body": False},
