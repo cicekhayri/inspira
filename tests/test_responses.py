@@ -1,9 +1,10 @@
+import json
 import os
 from http import HTTPStatus
 
 import pytest
 
-from pyblaze.constants import APPLICATION_JSON, TEXT_PLAIN
+from pyblaze.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
 from pyblaze.decorators.http_methods import delete, get, post, put
 from pyblaze.enums import HttpMethod
 from pyblaze.responses import (
@@ -45,7 +46,7 @@ async def test_basic_route(app):
 
 
 @pytest.mark.asyncio
-async def test_set_cookie(app):
+async def test_set_cookie_with_route(app):
     @get("/home")
     async def home(request):
         http_response = HttpResponse("This is a test endpoint")
