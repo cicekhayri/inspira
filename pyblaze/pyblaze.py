@@ -5,15 +5,15 @@ import logging
 import os
 import re
 import sys
-from http import HTTPStatus
 from typing import Callable, Dict, List
 
 from httpx import AsyncClient
 
 from pyblaze.config import Config
 from pyblaze.enums import HttpMethod
+from pyblaze.helpers import format_server_exception, format_not_found_exception
 from pyblaze.requests import Request, RequestContext
-from pyblaze.responses import JsonResponse, TemplateResponse
+from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
 
 
@@ -160,7 +160,7 @@ class PyBlaze:
 
                 await response(scope, receive, send)
             except Exception as exc:
-                error_response = await self.error_handler(request, exc)
+                error_response = await self.error_handler(exc)
                 await error_response(scope, receive, send)
         else:
             # Check for routes with dynamic parameters
@@ -179,7 +179,7 @@ class PyBlaze:
                             await response(scope, receive, send)
                             return
                         except Exception as exc:
-                            error_response = await self.error_handler(request, exc)
+                            error_response = await self.error_handler(exc)
                             await error_response(scope, receive, send)
             # If no matching route is found, return a 404 response
             await self.handle_not_found(scope, receive, send)
@@ -189,9 +189,7 @@ class PyBlaze:
         await template_response(scope, receive, send)
 
     async def handle_not_found(self, scope, receive, send):
-        not_found_response = JsonResponse(
-            {"error": "Not Found"}, status_code=HTTPStatus.NOT_FOUND
-        )
+        not_found_response = format_not_found_exception()
         await not_found_response(scope, receive, send)
 
     async def invoke_handler(self, handler, request, scope, params=None):
@@ -221,10 +219,9 @@ class PyBlaze:
         except ValueError:
             return value
 
-    async def default_error_handler(self, request, exc):
-        return JsonResponse(
-            {"error": str(exc)}, status_code=HTTPStatus.INTERNAL_SERVER_ERROR
-        )
+    async def default_error_handler(self, exc):
+        logging.exception(exc)
+        return format_server_exception()
 
     async def test_session(self, app, method, path, **kwargs):
         async with AsyncClient(app=app, base_url="http://testserver") as client:
