@@ -23,4 +23,3 @@ def create_app_file():
             "{{secret_key}}", get_random_secret_key()
         )
         output_file.write(content)
-

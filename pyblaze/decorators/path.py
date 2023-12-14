@@ -3,4 +3,5 @@ def path(path: str):
         cls.__path__ = path
         cls.__is_controller__ = True
         return cls
+
     return decorator

@@ -58,14 +58,18 @@ class PyBlaze:
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 if self._is_controller_file(file_path):
-                    rel_path = os.path.relpath(file_path, src_dir)[:-3].replace(os.sep, ".")
+                    rel_path = os.path.relpath(file_path, src_dir)[:-3].replace(
+                        os.sep, "."
+                    )
                     module_path = f"src.{rel_path}"
                     self._add_resources(module_path)
 
     def _add_resources(self, file_path: str):
         try:
             module_name = self._file_path_to_module(file_path)
-            src_directory = os.path.abspath(os.path.join(file_path, os.pardir, os.pardir))
+            src_directory = os.path.abspath(
+                os.path.join(file_path, os.pardir, os.pardir)
+            )
             sys.path.insert(0, src_directory)
             module = importlib.import_module(module_name)
             for name, obj in inspect.getmembers(module):
@@ -84,7 +88,11 @@ class PyBlaze:
         instance = cls()
         path_prefix = getattr(cls, "__path__", "")
         for name, method in inspect.getmembers(instance, inspect.ismethod):
-            if hasattr(method, "__is_handler__") and hasattr(method, "__method__") and hasattr(method, "__path__"):
+            if (
+                hasattr(method, "__is_handler__")
+                and hasattr(method, "__method__")
+                and hasattr(method, "__path__")
+            ):
                 http_method = getattr(method, "__method__")
                 route = getattr(method, "__path__")
                 full_route = path_prefix + route
@@ -102,16 +110,17 @@ class PyBlaze:
             if isinstance(node, ast.ClassDef):
                 for decorator in node.decorator_list:
                     if (
-                            isinstance(decorator, ast.Call)
-                            and isinstance(decorator.func, ast.Name)
-                            and decorator.func.id == "path"
+                        isinstance(decorator, ast.Call)
+                        and isinstance(decorator.func, ast.Name)
+                        and decorator.func.id == "path"
                     ):
                         return True
         return False
 
     def _is_controller_file(self, file_path):
-        return file_path.endswith("_controller.py") and self._parse_controller_decorators(file_path)
-
+        return file_path.endswith(
+            "_controller.py"
+        ) and self._parse_controller_decorators(file_path)
 
     def add_middleware(self, middleware: Callable):
         self.middleware.append(middleware)

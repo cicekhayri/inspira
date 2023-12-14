@@ -7,6 +7,7 @@ def get(path: str):
         handler.__path__ = path
         handler.__is_handler__ = True
         return handler
+
     return decorator
 
 
