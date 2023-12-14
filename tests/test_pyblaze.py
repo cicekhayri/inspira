@@ -36,9 +36,9 @@ def test_discover_controllers(app, monkeypatch):
     monkeypatch.setattr(os.path, "relpath", lambda *args: "controller_file.py")
 
     app._is_controller_file = Mock(return_value=True)
-    app._add_resources = Mock()
+    app._add_routes = Mock()
 
     app.discover_controllers()
 
     app._is_controller_file.assert_called_once_with("/path/to/src/controller_file.py")
-    app._add_resources.assert_called_once_with("src.controller_file")
+    app._add_routes.assert_called_once_with("src.controller_file")

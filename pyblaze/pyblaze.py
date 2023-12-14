@@ -27,6 +27,10 @@ class PyBlaze:
         self.session_type = session_type
         self.discover_controllers()
 
+    def add_middleware(self, middleware: Callable):
+        self.middleware.append(middleware)
+        return middleware
+
     def add_route(self, path: str, method: HttpMethod, handler: Callable):
         if path in self.routes[method.value]:
             raise AssertionError(
@@ -47,9 +51,9 @@ class PyBlaze:
                         os.sep, "."
                     )
                     module_path = f"src.{rel_path}"
-                    self._add_resources(module_path)
+                    self._add_routes(module_path)
 
-    def _add_resources(self, file_path: str):
+    def _add_routes(self, file_path: str):
         try:
             module_name = self._file_path_to_module(file_path)
             src_directory = os.path.abspath(
@@ -106,10 +110,6 @@ class PyBlaze:
         return file_path.endswith(
             "_controller.py"
         ) and self._parse_controller_decorators(file_path)
-
-    def add_middleware(self, middleware: Callable):
-        self.middleware.append(middleware)
-        return middleware
 
     async def __call__(self, scope, receive, send):
         request = Request(scope, receive)
