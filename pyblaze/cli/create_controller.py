@@ -3,7 +3,7 @@ import os
 import click
 
 from pyblaze.cli.create_app import generate_project
-from pyblaze.utils import singularize
+from pyblaze.utils import singularize, pluralize_word
 
 
 def create_src_directory():
@@ -42,6 +42,8 @@ def create_controller_file(name):
     ) as output_file:
         content = template_file.read().replace(
             "{{controller_name}}", singularize_name.capitalize()
+        ).replace(
+            "{{root_path}}", pluralize_word(name)
         )
         output_file.write(content)
 

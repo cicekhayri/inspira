@@ -1,7 +1,9 @@
 from pyblaze.decorators.http_methods import get
+from pyblaze.decorators.path import path
 from pyblaze.responses import JsonResponse
 
 
+@path("/{{root_path}}")
 class {{controller_name}}Controller:
 
     @get("/")
