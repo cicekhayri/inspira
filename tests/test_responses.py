@@ -249,3 +249,51 @@ async def test_template(app):
 
     assert response.status_code == HTTPStatus.OK
     assert response.text == "<h1>test</h1>"
+
+
+@pytest.mark.asyncio
+async def test_serialize_content_byte():
+    response = HttpResponse(content=b"example")
+    result = await response.serialize_content()
+    assert result == b"example"
+
+
+@pytest.mark.asyncio
+async def test_serialize_content_json():
+    response = JsonResponse(content={"key": "value"})
+    result = await response.serialize_content()
+    expected_result = json.dumps({"key": "value"}).encode(UTF8)
+    assert result == expected_result
+
+
+@pytest.mark.asyncio
+async def test_serialize_content_default():
+    response = HttpResponse(content="example")
+    result = await response.serialize_content()
+    expected_result = b"example"
+    assert result == expected_result
+
+
+@pytest.mark.asyncio
+async def test_encoded_headers():
+    response = HttpResponse(headers={"Key1": "Value1", "Key2": ["Value2a", "Value2b"]})
+    result = await response.encoded_headers()
+
+    expected_result = [
+        (b"content-type", TEXT_PLAIN.encode(UTF8)),
+        (b"Key1", "Value1"),
+        (b"Key2", b"Value2a"),
+        (b"Key2", b"Value2b")
+    ]
+
+    assert result == expected_result
+
+@pytest.mark.asyncio
+async def test_set_cookie():
+    response = HttpResponse()
+    response.set_cookie("user", "john_doe", max_age=3600, path="/")
+    headers = response.headers.get("set-cookie", [])
+    assert len(headers) == 1
+    assert "user=john_doe" in headers[0]
+    assert "Max-Age=3600" in headers[0]
+    assert "Path=/" in headers[0]
