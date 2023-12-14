@@ -17,7 +17,10 @@ def create_database_file(database_name, database_type):
         database_url = f"sqlite:///{database_name}.db"
     elif database_type == "mssql":
         # Assuming a Windows authentication connection
-        database_url = f"mssql+pyodbc://@localhost/{database_name}?driver=ODBC+Driver+17+for+SQL+Server"
+        database_url = (
+            f"mssql+pyodbc://"
+            f"@localhost/{database_name}?driver=ODBC+Driver+17+for+SQL+Server"
+        )
 
     with open(template_path, "r") as template_file, open(
         output_path, "w"

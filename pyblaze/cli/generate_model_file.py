@@ -2,7 +2,6 @@ import os
 
 import click
 
-from pyblaze.enums import SQLALCHEMY_TYPE_MAPPING
 from pyblaze.utils import pluralize_word, singularize
 
 
