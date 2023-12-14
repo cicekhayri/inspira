@@ -58,6 +58,27 @@ class HttpResponse:
         self.headers.setdefault("set-cookie", []).append(cookie_str)
 
     async def __call__(self, scope, receive, send):
+        headers = await self.encoded_headers()
+
+        await send(
+            {
+                "type": "http.response.start",
+                "status": self.status_code,
+                "headers": headers,
+            }
+        )
+
+        body = await self.serialize_content()
+
+        await send(
+            {
+                "type": "http.response.body",
+                "body": body,
+                "more_body": False,
+            }
+        )
+
+    async def encoded_headers(self):
         headers = [
             (b"content-type", self.content_type.encode(UTF8)),
         ]
@@ -70,16 +91,9 @@ class HttpResponse:
                     headers.append((key.encode(UTF8), value))
             else:
                 headers.append((key.encode(UTF8), value_list))
+        return headers
 
-        await send(
-            {
-                "type": "http.response.start",
-                "status": self.status_code,
-                "headers": headers,
-            }
-        )
-
-        # Serialize content based on content type
+    async def serialize_content(self):
         if self.content is not None:
             if isinstance(self.content, bytes):
                 body = self.content
@@ -89,14 +103,7 @@ class HttpResponse:
                 body = str(self.content).encode(UTF8)
         else:
             body = b""
-
-        await send(
-            {
-                "type": "http.response.body",
-                "body": body,
-                "more_body": False,
-            }
-        )
+        return body
 
 
 class JsonResponse(HttpResponse):
