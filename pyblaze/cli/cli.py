@@ -1,6 +1,6 @@
 import click
 
-from pyblaze.cli.create_app import add_route_to_app, generate_project
+from pyblaze.cli.create_app import generate_project
 from pyblaze.cli.create_controller import create_controller_file, create_src_directory
 from pyblaze.cli.generate_database_file import create_database_file
 from pyblaze.cli.generate_model_file import database_file_exists, generate_model_file
@@ -35,7 +35,6 @@ def module(name, skip_repository, skip_model):
         return
 
     create_module_files(name, skip_repository, skip_model)
-    add_route_to_app(name)
 
 
 def create_module_files(name, skip_repository, skip_model):
