@@ -1,4 +1,5 @@
 import base64
+import datetime
 import hashlib
 import json
 
@@ -6,7 +7,33 @@ from pyblaze.sessions import (
     decode_session_data,
     encode_session_data,
     get_or_create_session,
+    DateTimeEncoder,
 )
+
+
+def test_datatime_encoder():
+    encoder = DateTimeEncoder()
+
+    dt_object = datetime.datetime(2023, 1, 15, 12, 30, 0)
+    encoded_dt = encoder.encode(dt_object)
+    assert encoded_dt == '"2023-01-15T12:30:00"'
+
+
+def test_datetime_encoder_list_with_datetime_object():
+    encoder = DateTimeEncoder()
+    dt_object = datetime.datetime(2023, 1, 15, 12, 30, 0)
+    data = {"timestamp": dt_object, "other_data": "example"}
+    encoded_data = encoder.encode(data)
+    assert (
+        encoded_data == '{"timestamp": "2023-01-15T12:30:00", "other_data": "example"}'
+    )
+
+
+def test_datatime_encoder_non_datetime_object():
+    encoder = DateTimeEncoder()
+    non_dt_object = {"key": "value"}
+    encoded_non_dt = encoder.encode(non_dt_object)
+    assert encoded_non_dt == '{"key": "value"}'
 
 
 def test_encode_session_data():
