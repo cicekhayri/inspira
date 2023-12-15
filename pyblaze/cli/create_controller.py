@@ -43,7 +43,7 @@ def create_controller_file(name):
         content = (
             template_file.read()
             .replace("{{controller_name}}", singularize_name.capitalize())
-            .replace("{{root_path}}", pluralize_word(name))
+            .replace("{{root_path}}", name.lower())
         )
         output_file.write(content)
 
