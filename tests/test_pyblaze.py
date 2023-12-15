@@ -1,3 +1,4 @@
+import inspect
 import os
 from http import HTTPStatus
 from unittest.mock import Mock
@@ -38,3 +39,18 @@ def test_discover_controllers(app, monkeypatch):
 
     app._is_controller_file.assert_called_once_with("/path/to/src/controller_file.py")
     app._add_routes.assert_called_once_with("src.controller_file")
+
+
+def test_convert_param_type_with_valid_type(app):
+    result = app.convert_param_type("10", int)
+    assert result == 10, "Expected the value to be converted to int"
+
+
+def test_convert_param_type_with_none_type(app):
+    result = app.convert_param_type("10", None)
+    assert result == "10", "Expected the value to be converted to str"
+
+
+def test_convert_param_type_with_empty_type(app):
+    result = app.convert_param_type("10", inspect.Parameter.empty)
+    assert result == "10", "Expected the value to be converted to str"

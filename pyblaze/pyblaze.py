@@ -81,9 +81,9 @@ class PyBlaze:
 
         for name, method in inspect.getmembers(instance, inspect.ismethod):
             if (
-                    hasattr(method, "__is_handler__")
-                    and hasattr(method, "__method__")
-                    and hasattr(method, "__path__")
+                hasattr(method, "__is_handler__")
+                and hasattr(method, "__method__")
+                and hasattr(method, "__path__")
             ):
                 http_method = getattr(method, "__method__")
                 route = getattr(method, "__path__")
