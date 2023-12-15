@@ -13,6 +13,31 @@ def test_set_request(mock_scope):
     assert RequestContext.get_request() == request
 
 
+def test_get_session(request_with_session):
+    assert request_with_session.get_session("user_id") == 123
+    assert request_with_session.get_session("username") == "john_doe"
+
+
+def test_set_session(mock_scope):
+    receive = AsyncMock()
+    request = Request(mock_scope, receive)
+    request.set_session("new_key", "new_value")
+    assert request.session == {"new_key": "new_value"}
+
+
+def test_remove_session(request_with_session):
+    removed_value = request_with_session.remove_session("user_id")
+    assert removed_value == 123
+    assert "user_id" not in request_with_session.session
+
+
+def test_remove_session_nonexistent_key(request_with_session):
+    removed_value = request_with_session.remove_session("nonexistent_key")
+
+    assert removed_value is None
+    assert request_with_session.session == {"user_id": 123, "username": "john_doe"}
+
+
 @pytest.mark.asyncio
 async def test_json_with_valid_json(mock_scope):
     receive = AsyncMock()

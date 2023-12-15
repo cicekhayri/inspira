@@ -1,14 +1,24 @@
 import os
 import shutil
+from unittest.mock import AsyncMock
 
 import pytest
 
 from pyblaze import PyBlaze
+from pyblaze.requests import Request
 
 
 @pytest.fixture
 def app():
     return PyBlaze()
+
+
+@pytest.fixture
+def request_with_session(mock_scope):
+    receive = AsyncMock()
+    request = Request(mock_scope, receive)
+    request.session = {"user_id": 123, "username": "john_doe"}
+    return request
 
 
 @pytest.fixture
