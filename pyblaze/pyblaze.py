@@ -14,6 +14,7 @@ from pyblaze.helpers import format_not_found_exception, format_server_exception
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
+from pyblaze.websockets import handle_websocket
 
 
 class PyBlaze:
@@ -122,7 +123,10 @@ class PyBlaze:
                     if (
                         isinstance(decorator, ast.Call)
                         and isinstance(decorator.func, ast.Name)
-                        and decorator.func.id == "path"
+                        and (
+                            decorator.func.id == "path"
+                            or decorator.func.id == "websocket"
+                        )
                     ):
                         return True
         return False
@@ -133,7 +137,10 @@ class PyBlaze:
         ) and self._parse_controller_decorators(file_path)
 
     async def __call__(self, scope, receive, send):
-        await self.handle_http(receive, scope, send)
+        if scope["type"] == "websocket":
+            await handle_websocket(scope, receive, send)
+        elif scope["type"] == "http":
+            await self.handle_http(receive, scope, send)
 
     async def handle_http(self, receive, scope, send):
         request = await self.create_request(receive, scope)

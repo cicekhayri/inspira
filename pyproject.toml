@@ -16,7 +16,8 @@ dependencies = [
     "sqlalchemy",
     "bcrypt",
     "inflect",
-    "sqlalchemy-utils"
+    "sqlalchemy-utils",
+    "websockets"
 ]
 
 [project.scripts]
