@@ -10,6 +10,8 @@ PyBlaze is a lightweight framework for building asynchronous web applications us
 - Middleware support for extending functionality
 - Routing system for defining URL patterns
 - Templating engine for rendering dynamic content
+- WebSocket support for real-time communication
+- Sessions for managing user state across requests
 
 ## Quick Start
 
