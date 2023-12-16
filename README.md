@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-PyBlaze is a lightweight framework for building asynchronous web applications using the ASGI (Asynchronous Server Gateway Interface) protocol.
+PyBlaze is a lightweight framework for building asynchronous web applications.
 
 ## Features
 
