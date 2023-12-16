@@ -133,15 +133,17 @@ class PyBlaze:
         ) and self._parse_controller_decorators(file_path)
 
     async def __call__(self, scope, receive, send):
+        await self.handle_http(receive, scope, send)
+
+    async def handle_http(self, receive, scope, send):
         request = await self.create_request(receive, scope)
         RequestContext.set_request(request)
 
         await self.set_request_session(request)
+        await self.process_middlewares(request)
 
         method = scope["method"]
         path = scope["path"]
-
-        await self.process_middlewares(request)
 
         if path.startswith("/static"):
             await self._handle_static_files(scope, receive, send, request)
