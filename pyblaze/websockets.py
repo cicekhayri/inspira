@@ -1,3 +1,6 @@
+import json
+
+
 class WebSocket:
     def __init__(self, scope, receive, send):
         assert scope["type"] == "websocket"
@@ -6,6 +9,13 @@ class WebSocket:
 
     async def send_text(self, data: str) -> None:
         await self._send({"type": "websocket.send", "text": data})
+
+    async def send_json(self, data: dict) -> None:
+        text_message = json.dumps(data, separators=(",", ":"))
+        await self._send({"type": "websocket.send", "text": text_message})
+
+    async def send_binary(self, data: bytes) -> None:
+        await self._send({"type": "websocket.send", "bytes": data})
 
     async def on_open(self):
         await self._send({"type": "websocket.accept"})

@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from pyblaze.websockets import (
     WebSocketControllerRegistry,
@@ -106,3 +108,42 @@ async def test_handle_websocket_invalid_path(app):
     await app({"type": "websocket", "path": "/invalid_path"}, receive, send)
 
     assert send_queue == []
+
+
+@pytest.mark.asyncio
+async def test_send_text():
+    websocket = WebSocket(
+        scope={"type": "websocket"}, receive=AsyncMock(), send=AsyncMock()
+    )
+
+    data = "dddd"
+    await websocket.send_text(data)
+
+    expected_message = {"type": "websocket.send", "text": "dddd"}
+    websocket._send.assert_called_once_with(expected_message)
+
+
+@pytest.mark.asyncio
+async def test_send_json_text():
+    websocket = WebSocket(
+        scope={"type": "websocket"}, receive=AsyncMock(), send=AsyncMock()
+    )
+
+    data = {"key": "value"}
+    await websocket.send_json(data)
+
+    expected_message = {"type": "websocket.send", "text": '{"key":"value"}'}
+    websocket._send.assert_called_once_with(expected_message)
+
+
+@pytest.mark.asyncio
+async def test_send_bytes():
+    websocket = WebSocket(
+        scope={"type": "websocket"}, receive=AsyncMock(), send=AsyncMock()
+    )
+
+    data = b"value"
+    await websocket.send_binary(data)
+
+    expected_message = {"type": "websocket.send", "bytes": b"value"}
+    websocket._send.assert_called_once_with(expected_message)
