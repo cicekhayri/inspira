@@ -6,7 +6,7 @@ def resolve_dependencies_automatic(cls):
 
     # Get the constructor parameters, if available
     init_method = getattr(cls, "__init__", None)
-    print(cls)
+
     if init_method and init_method != object.__init__:
         constructor_params = inspect.signature(init_method).parameters.values()
         for param in constructor_params:
