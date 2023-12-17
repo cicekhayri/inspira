@@ -1,6 +1,6 @@
 [project]
 name = "pyblaze"
-version = "0.0.1"
+
 description = "PyBlaze is a lightweight framework for building asynchronous web applications."
 authors = [{name = "Hayri Cicek", email = "hayri@pyblaze.com"}]
 license = {file = "LICENSE"}
@@ -19,6 +19,8 @@ dependencies = [
     "sqlalchemy-utils",
     "websockets"
 ]
+
+dynamic = ["version"]
 
 [project.scripts]
 pyblaze = "pyblaze.cli.cli:cli"
