@@ -1,7 +1,7 @@
 [project]
 name = "pyblaze"
-
 description = "PyBlaze is a lightweight framework for building asynchronous web applications."
+readme = "README.md"
 authors = [{name = "Hayri Cicek", email = "hayri@pyblaze.com"}]
 license = {file = "LICENSE"}
 classifiers = [
