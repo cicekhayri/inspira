@@ -14,6 +14,7 @@ from pyblaze.helpers import format_not_found_exception, format_server_exception
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
+from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
 from pyblaze.websockets import handle_websocket
 
 
@@ -75,7 +76,7 @@ class PyBlaze:
         if not hasattr(cls, "__path__"):
             return
 
-        dependencies = self.resolve_dependencies_automatic(cls)
+        dependencies = resolve_dependencies_automatic(cls)
         instance = cls(*dependencies) if dependencies is not None else cls()
 
         path_prefix = getattr(cls, "__path__", "")
@@ -90,24 +91,6 @@ class PyBlaze:
                 route = getattr(method, "__path__")
                 full_route = path_prefix + route
                 self.add_route(full_route, http_method, method)
-
-    def resolve_dependencies_automatic(self, cls):
-        dependencies = []
-
-        # Get the constructor parameters, if available
-        init_method = getattr(cls, "__init__", None)
-        if init_method and init_method != object.__init__:
-            constructor_params = inspect.signature(init_method).parameters.values()
-            for param in constructor_params:
-                if param.name != "self":  # Exclude 'self' parameter
-                    param_type = param.annotation
-                    dependency = self.resolve_dependency(param_type)
-                    dependencies.append(dependency)
-
-        return dependencies if dependencies else None
-
-    def resolve_dependency(self, dependency_type):
-        return dependency_type() if dependency_type else None
 
     def _file_path_to_module(self, file_path: str):
         rel_path = os.path.relpath(file_path, os.getcwd())

@@ -1,4 +1,5 @@
 from pyblaze.constants import WEBSOCKET_RECEIVE_TYPE, WEBSOCKET_DISCONNECT_TYPE
+from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
 from pyblaze.websockets import WebSocket, WebSocketControllerRegistry
 
 
@@ -11,10 +12,12 @@ async def handle_websocket(scope, receive, send):
         return
 
     websocket_cls = WebSocket(scope, receive, send)
-    controller_instance = controller_cls()
+
+    dependencies = resolve_dependencies_automatic(controller_cls)
+    instance = controller_cls(*dependencies) if dependencies is not None else controller_cls()
 
     try:
-        await controller_instance.on_open(websocket_cls)
+        await instance.on_open(websocket_cls)
 
         while True:
             message = await websocket_cls.receive()
@@ -23,9 +26,9 @@ async def handle_websocket(scope, receive, send):
                 break
 
             if message["type"] == WEBSOCKET_RECEIVE_TYPE:
-                await controller_instance.on_message(websocket_cls, message)
+                await instance.on_message(websocket_cls, message)
 
     except Exception as e:
         print(f"WebSocket connection error: {e}")
     finally:
-        await controller_instance.on_close(websocket_cls)
+        await instance.on_close(websocket_cls)
