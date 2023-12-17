@@ -1,5 +1,6 @@
 import json
 import urllib.parse
+from typing import Callable, Any, Dict
 
 from pyblaze.constants import UTF8
 
@@ -17,7 +18,7 @@ class RequestContext:
 
 
 class Request:
-    def __init__(self, scope, receive):
+    def __init__(self, scope: Dict[str, Any], receive: Callable):
         self.scope = scope
         self.receive = receive
         self._session = {}
