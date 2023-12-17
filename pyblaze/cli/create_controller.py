@@ -3,7 +3,7 @@ import os
 import click
 
 from pyblaze.cli.create_app import generate_project
-from pyblaze.utils import pluralize_word, singularize
+from pyblaze.utils import singularize
 
 
 def create_src_directory():
