@@ -14,7 +14,9 @@ async def handle_websocket(scope, receive, send):
     websocket_cls = WebSocket(scope, receive, send)
 
     dependencies = resolve_dependencies_automatic(controller_cls)
-    instance = controller_cls(*dependencies) if dependencies is not None else controller_cls()
+    instance = (
+        controller_cls(*dependencies) if dependencies is not None else controller_cls()
+    )
 
     try:
         await instance.on_open(websocket_cls)
