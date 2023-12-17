@@ -52,7 +52,8 @@ def add_repository_dependency_to_controller(module_name):
         f" import {module_name_capitalized}Repository\n\n\n"
     )
 
-    class_pattern = re.compile(r"@path\(.+\)\nclass\s+[A-Za-z_][A-Za-z0-9_]*:")
+    # Update the regular expression to match @path or @websocket
+    class_pattern = re.compile(r"@(path|websocket)\(.+\)\nclass\s+[A-Za-z_][A-Za-z0-9_]*:")
     match = class_pattern.search(existing_content)
 
     if match:
