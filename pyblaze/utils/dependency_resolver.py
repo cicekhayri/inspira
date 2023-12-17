@@ -1,8 +1,9 @@
 import inspect
+from typing import Type, List, Any, Optional, Callable
 
 
-def resolve_dependencies_automatic(cls):
-    dependencies = []
+def resolve_dependencies_automatic(cls: Type) -> Optional[List[Any]]:
+    dependencies: List[Any] = []
 
     # Get the constructor parameters, if available
     init_method = getattr(cls, "__init__", None)
@@ -18,5 +19,5 @@ def resolve_dependencies_automatic(cls):
     return dependencies if dependencies else None
 
 
-def resolve_dependency(dependency_type):
+def resolve_dependency(dependency_type: Type[Callable]) -> Optional[Callable]:
     return dependency_type() if dependency_type else None

@@ -50,7 +50,7 @@ h1, a{{
 """
 
 
-def format_server_exception():
+def format_server_exception() -> HttpResponse:
     msg = template.format(
         message="Internal Server Error"
         "<br><br>We are currently trying to fix the problem.",
@@ -59,7 +59,7 @@ def format_server_exception():
     return HttpResponse(content=msg, status_code=500, content_type="text/html")
 
 
-def format_not_found_exception():
+def format_not_found_exception() -> HttpResponse:
     msg = template.format(
         message="Ooops!!! The page you are looking for is not found", status_code=404
     )

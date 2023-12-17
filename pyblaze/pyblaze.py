@@ -5,7 +5,7 @@ import logging
 import os
 import re
 import sys
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Any
 
 from httpx import AsyncClient
 
@@ -29,11 +29,11 @@ class PyBlaze:
         self.session_type = session_type
         self.discover_controllers()
 
-    def add_middleware(self, middleware: Callable):
+    def add_middleware(self, middleware: Callable) -> Callable:
         self.middleware.append(middleware)
         return middleware
 
-    def add_route(self, path: str, method: HttpMethod, handler: Callable):
+    def add_route(self, path: str, method: HttpMethod, handler: Callable) -> None:
         if path in self.routes[method.value]:
             raise AssertionError(
                 f"Route with method '{method}' and path '{path}' already exists"
@@ -41,7 +41,7 @@ class PyBlaze:
 
         self.routes[method.value][path] = handler
 
-    def discover_controllers(self):
+    def discover_controllers(self) -> None:
         current_dir = os.getcwd()
         src_dir = os.path.join(current_dir, "src")
 
@@ -55,7 +55,7 @@ class PyBlaze:
                     module_path = f"src.{rel_path}"
                     self._add_routes(module_path)
 
-    def _add_routes(self, file_path: str):
+    def _add_routes(self, file_path: str) -> None:
         try:
             module_name = self._file_path_to_module(file_path)
             src_directory = os.path.abspath(
@@ -72,7 +72,7 @@ class PyBlaze:
             # Remove the 'src' directory from the Python path after importing
             sys.path.pop(0)
 
-    def _add_class_routes(self, cls):
+    def _add_class_routes(self, cls) -> None:
         if not hasattr(cls, "__path__"):
             return
 
@@ -92,11 +92,11 @@ class PyBlaze:
                 full_route = path_prefix + route
                 self.add_route(full_route, http_method, method)
 
-    def _file_path_to_module(self, file_path: str):
+    def _file_path_to_module(self, file_path: str) -> str:
         rel_path = os.path.relpath(file_path, os.getcwd())
         return rel_path.replace(os.sep, ".")
 
-    def _parse_controller_decorators(self, file_path):
+    def _parse_controller_decorators(self, file_path: str) -> bool:
         with open(file_path, "r") as file:
             tree = ast.parse(file.read(), filename=file_path)
 
@@ -114,18 +114,22 @@ class PyBlaze:
                         return True
         return False
 
-    def _is_controller_file(self, file_path):
+    def _is_controller_file(self, file_path: str) -> bool:
         return file_path.endswith(
             "_controller.py"
         ) and self._parse_controller_decorators(file_path)
 
-    async def __call__(self, scope, receive, send):
+    async def __call__(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable
+    ) -> None:
         if scope["type"] == "websocket":
             await handle_websocket(scope, receive, send)
         elif scope["type"] == "http":
-            await self.handle_http(receive, scope, send)
+            await self.handle_http(scope, receive, send)
 
-    async def handle_http(self, receive, scope, send):
+    async def handle_http(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable
+    ) -> None:
         request = await self.create_request(receive, scope)
         RequestContext.set_request(request)
 
@@ -142,7 +146,15 @@ class PyBlaze:
         else:
             await self.handle_dynamic_route(method, path, request, scope, receive, send)
 
-    async def handle_dynamic_route(self, method, path, request, scope, receive, send):
+    async def handle_dynamic_route(
+        self,
+        method: str,
+        path: str,
+        request: Request,
+        scope: Dict[str, Any],
+        receive: Callable,
+        send: Callable,
+    ):
         for route_path, handler in self.routes[method].items():
             if "{" in route_path and "}" in route_path:
                 route_pattern = route_path.replace("{", "(?P<").replace("}", ">[^/]+)")
@@ -161,7 +173,15 @@ class PyBlaze:
         # If no matching route is found, return a 404 response
         await self.handle_not_found(scope, receive, send)
 
-    async def handle_route(self, method, path, receive, request, scope, send):
+    async def handle_route(
+        self,
+        method: str,
+        path: str,
+        receive: Callable,
+        request: Request,
+        scope: Dict[str, Any],
+        send: Callable,
+    ):
         try:
             handler = self.routes[method][path]
             response = await self.invoke_handler(handler, request, scope)
@@ -179,27 +199,33 @@ class PyBlaze:
             error_response = await self.error_handler(exc)
             await error_response(scope, receive, send)
 
-    async def process_middlewares(self, request):
+    async def process_middlewares(self, request: Request):
         for middleware in self.middleware:
             request = await middleware(request)
 
-    async def create_request(self, receive, scope):
+    async def create_request(self, receive: Callable, scope: Dict[str, Any]) -> Request:
         return Request(scope, receive)
 
-    async def set_request_session(self, request):
+    async def set_request_session(self, request: Request) -> None:
         if self.session_type:
             session = get_or_create_session(request, self.secret_key)
             request.session = session
 
-    async def _handle_static_files(self, scope, receive, send, request):
+    async def _handle_static_files(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable, request: Request
+    ) -> None:
         template_response = TemplateResponse(request, scope["path"])
         await template_response(scope, receive, send)
 
-    async def handle_not_found(self, scope, receive, send):
+    async def handle_not_found(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable
+    ) -> None:
         not_found_response = format_not_found_exception()
         await not_found_response(scope, receive, send)
 
-    async def invoke_handler(self, handler, request, scope, params=None):
+    async def invoke_handler(
+        self, handler, request: Request, scope: Dict[str, Any], params=None
+    ):
         handler_signature = inspect.signature(handler)
         handler_params = {}
         for param_name, param in handler_signature.parameters.items():

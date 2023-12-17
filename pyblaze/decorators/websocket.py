@@ -1,7 +1,7 @@
 from pyblaze.websockets import WebSocketControllerRegistry
 
 
-def websocket(path):
+def websocket(path: str):
     def decorator(cls):
         WebSocketControllerRegistry.register_controller(path, cls)
         return cls

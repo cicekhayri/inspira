@@ -1,8 +1,11 @@
 from pyblaze.enums import HttpMethod
 
 
-def get(path: str):
-    def decorator(handler):
+from typing import Callable, Type
+
+
+def get(path: str) -> Callable[[Type], Type]:
+    def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.GET
         handler.__path__ = path
         handler.__is_handler__ = True
@@ -11,8 +14,8 @@ def get(path: str):
     return decorator
 
 
-def post(path: str):
-    def decorator(handler):
+def post(path: str) -> Callable[[Type], Type]:
+    def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.POST
         handler.__path__ = path
         handler.__is_handler__ = True
@@ -21,8 +24,8 @@ def post(path: str):
     return decorator
 
 
-def put(path: str):
-    def decorator(handler):
+def put(path: str) -> Callable[[Type], Type]:
+    def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.PUT
         handler.__path__ = path
         handler.__is_handler__ = True
@@ -31,8 +34,8 @@ def put(path: str):
     return decorator
 
 
-def delete(path: str):
-    def decorator(handler):
+def delete(path: str) -> Callable[[Type], Type]:
+    def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.DELETE
         handler.__path__ = path
         handler.__is_handler__ = True
