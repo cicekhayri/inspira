@@ -1,9 +1,12 @@
 from unittest.mock import AsyncMock
 
 import pytest
+
+from pyblaze.constants import WEBSOCKET_SEND_TYPE, WEBSOCKET_RECEIVE_TYPE, WEBSOCKET_CLOSE_TYPE, WEBSOCKET_ACCEPT_TYPE, \
+    WEBSOCKET_DISCONNECT_TYPE, WEBSOCKET_TYPE
+from pyblaze.decorators.websocket import websocket
 from pyblaze.websockets import (
     WebSocketControllerRegistry,
-    websocket,
     WebSocket,
 )
 
@@ -23,7 +26,7 @@ class TestWebSocketController:
 
 @pytest.mark.asyncio
 async def test_handle_websocket(app):
-    receive_queue = [{"type": "websocket.receive", "text": "Test message"}]
+    receive_queue = [{"type": WEBSOCKET_RECEIVE_TYPE, "text": "Test message"}]
     send_queue = []
 
     async def receive():
@@ -34,21 +37,21 @@ async def test_handle_websocket(app):
 
     WebSocketControllerRegistry.register_controller("/test", TestWebSocketController)
 
-    await app({"type": "websocket", "path": "/test"}, receive, send)
+    await app({"type": WEBSOCKET_TYPE, "path": "/test"}, receive, send)
 
     assert send_queue == [
-        {"type": "websocket.accept"},
-        {"type": "websocket.send", "text": "Server response to: Test message"},
-        {"type": "websocket.close"},
+        {"type": WEBSOCKET_ACCEPT_TYPE},
+        {"type": WEBSOCKET_SEND_TYPE, "text": "Server response to: Test message"},
+        {"type": WEBSOCKET_CLOSE_TYPE},
     ]
 
 
 @pytest.mark.asyncio
 async def test_handle_websocket_multiple_messages(app):
     receive_queue = [
-        {"type": "websocket.receive", "text": "Message 1"},
-        {"type": "websocket.receive", "text": "Message 2"},
-        {"type": "websocket.receive", "text": "Message 3"},
+        {"type": WEBSOCKET_RECEIVE_TYPE, "text": "Message 1"},
+        {"type": WEBSOCKET_RECEIVE_TYPE, "text": "Message 2"},
+        {"type": WEBSOCKET_RECEIVE_TYPE, "text": "Message 3"},
     ]
     send_queue = []
 
@@ -60,20 +63,20 @@ async def test_handle_websocket_multiple_messages(app):
 
     WebSocketControllerRegistry.register_controller("/test", TestWebSocketController)
 
-    await app({"type": "websocket", "path": "/test"}, receive, send)
+    await app({"type": WEBSOCKET_TYPE, "path": "/test"}, receive, send)
 
     assert send_queue == [
-        {"type": "websocket.accept"},
-        {"type": "websocket.send", "text": "Server response to: Message 1"},
-        {"type": "websocket.send", "text": "Server response to: Message 2"},
-        {"type": "websocket.send", "text": "Server response to: Message 3"},
-        {"type": "websocket.close"},
+        {"type": WEBSOCKET_ACCEPT_TYPE},
+        {"type": WEBSOCKET_SEND_TYPE, "text": "Server response to: Message 1"},
+        {"type": WEBSOCKET_SEND_TYPE, "text": "Server response to: Message 2"},
+        {"type": WEBSOCKET_SEND_TYPE, "text": "Server response to: Message 3"},
+        {"type": WEBSOCKET_CLOSE_TYPE},
     ]
 
 
 @pytest.mark.asyncio
 async def test_handle_websocket_connection_closure(app):
-    receive_queue = [{"type": "websocket.disconnet"}]
+    receive_queue = [{"type": WEBSOCKET_DISCONNECT_TYPE}]
     send_queue = []
 
     async def receive():
@@ -84,17 +87,17 @@ async def test_handle_websocket_connection_closure(app):
 
     WebSocketControllerRegistry.register_controller("/test", TestWebSocketController)
 
-    await app({"type": "websocket", "path": "/test"}, receive, send)
+    await app({"type": WEBSOCKET_TYPE, "path": "/test"}, receive, send)
 
     assert send_queue == [
-        {"type": "websocket.accept"},
-        {"type": "websocket.close"},
+        {"type": WEBSOCKET_ACCEPT_TYPE},
+        {"type": WEBSOCKET_CLOSE_TYPE},
     ]
 
 
 @pytest.mark.asyncio
 async def test_handle_websocket_invalid_path(app):
-    receive_queue = [{"type": "websocket.receive", "text": "Test message"}]
+    receive_queue = [{"type": WEBSOCKET_RECEIVE_TYPE, "text": "Test message"}]
     send_queue = []
 
     async def receive():
@@ -105,7 +108,7 @@ async def test_handle_websocket_invalid_path(app):
 
     WebSocketControllerRegistry.register_controller("/test", TestWebSocketController)
 
-    await app({"type": "websocket", "path": "/invalid_path"}, receive, send)
+    await app({"type": WEBSOCKET_TYPE, "path": "/invalid_path"}, receive, send)
 
     assert send_queue == []
 
@@ -113,37 +116,37 @@ async def test_handle_websocket_invalid_path(app):
 @pytest.mark.asyncio
 async def test_send_text():
     websocket = WebSocket(
-        scope={"type": "websocket"}, receive=AsyncMock(), send=AsyncMock()
+        scope={"type": WEBSOCKET_TYPE}, receive=AsyncMock(), send=AsyncMock()
     )
 
     data = "dddd"
     await websocket.send_text(data)
 
-    expected_message = {"type": "websocket.send", "text": "dddd"}
+    expected_message = {"type": WEBSOCKET_SEND_TYPE, "text": "dddd"}
     websocket._send.assert_called_once_with(expected_message)
 
 
 @pytest.mark.asyncio
 async def test_send_json_text():
     websocket = WebSocket(
-        scope={"type": "websocket"}, receive=AsyncMock(), send=AsyncMock()
+        scope={"type": WEBSOCKET_TYPE}, receive=AsyncMock(), send=AsyncMock()
     )
 
     data = {"key": "value"}
     await websocket.send_json(data)
 
-    expected_message = {"type": "websocket.send", "text": '{"key":"value"}'}
+    expected_message = {"type": WEBSOCKET_SEND_TYPE, "text": '{"key":"value"}'}
     websocket._send.assert_called_once_with(expected_message)
 
 
 @pytest.mark.asyncio
 async def test_send_bytes():
     websocket = WebSocket(
-        scope={"type": "websocket"}, receive=AsyncMock(), send=AsyncMock()
+        scope={"type": WEBSOCKET_TYPE}, receive=AsyncMock(), send=AsyncMock()
     )
 
     data = b"value"
     await websocket.send_binary(data)
 
-    expected_message = {"type": "websocket.send", "bytes": b"value"}
+    expected_message = {"type": WEBSOCKET_SEND_TYPE, "bytes": b"value"}
     websocket._send.assert_called_once_with(expected_message)
