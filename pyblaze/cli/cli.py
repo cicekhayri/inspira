@@ -23,7 +23,8 @@ def new():
 @click.argument("name")
 @click.option("--skip-repository", "skip_repository", is_flag=True, required=False)
 @click.option("--skip-model", "skip_model", is_flag=True, required=False)
-def module(name, skip_repository, skip_model):
+@click.option("--websocket", "is_websocket", is_flag=True, required=False)
+def module(name, skip_repository, skip_model, is_websocket):
     if not name:
         click.echo("Please provide a name for the module")
         return
@@ -34,12 +35,12 @@ def module(name, skip_repository, skip_model):
         )
         return
 
-    create_module_files(name, skip_repository, skip_model)
+    create_module_files(name, skip_repository, skip_model, is_websocket)
 
 
-def create_module_files(name, skip_repository, skip_model):
+def create_module_files(name, skip_repository, skip_model, is_websocket):
     create_src_directory()
-    create_controller_file(name)
+    create_controller_file(name, is_websocket)
 
     if not skip_model:
         generate_model_file(name)

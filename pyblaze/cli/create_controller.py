@@ -16,12 +16,13 @@ def create_src_directory():
         os.makedirs(src_directory)
 
 
-def create_controller_file(name):
+def create_controller_file(name, is_websocket):
     src_directory = "src"
     controller_directory = os.path.join(src_directory, name)
     singularize_name = singularize(name.lower())
-    # Create the resource directory
+
     os.makedirs(controller_directory)
+    controller_template_file = "controller_template.txt"
 
     # Create __init__.py in the resource directory
     init_file = os.path.join(controller_directory, "__init__.py")
@@ -29,12 +30,15 @@ def create_controller_file(name):
     with open(init_file, "w"):
         pass
 
-    # Create the controller file
     controller_file = os.path.join(
         controller_directory, f"{singularize_name}_controller.py"
     )
+
+    if is_websocket:
+        controller_template_file = "websocket_controller_template.txt"
+
     template_path = os.path.join(
-        os.path.dirname(__file__), "templates", "controller_template.txt"
+        os.path.dirname(__file__), "templates", controller_template_file
     )
 
     with open(template_path, "r") as template_file, open(
