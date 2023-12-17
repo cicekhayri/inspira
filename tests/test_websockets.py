@@ -19,6 +19,7 @@ from pyblaze.websockets import (
 
 @websocket("/test")
 class TestWebSocketController:
+
     async def on_open(self, websocket: WebSocket):
         await websocket.on_open()
 
