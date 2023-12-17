@@ -1,6 +1,11 @@
 import json
 
-from pyblaze.constants import WEBSOCKET_SEND_TYPE, WEBSOCKET_ACCEPT_TYPE, WEBSOCKET_CLOSE_TYPE, WEBSOCKET_TYPE
+from pyblaze.constants import (
+    WEBSOCKET_SEND_TYPE,
+    WEBSOCKET_ACCEPT_TYPE,
+    WEBSOCKET_CLOSE_TYPE,
+    WEBSOCKET_TYPE,
+)
 
 
 class WebSocket:

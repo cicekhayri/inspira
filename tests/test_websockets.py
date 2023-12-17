@@ -2,8 +2,14 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from pyblaze.constants import WEBSOCKET_SEND_TYPE, WEBSOCKET_RECEIVE_TYPE, WEBSOCKET_CLOSE_TYPE, WEBSOCKET_ACCEPT_TYPE, \
-    WEBSOCKET_DISCONNECT_TYPE, WEBSOCKET_TYPE
+from pyblaze.constants import (
+    WEBSOCKET_SEND_TYPE,
+    WEBSOCKET_RECEIVE_TYPE,
+    WEBSOCKET_CLOSE_TYPE,
+    WEBSOCKET_ACCEPT_TYPE,
+    WEBSOCKET_DISCONNECT_TYPE,
+    WEBSOCKET_TYPE,
+)
 from pyblaze.decorators.websocket import websocket
 from pyblaze.websockets import (
     WebSocketControllerRegistry,
