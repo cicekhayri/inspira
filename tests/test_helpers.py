@@ -1,6 +1,9 @@
 from pyblaze.constants import TEXT_HTML
-from pyblaze.helpers.error_templates import format_server_exception, format_not_found_exception, \
-    format_method_not_allowed_exception
+from pyblaze.helpers.error_templates import (
+    format_server_exception,
+    format_not_found_exception,
+    format_method_not_allowed_exception,
+)
 
 
 def test_format_server_exception():

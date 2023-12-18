@@ -9,7 +9,11 @@ from typing import Callable, Dict, List, Any
 from httpx import AsyncClient
 
 from pyblaze.enums import HttpMethod
-from pyblaze.helpers.error_handlers import default_error_handler, handle_method_not_allowed, handle_not_found
+from pyblaze.helpers.error_handlers import (
+    default_error_handler,
+    handle_method_not_allowed,
+    handle_not_found,
+)
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session

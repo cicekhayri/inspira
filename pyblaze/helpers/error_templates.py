@@ -65,7 +65,7 @@ def format_not_found_exception() -> HttpResponse:
     msg = template.format(
         title="Not Found",
         message="Ooops!!! The page you are looking for is not found",
-        status_code=404
+        status_code=404,
     )
     return HttpResponse(content=msg, status_code=404, content_type=TEXT_HTML)
 
