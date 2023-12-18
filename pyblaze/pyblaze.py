@@ -17,6 +17,7 @@ from pyblaze.helpers.error_handlers import (
 from pyblaze.helpers.static_file_handler import handle_static_files
 from pyblaze.requests import Request, RequestContext
 from pyblaze.sessions import encode_session_data, get_or_create_session
+from pyblaze.utils.controller_parser import parse_controller_decorators
 from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
 from pyblaze.utils.handler_invoker import invoke_handler
 from pyblaze.websockets import handle_websocket
@@ -100,28 +101,10 @@ class PyBlaze:
         rel_path = os.path.relpath(file_path, os.getcwd())
         return rel_path.replace(os.sep, ".")
 
-    def _parse_controller_decorators(self, file_path: str) -> bool:
-        with open(file_path, "r") as file:
-            tree = ast.parse(file.read(), filename=file_path)
-
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef):
-                for decorator in node.decorator_list:
-                    if (
-                        isinstance(decorator, ast.Call)
-                        and isinstance(decorator.func, ast.Name)
-                        and (
-                            decorator.func.id == "path"
-                            or decorator.func.id == "websocket"
-                        )
-                    ):
-                        return True
-        return False
-
     def _is_controller_file(self, file_path: str) -> bool:
         return file_path.endswith(
             "_controller.py"
-        ) and self._parse_controller_decorators(file_path)
+        ) and parse_controller_decorators(file_path)
 
     async def __call__(
         self, scope: Dict[str, Any], receive: Callable, send: Callable
