@@ -18,7 +18,7 @@ from pyblaze.helpers.static_file_handler import handle_static_files
 from pyblaze.requests import Request, RequestContext
 from pyblaze.sessions import encode_session_data, get_or_create_session
 from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
-from pyblaze.utils.param_converter import convert_param_type
+from pyblaze.utils.handler_invoker import invoke_handler
 from pyblaze.websockets import handle_websocket
 
 
@@ -172,7 +172,7 @@ class PyBlaze:
                 if match:
                     try:
                         params = match.groupdict()
-                        response = await self.invoke_handler(
+                        response = await invoke_handler(
                             handler, request, scope, params
                         )
                         await response(scope, receive, send)
@@ -194,7 +194,7 @@ class PyBlaze:
     ):
         try:
             handler = self.routes[method][path]
-            response = await self.invoke_handler(handler, request, scope)
+            response = await invoke_handler(handler, request, scope)
 
             if self.session_type:
                 encoded_and_signed_data = encode_session_data(
@@ -220,27 +220,6 @@ class PyBlaze:
         if self.session_type:
             session = get_or_create_session(request, self.secret_key)
             request.session = session
-
-    async def invoke_handler(
-        self, handler, request: Request, scope: Dict[str, Any], params=None
-    ):
-        handler_signature = inspect.signature(handler)
-        handler_params = {}
-        for param_name, param in handler_signature.parameters.items():
-            if param_name == "request":
-                handler_params["request"] = request
-            elif param_name == "scope":
-                handler_params["scope"] = scope
-            elif param_name in params:
-                handler_params[param_name] = convert_param_type(
-                    params[param_name], param.annotation
-                )
-            elif param.default != inspect.Parameter.empty:
-                handler_params[param_name] = param.default
-            else:
-                handler_params[param_name] = None
-
-        return await handler(**handler_params)
 
     async def test_session(self, app, method, path, **kwargs):
         async with AsyncClient(app=app, base_url="http://testserver") as client:
