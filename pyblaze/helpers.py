@@ -69,7 +69,7 @@ def format_not_found_exception() -> HttpResponse:
 def format_method_not_allowed_exception() -> HttpResponse:
     msg = template.format(
         message="Method Not Allowed"
-                "<br><br>The method is not allowed for the requested URL.",
-        status_code=405
+        "<br><br>The method is not allowed for the requested URL.",
+        status_code=405,
     )
     return HttpResponse(content=msg, status_code=405, content_type="text/html")
