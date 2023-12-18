@@ -1,9 +1,12 @@
+from unittest.mock import patch, mock_open
+
 from pyblaze.constants import TEXT_HTML
 from pyblaze.helpers.error_templates import (
     format_server_exception,
     format_not_found_exception,
     format_method_not_allowed_exception,
 )
+from pyblaze.utils.controller_parser import parse_controller_decorators
 
 
 def test_format_server_exception():
@@ -26,3 +29,42 @@ def test_format_method_not_allowed_exception():
     assert response.status_code == 405
     assert "Method Not Allowed" in response.content
     assert "The method is not allowed for the requested URL." in response.content
+
+
+def test_parse_controller_decorators_with_path_decorator():
+    code = """
+@path("/example")
+class MyController:
+    pass
+    """
+    with patch("builtins.open", mock_open(read_data=code)):
+        result = parse_controller_decorators("fake_file_path")
+        assert result is True
+
+
+def test_parse_controller_decorators_with_websocket_decorator():
+    code = """
+@websocket("/example")
+class MyController:
+    pass
+    """
+    with patch("builtins.open", mock_open(read_data=code)):
+        result = parse_controller_decorators("fake_file_path")
+        assert result is True
+
+
+def test_parse_controller_decorators_without_matching_decorators():
+    code = """
+class MyController:
+    pass
+    """
+    with patch("builtins.open", mock_open(read_data=code)):
+        result = parse_controller_decorators("fake_file_path")
+        assert result is False
+
+
+def test_parse_controller_decorators_with_invalid_code():
+    code = "invalid_python_code"
+    with patch("builtins.open", mock_open(read_data=code)):
+        result = parse_controller_decorators("fake_file_path")
+        assert result is False
