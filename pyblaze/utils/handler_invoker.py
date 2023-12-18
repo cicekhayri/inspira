@@ -5,9 +5,7 @@ from pyblaze.requests import Request
 from pyblaze.utils.param_converter import convert_param_type
 
 
-async def invoke_handler(
-        handler, request: Request, scope: Dict[str, Any], params=None
-):
+async def invoke_handler(handler, request: Request, scope: Dict[str, Any], params=None):
     handler_signature = inspect.signature(handler)
     handler_params = {}
     for param_name, param in handler_signature.parameters.items():

@@ -102,9 +102,9 @@ class PyBlaze:
         return rel_path.replace(os.sep, ".")
 
     def _is_controller_file(self, file_path: str) -> bool:
-        return file_path.endswith(
-            "_controller.py"
-        ) and parse_controller_decorators(file_path)
+        return file_path.endswith("_controller.py") and parse_controller_decorators(
+            file_path
+        )
 
     async def __call__(
         self, scope: Dict[str, Any], receive: Callable, send: Callable
@@ -155,9 +155,7 @@ class PyBlaze:
                 if match:
                     try:
                         params = match.groupdict()
-                        response = await invoke_handler(
-                            handler, request, scope, params
-                        )
+                        response = await invoke_handler(handler, request, scope, params)
                         await response(scope, receive, send)
                         return
                     except Exception as exc:

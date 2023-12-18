@@ -12,10 +12,8 @@ def parse_controller_decorators(file_path: str) -> bool:
                     isinstance(decorator, ast.Call)
                     and isinstance(decorator.func, ast.Name)
                     and (
-                        decorator.func.id == "path"
-                        or decorator.func.id == "websocket"
+                        decorator.func.id == "path" or decorator.func.id == "websocket"
                     )
                 ):
                     return True
     return False
-
