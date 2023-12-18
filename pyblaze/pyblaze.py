@@ -1,7 +1,6 @@
 import ast
 import importlib
 import inspect
-import logging
 import os
 import re
 import sys
@@ -10,11 +9,7 @@ from typing import Callable, Dict, List, Any
 from httpx import AsyncClient
 
 from pyblaze.enums import HttpMethod
-from pyblaze.helpers import (
-    format_not_found_exception,
-    format_server_exception,
-    format_method_not_allowed_exception,
-)
+from pyblaze.helpers.error_handlers import default_error_handler, handle_method_not_allowed, handle_not_found
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
@@ -27,7 +22,7 @@ class PyBlaze:
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
-        self.error_handler = self.default_error_handler
+        self.error_handler = default_error_handler
         self.middleware: List[Callable] = []
         self.secret_key = secret_key
         self.session_type = session_type
@@ -150,7 +145,7 @@ class PyBlaze:
         else:
             # Check if the route is present but with a different method
             if any(path in methods for methods in self.routes.values()):
-                await self.handle_method_not_allowed(scope, receive, send)
+                await handle_method_not_allowed(scope, receive, send)
             else:
                 await self.handle_dynamic_route(
                     method, path, request, scope, receive, send
@@ -181,7 +176,7 @@ class PyBlaze:
                         error_response = await self.error_handler(exc)
                         await error_response(scope, receive, send)
         # If no matching route is found, return a 404 response
-        await self.handle_not_found(scope, receive, send)
+        await handle_not_found(scope, receive, send)
 
     async def handle_route(
         self,
@@ -227,18 +222,6 @@ class PyBlaze:
         template_response = TemplateResponse(request, scope["path"])
         await template_response(scope, receive, send)
 
-    async def handle_method_not_allowed(
-        self, scope: Dict[str, Any], receive: Callable, send: Callable
-    ) -> None:
-        method_not_allowed_response = format_method_not_allowed_exception()
-        await method_not_allowed_response(scope, receive, send)
-
-    async def handle_not_found(
-        self, scope: Dict[str, Any], receive: Callable, send: Callable
-    ) -> None:
-        not_found_response = format_not_found_exception()
-        await not_found_response(scope, receive, send)
-
     async def invoke_handler(
         self, handler, request: Request, scope: Dict[str, Any], params=None
     ):
@@ -267,10 +250,6 @@ class PyBlaze:
             return param_type(value)
         except ValueError:
             return value
-
-    async def default_error_handler(self, exc):
-        logging.exception(exc)
-        return format_server_exception()
 
     async def test_session(self, app, method, path, **kwargs):
         async with AsyncClient(app=app, base_url="http://testserver") as client:

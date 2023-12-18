@@ -1,9 +1,10 @@
-from .responses import HttpResponse
+from pyblaze.constants import TEXT_HTML
+from pyblaze.responses import HttpResponse
 
 template = """
 <!DOCTYPE html>
 <html>
-<title>Not Found</title>
+<title>{title}</title>
 <style>
 html, body{{
   margin: 0;
@@ -52,24 +53,28 @@ h1, a{{
 
 def format_server_exception() -> HttpResponse:
     msg = template.format(
+        title="Internal Server Error",
         message="Internal Server Error"
         "<br><br>We are currently trying to fix the problem.",
         status_code=500,
     )
-    return HttpResponse(content=msg, status_code=500, content_type="text/html")
+    return HttpResponse(content=msg, status_code=500, content_type=TEXT_HTML)
 
 
 def format_not_found_exception() -> HttpResponse:
     msg = template.format(
-        message="Ooops!!! The page you are looking for is not found", status_code=404
+        title="Not Found",
+        message="Ooops!!! The page you are looking for is not found",
+        status_code=404
     )
-    return HttpResponse(content=msg, status_code=404, content_type="text/html")
+    return HttpResponse(content=msg, status_code=404, content_type=TEXT_HTML)
 
 
 def format_method_not_allowed_exception() -> HttpResponse:
     msg = template.format(
+        title="Method Not Allowed",
         message="Method Not Allowed"
         "<br><br>The method is not allowed for the requested URL.",
         status_code=405,
     )
-    return HttpResponse(content=msg, status_code=405, content_type="text/html")
+    return HttpResponse(content=msg, status_code=405, content_type=TEXT_HTML)
