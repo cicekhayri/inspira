@@ -10,7 +10,11 @@ from typing import Callable, Dict, List, Any
 from httpx import AsyncClient
 
 from pyblaze.enums import HttpMethod
-from pyblaze.helpers import format_not_found_exception, format_server_exception
+from pyblaze.helpers import (
+    format_not_found_exception,
+    format_server_exception,
+    format_method_not_allowed_exception,
+)
 from pyblaze.requests import Request, RequestContext
 from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
@@ -144,7 +148,13 @@ class PyBlaze:
         elif path in self.routes[method]:
             await self.handle_route(method, path, receive, request, scope, send)
         else:
-            await self.handle_dynamic_route(method, path, request, scope, receive, send)
+            # Check if the route is present but with a different method
+            if any(path in methods for methods in self.routes.values()):
+                await self.handle_method_not_allowed(scope, receive, send)
+            else:
+                await self.handle_dynamic_route(
+                    method, path, request, scope, receive, send
+                )
 
     async def handle_dynamic_route(
         self,
@@ -216,6 +226,12 @@ class PyBlaze:
     ) -> None:
         template_response = TemplateResponse(request, scope["path"])
         await template_response(scope, receive, send)
+
+    async def handle_method_not_allowed(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable
+    ) -> None:
+        method_not_allowed_response = format_method_not_allowed_exception()
+        await method_not_allowed_response(scope, receive, send)
 
     async def handle_not_found(
         self, scope: Dict[str, Any], receive: Callable, send: Callable
