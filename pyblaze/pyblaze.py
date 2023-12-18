@@ -14,10 +14,11 @@ from pyblaze.helpers.error_handlers import (
     handle_method_not_allowed,
     handle_not_found,
 )
+from pyblaze.helpers.static_file_handler import handle_static_files
 from pyblaze.requests import Request, RequestContext
-from pyblaze.responses import TemplateResponse
 from pyblaze.sessions import encode_session_data, get_or_create_session
 from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
+from pyblaze.utils.param_converter import convert_param_type
 from pyblaze.websockets import handle_websocket
 
 
@@ -143,7 +144,7 @@ class PyBlaze:
         path = scope["path"]
 
         if path.startswith("/static"):
-            await self._handle_static_files(scope, receive, send, request)
+            await handle_static_files(scope, receive, send, request)
         elif path in self.routes[method]:
             await self.handle_route(method, path, receive, request, scope, send)
         else:
@@ -220,12 +221,6 @@ class PyBlaze:
             session = get_or_create_session(request, self.secret_key)
             request.session = session
 
-    async def _handle_static_files(
-        self, scope: Dict[str, Any], receive: Callable, send: Callable, request: Request
-    ) -> None:
-        template_response = TemplateResponse(request, scope["path"])
-        await template_response(scope, receive, send)
-
     async def invoke_handler(
         self, handler, request: Request, scope: Dict[str, Any], params=None
     ):
@@ -237,7 +232,7 @@ class PyBlaze:
             elif param_name == "scope":
                 handler_params["scope"] = scope
             elif param_name in params:
-                handler_params[param_name] = self.convert_param_type(
+                handler_params[param_name] = convert_param_type(
                     params[param_name], param.annotation
                 )
             elif param.default != inspect.Parameter.empty:
@@ -246,14 +241,6 @@ class PyBlaze:
                 handler_params[param_name] = None
 
         return await handler(**handler_params)
-
-    def convert_param_type(self, value, param_type):
-        try:
-            if param_type is None or param_type == inspect.Parameter.empty:
-                return str(value)
-            return param_type(value)
-        except ValueError:
-            return value
 
     async def test_session(self, app, method, path, **kwargs):
         async with AsyncClient(app=app, base_url="http://testserver") as client:

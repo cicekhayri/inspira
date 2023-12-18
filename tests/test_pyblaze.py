@@ -8,6 +8,7 @@ import pytest
 from pyblaze.decorators.http_methods import get
 from pyblaze.enums import HttpMethod
 from pyblaze.responses import JsonResponse
+from pyblaze.utils.param_converter import convert_param_type
 
 
 @pytest.mark.asyncio
@@ -42,15 +43,15 @@ def test_discover_controllers(app, monkeypatch):
 
 
 def test_convert_param_type_with_valid_type(app):
-    result = app.convert_param_type("10", int)
+    result = convert_param_type("10", int)
     assert result == 10, "Expected the value to be converted to int"
 
 
 def test_convert_param_type_with_none_type(app):
-    result = app.convert_param_type("10", None)
+    result = convert_param_type("10", None)
     assert result == "10", "Expected the value to be converted to str"
 
 
 def test_convert_param_type_with_empty_type(app):
-    result = app.convert_param_type("10", inspect.Parameter.empty)
+    result = convert_param_type("10", inspect.Parameter.empty)
     assert result == "10", "Expected the value to be converted to str"
