@@ -64,3 +64,12 @@ def format_not_found_exception() -> HttpResponse:
         message="Ooops!!! The page you are looking for is not found", status_code=404
     )
     return HttpResponse(content=msg, status_code=404, content_type="text/html")
+
+
+def format_method_not_allowed_exception() -> HttpResponse:
+    msg = template.format(
+        message="Method Not Allowed"
+                "<br><br>The method is not allowed for the requested URL.",
+        status_code=405
+    )
+    return HttpResponse(content=msg, status_code=405, content_type="text/html")
