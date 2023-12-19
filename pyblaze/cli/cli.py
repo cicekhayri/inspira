@@ -5,6 +5,7 @@ from pyblaze.cli.create_controller import create_controller_file, create_src_dir
 from pyblaze.cli.generate_database_file import create_database_file
 from pyblaze.cli.generate_model_file import database_file_exists, generate_model_file
 from pyblaze.cli.generate_repository_file import generate_repository_file
+from pyblaze.cli.generate_service_file import generate_service_file
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 
@@ -21,31 +22,29 @@ def new():
 
 @new.command()
 @click.argument("name")
-@click.option("--skip-repository", "skip_repository", is_flag=True, required=False)
-@click.option("--skip-model", "skip_model", is_flag=True, required=False)
+@click.option("--only-controller", "only_controller", is_flag=True, required=False)
 @click.option("--websocket", "is_websocket", is_flag=True, required=False)
-def module(name, skip_repository, skip_model, is_websocket):
+def module(name, only_controller, is_websocket):
     if not name:
         click.echo("Please provide a name for the module")
         return
 
-    if not (skip_model or skip_repository) and not database_file_exists():
+    if not only_controller and not database_file_exists():
         click.echo(
             "Database file doesn't exist. Please generate one before generating modules"
         )
         return
 
-    create_module_files(name, skip_repository, skip_model, is_websocket)
+    create_module_files(name, only_controller, is_websocket)
 
 
-def create_module_files(name, skip_repository, skip_model, is_websocket):
+def create_module_files(name, only_controller, is_websocket):
     create_src_directory()
     create_controller_file(name, is_websocket)
 
-    if not skip_model:
+    if not only_controller:
         generate_model_file(name)
-
-    if not skip_repository:
+        generate_service_file(name)
         generate_repository_file(name)
 
 

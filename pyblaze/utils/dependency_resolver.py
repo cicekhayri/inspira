@@ -20,4 +20,17 @@ def resolve_dependencies_automatic(cls: Type) -> Optional[List[Any]]:
 
 
 def resolve_dependency(dependency_type: Type[Callable]) -> Optional[Callable]:
-    return dependency_type() if dependency_type else None
+    if dependency_type:
+        init_method = getattr(dependency_type, "__init__", None)
+        if init_method and init_method != object.__init__:
+            constructor_params = inspect.signature(init_method).parameters.values()
+            resolved_params = [
+                resolve_dependency(param.annotation)
+                for param in constructor_params
+                if param.name != "self"
+            ]
+            return dependency_type(*resolved_params)
+        else:
+            return dependency_type()
+    else:
+        return None
