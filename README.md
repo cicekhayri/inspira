@@ -88,6 +88,7 @@ After running the command to generate a new module (`inspira new module orders`)
         ├── order.py
         ├── order_controller.py
         └── order_repository.py
+        └── order_service.py
 ```
 
 ## Starting the Server
