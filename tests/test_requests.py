@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from pyblaze.requests import Request, RequestContext
+from inspira.requests import Request, RequestContext
 
 
 def test_set_request(mock_scope):

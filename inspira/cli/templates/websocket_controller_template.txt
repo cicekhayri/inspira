@@ -1,5 +1,5 @@
-from pyblaze.decorators.websocket import websocket
-from pyblaze.websockets import WebSocket
+from inspira.decorators.websocket import websocket
+from inspira.websockets import WebSocket
 
 
 @websocket("/{{root_path}}")

@@ -2,9 +2,9 @@ from http import HTTPStatus
 
 import pytest
 
-from pyblaze.decorators.http_methods import get
-from pyblaze.enums import HttpMethod
-from pyblaze.responses import JsonResponse
+from inspira.decorators.http_methods import get
+from inspira.enums import HttpMethod
+from inspira.responses import JsonResponse
 
 
 @pytest.mark.asyncio

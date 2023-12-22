@@ -1,4 +1,4 @@
-from pyblaze.enums import HttpMethod
+from inspira.enums import HttpMethod
 
 
 from typing import Callable, Type

@@ -1,4 +1,4 @@
-from pyblaze.websockets import WebSocketControllerRegistry
+from inspira.websockets import WebSocketControllerRegistry
 
 
 def websocket(path: str):

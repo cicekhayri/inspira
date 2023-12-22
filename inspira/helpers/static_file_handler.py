@@ -1,7 +1,7 @@
 from typing import Dict, Any, Callable
 
-from pyblaze.requests import Request
-from pyblaze.responses import TemplateResponse
+from inspira.requests import Request
+from inspira.responses import TemplateResponse
 
 
 async def handle_static_files(

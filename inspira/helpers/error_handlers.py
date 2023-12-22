@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any, Callable
 
-from pyblaze.helpers.error_templates import (
+from inspira.helpers.error_templates import (
     format_method_not_allowed_exception,
     format_not_found_exception,
     format_server_exception,

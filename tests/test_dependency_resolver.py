@@ -1,4 +1,4 @@
-from pyblaze.utils import resolve_dependencies_automatic, resolve_dependency
+from inspira.utils import resolve_dependencies_automatic, resolve_dependency
 
 
 def test_resolve_dependencies_automatic_with_dependencies():

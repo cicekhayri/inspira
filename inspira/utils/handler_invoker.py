@@ -1,8 +1,8 @@
 import inspect
 from typing import Dict, Any
 
-from pyblaze.requests import Request
-from pyblaze.utils.param_converter import convert_param_type
+from inspira.requests import Request
+from inspira.utils.param_converter import convert_param_type
 
 
 async def invoke_handler(handler, request: Request, scope: Dict[str, Any], params=None):

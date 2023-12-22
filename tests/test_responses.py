@@ -4,10 +4,10 @@ from http import HTTPStatus
 
 import pytest
 
-from pyblaze.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
-from pyblaze.decorators.http_methods import delete, get, post, put
-from pyblaze.enums import HttpMethod
-from pyblaze.responses import (
+from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
+from inspira.decorators.http_methods import delete, get, post, put
+from inspira.enums import HttpMethod
+from inspira.responses import (
     HttpResponse,
     HttpResponseRedirect,
     JsonResponse,
@@ -161,7 +161,7 @@ async def test_endpoint_without_type_defaults_to_string(app):
 
 @pytest.mark.asyncio
 async def test_posting_json(app):
-    payload = {"name": "Hayri", "email": "hayri@pyblaze.com"}
+    payload = {"name": "Hayri", "email": "hayri@inspira.com"}
 
     @post("/posting-json")
     async def posting_json(request):
@@ -178,7 +178,7 @@ async def test_posting_json(app):
 
 @pytest.mark.asyncio
 async def test_posting_form_data(app):
-    payload = {"name": "Hayri", "email": "hayri@pyblaze.com"}
+    payload = {"name": "Hayri", "email": "hayri@inspira.com"}
 
     @post("/posting-form")
     async def posting_form(request):

@@ -3,7 +3,7 @@ import datetime
 import hashlib
 import json
 
-from pyblaze.sessions import (
+from inspira.sessions import (
     decode_session_data,
     encode_session_data,
     get_or_create_session,
@@ -37,7 +37,7 @@ def test_datatime_encoder_non_datetime_object():
 
 
 def test_encode_session_data():
-    session_data = {"user_id": 123, "username": "test_user"}
+    session_data = {"email": "hayri@inspiraframework.com"}
     secret_key = "your_secret_key"
 
     expected_result = encode_session_data(session_data, secret_key)
@@ -55,6 +55,7 @@ def test_encode_session_data():
     assert decoded_data == session_data
 
     expected_signature = hashlib.sha256(f"{parts[0]}{secret_key}".encode()).hexdigest()
+    print(expected_result)
     assert parts[1] == expected_signature
 
 
@@ -70,17 +71,17 @@ def test_encode_session_data_empty():
 
 
 def test_decode_session_data():
-    session_id = "eyJlbWFpbCI6ImhheXJpQHB5YmxhemUuY29tIn0.e30.zOEUjH6Q3PtYI16WgpF7xM1jlHDM8gbD9mRNgYxOKgI"
+    session_id = "eyJlbWFpbCI6ICJoYXlyaUBtb2R1bGFmcmFtZXdvcmsuY29tIn0=.178fb652833e4944b7cd5ef8339cdd020b13d28f628410f4894d0e27ad23deb0"
 
     actual_result = decode_session_data(session_id)
-    expected_result = {"email": "hayri@pyblaze.com"}
+    expected_result = {"email": "hayri@inspiraframework.com"}
 
     assert actual_result == expected_result
 
 
 def test_get_or_create_session():
-    session_id = "eyJlbWFpbCI6ImhheXJpQHB5YmxhemUuY29tIn0.e30.zOEUjH6Q3PtYI16WgpF7xM1jlHDM8gbD9mRNgYxOKgI"
-    expected_result = {"email": "hayri@pyblaze.com"}
+    session_id = "eyJlbWFpbCI6ICJoYXlyaUBtb2R1bGFmcmFtZXdvcmsuY29tIn0=.178fb652833e4944b7cd5ef8339cdd020b13d28f628410f4894d0e27ad23deb0"
+    expected_result = {"email": "hayri@inspiraframework.com"}
 
     class MockRequest:
         def __init__(self, cookie_value):

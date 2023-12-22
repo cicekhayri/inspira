@@ -1,5 +1,5 @@
-from pyblaze.constants import TEXT_HTML
-from pyblaze.responses import HttpResponse
+from inspira.constants import TEXT_HTML
+from inspira.responses import HttpResponse
 
 template = """
 <!DOCTYPE html>

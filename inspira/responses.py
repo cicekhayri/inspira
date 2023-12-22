@@ -6,7 +6,7 @@ from http import HTTPStatus
 
 from jinja2 import Environment, FileSystemLoader
 
-from pyblaze.constants import APPLICATION_JSON, NOT_FOUND, TEXT_HTML, TEXT_PLAIN, UTF8
+from inspira.constants import APPLICATION_JSON, NOT_FOUND, TEXT_HTML, TEXT_PLAIN, UTF8
 
 
 class HttpResponse:

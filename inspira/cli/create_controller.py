@@ -2,8 +2,8 @@ import os
 
 import click
 
-from pyblaze.cli.create_app import generate_project
-from pyblaze.utils import singularize
+from inspira.cli.create_app import generate_project
+from inspira.utils import singularize
 
 
 def create_src_directory():

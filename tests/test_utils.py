@@ -1,4 +1,4 @@
-from pyblaze.utils import (
+from inspira.utils import (
     singularize,
     pluralize_word,
     get_random_secret_key,

@@ -2,7 +2,7 @@ import os
 
 import click
 
-from pyblaze.utils import pluralize_word, singularize
+from inspira.utils import pluralize_word, singularize
 
 
 def generate_model_file(module_name):

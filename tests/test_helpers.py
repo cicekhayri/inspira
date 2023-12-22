@@ -1,12 +1,12 @@
 from unittest.mock import patch, mock_open
 
-from pyblaze.constants import TEXT_HTML
-from pyblaze.helpers.error_templates import (
+from inspira.constants import TEXT_HTML
+from inspira.helpers.error_templates import (
     format_server_exception,
     format_not_found_exception,
     format_method_not_allowed_exception,
 )
-from pyblaze.utils.controller_parser import parse_controller_decorators
+from inspira.utils.controller_parser import parse_controller_decorators
 
 
 def test_format_server_exception():

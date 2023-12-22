@@ -1,4 +1,3 @@
-import ast
 import importlib
 import inspect
 import os
@@ -8,22 +7,22 @@ from typing import Callable, Dict, List, Any
 
 from httpx import AsyncClient
 
-from pyblaze.enums import HttpMethod
-from pyblaze.helpers.error_handlers import (
+from inspira.enums import HttpMethod
+from inspira.helpers.error_handlers import (
     default_error_handler,
     handle_method_not_allowed,
     handle_not_found,
 )
-from pyblaze.helpers.static_file_handler import handle_static_files
-from pyblaze.requests import Request, RequestContext
-from pyblaze.sessions import encode_session_data, get_or_create_session
-from pyblaze.utils.controller_parser import parse_controller_decorators
-from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
-from pyblaze.utils.handler_invoker import invoke_handler
-from pyblaze.websockets import handle_websocket
+from inspira.helpers.static_file_handler import handle_static_files
+from inspira.requests import Request, RequestContext
+from inspira.sessions import encode_session_data, get_or_create_session
+from inspira.utils.controller_parser import parse_controller_decorators
+from inspira.utils.dependency_resolver import resolve_dependencies_automatic
+from inspira.utils.handler_invoker import invoke_handler
+from inspira.websockets import handle_websocket
 
 
-class PyBlaze:
+class Inspira:
     def __init__(self, secret_key=None, session_type=None):
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod

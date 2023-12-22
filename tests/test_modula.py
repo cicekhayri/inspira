@@ -5,10 +5,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from pyblaze.decorators.http_methods import get
-from pyblaze.enums import HttpMethod
-from pyblaze.responses import JsonResponse
-from pyblaze.utils.param_converter import convert_param_type
+from inspira.decorators.http_methods import get
+from inspira.enums import HttpMethod
+from inspira.responses import JsonResponse
+from inspira.utils.param_converter import convert_param_type
 
 
 @pytest.mark.asyncio

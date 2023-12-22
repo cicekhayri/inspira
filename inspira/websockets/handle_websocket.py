@@ -1,6 +1,6 @@
-from pyblaze.constants import WEBSOCKET_RECEIVE_TYPE, WEBSOCKET_DISCONNECT_TYPE
-from pyblaze.utils.dependency_resolver import resolve_dependencies_automatic
-from pyblaze.websockets import WebSocket, WebSocketControllerRegistry
+from inspira.constants import WEBSOCKET_RECEIVE_TYPE, WEBSOCKET_DISCONNECT_TYPE
+from inspira.utils.dependency_resolver import resolve_dependencies_automatic
+from inspira.websockets import WebSocket, WebSocketControllerRegistry
 
 
 async def handle_websocket(scope, receive, send):

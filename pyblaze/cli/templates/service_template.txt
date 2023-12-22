@@ -1,5 +1,0 @@
-class {{model_name_upper}}Service:
-
-    def get_all_{{model_name}}(self):
-        return self._{{model_name}}_repository.get_all_{{model_name}}()
-

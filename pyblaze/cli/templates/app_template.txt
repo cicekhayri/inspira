@@ -1,5 +1,0 @@
-from pyblaze.pyblaze import PyBlaze
-
-
-app = PyBlaze()
-app.secret_key = "{{secret_key}}"

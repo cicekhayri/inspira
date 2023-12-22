@@ -1,8 +1,8 @@
 [project]
-name = "pyblaze"
-description = "PyBlaze is a lightweight framework for building asynchronous web applications."
+name = "inspira"
+description = "Inspira is a lightweight framework for building asynchronous web applications."
 readme = "README.md"
-authors = [{name = "Hayri Cicek", email = "hayri@pyblaze.com"}]
+authors = [{name = "Hayri Cicek", email = "hayri@inspira.com"}]
 license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -40,10 +40,10 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-pyblaze = "pyblaze.cli.cli:cli"
+inspira = "inspira.cli.cli:cli"
 
 [project.urls]
-Home = "https://pyblaze.com"
+Home = "https://inspira.com"
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]

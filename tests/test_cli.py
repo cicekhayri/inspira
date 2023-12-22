@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from pyblaze.cli import cli
+from inspira.cli import cli
 
 
 def test_init_command(teardown_app_file):

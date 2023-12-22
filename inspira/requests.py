@@ -2,7 +2,7 @@ import json
 import urllib.parse
 from typing import Callable, Any, Dict
 
-from pyblaze.constants import UTF8
+from inspira.constants import UTF8
 
 
 class RequestContext:

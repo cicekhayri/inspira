@@ -2,7 +2,7 @@ import os
 
 import click
 
-from pyblaze.utils import get_random_secret_key
+from inspira.utils import get_random_secret_key
 
 
 def generate_project():

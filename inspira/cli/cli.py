@@ -1,11 +1,11 @@
 import click
 
-from pyblaze.cli.create_app import generate_project
-from pyblaze.cli.create_controller import create_controller_file, create_src_directory
-from pyblaze.cli.generate_database_file import create_database_file
-from pyblaze.cli.generate_model_file import database_file_exists, generate_model_file
-from pyblaze.cli.generate_repository_file import generate_repository_file
-from pyblaze.cli.generate_service_file import generate_service_file
+from inspira.cli.create_app import generate_project
+from inspira.cli.create_controller import create_controller_file, create_src_directory
+from inspira.cli.generate_database_file import create_database_file
+from inspira.cli.generate_model_file import database_file_exists, generate_model_file
+from inspira.cli.generate_repository_file import generate_repository_file
+from inspira.cli.generate_service_file import generate_service_file
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 

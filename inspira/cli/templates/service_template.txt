@@ -1,0 +1,6 @@
+class {{model_name_upper}}Service:
+
+    def get_all_{{model_name}}(self):
+        return self._{{model_name_singular}}_repository.get_all_{{model_name}}()
+
+gi

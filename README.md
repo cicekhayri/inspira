@@ -1,17 +1,8 @@
-# PyBlaze
+# Inspira
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-PyBlaze is a lightweight framework for building asynchronous web applications.
-
-## Features
-
-- Asynchronous request handling
-- Middleware support for extending functionality
-- Routing system for defining URL patterns
-- Templating engine for rendering dynamic content
-- WebSocket support for real-time communication
-- Sessions for managing user state across requests
+Inspira is a lightweight framework for building asynchronous web applications.
 
 ## Quick Start
 
@@ -34,10 +25,10 @@ python -m venv venv
 source venv/bin/activate   # On Windows, use `venv\Scripts\activate`
 ```
 
-**Install PyBlaze**
+**Install Inspira**
 
 ```bash
-pip install pyblaze
+pip install inspira
 ```
 
 ## Generating an App
@@ -45,7 +36,7 @@ pip install pyblaze
 To generate a new app for your project, run the following command:
 
 ```bash
-pyblaze init
+inspira init
 ```
 
 ## Generate Database file
@@ -53,7 +44,7 @@ pyblaze init
 Use the following command to generate a database file:
 
 ```bash
-pyblaze new database --name mydb --type sqlite
+inspira new database --name mydb --type sqlite
 ```
 
 This command will create a new database file named `mydb` with `SQLite` as the database type.
@@ -81,12 +72,12 @@ def init_db():
 To generate necessary resources for your project, run the following command:
 
 ```bash
-pyblaze new module orders
+inspira new module orders
 ```
 
 ## Generated Directory Structure
 
-After running the command to generate a new module (`pyblaze new module orders`), the directory structure of your project should look like the following:
+After running the command to generate a new module (`inspira new module orders`), the directory structure of your project should look like the following:
 
 ```bash
 ├── app.py
@@ -110,7 +101,7 @@ uvicorn app:app --reload
 
 ## Sessions
 
-Inside `app.py`, after initializing PyBlaze instance:
+Inside `app.py`, after initializing Inspira instance:
 
 
 ```python

@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from pyblaze import PyBlaze
-from pyblaze.requests import Request
+from inspira import Inspira
+from inspira.requests import Request
 
 
 @pytest.fixture
 def app():
-    return PyBlaze()
+    return Inspira()
 
 
 @pytest.fixture
