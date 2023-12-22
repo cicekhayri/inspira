@@ -34,6 +34,16 @@ def put(path: str) -> Callable[[Type], Type]:
     return decorator
 
 
+def patch(path: str) -> Callable[[Type], Type]:
+    def decorator(handler: Type) -> Type:
+        handler.__method__ = HttpMethod.PATCH
+        handler.__path__ = path
+        handler.__is_handler__ = True
+        return handler
+
+    return decorator
+
+
 def delete(path: str) -> Callable[[Type], Type]:
     def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.DELETE
