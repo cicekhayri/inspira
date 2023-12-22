@@ -55,7 +55,7 @@ def test_encode_session_data():
     assert decoded_data == session_data
 
     expected_signature = hashlib.sha256(f"{parts[0]}{secret_key}".encode()).hexdigest()
-    print(expected_result)
+
     assert parts[1] == expected_signature
 
 
@@ -71,7 +71,7 @@ def test_encode_session_data_empty():
 
 
 def test_decode_session_data():
-    session_id = "eyJlbWFpbCI6ICJoYXlyaUBtb2R1bGFmcmFtZXdvcmsuY29tIn0=.178fb652833e4944b7cd5ef8339cdd020b13d28f628410f4894d0e27ad23deb0"
+    session_id = "eyJlbWFpbCI6ICJoYXlyaUBpbnNwaXJhZnJhbWV3b3JrLmNvbSJ9.6686454bb770d5e5e84baa7d2abb6746a112ecf1c8f91d9a00e091c1cc30b288"
 
     actual_result = decode_session_data(session_id)
     expected_result = {"email": "hayri@inspiraframework.com"}
@@ -80,7 +80,7 @@ def test_decode_session_data():
 
 
 def test_get_or_create_session():
-    session_id = "eyJlbWFpbCI6ICJoYXlyaUBtb2R1bGFmcmFtZXdvcmsuY29tIn0=.178fb652833e4944b7cd5ef8339cdd020b13d28f628410f4894d0e27ad23deb0"
+    session_id = "eyJlbWFpbCI6ICJoYXlyaUBpbnNwaXJhZnJhbWV3b3JrLmNvbSJ9.6686454bb770d5e5e84baa7d2abb6746a112ecf1c8f91d9a00e091c1cc30b288"
     expected_result = {"email": "hayri@inspiraframework.com"}
 
     class MockRequest:
