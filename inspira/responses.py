@@ -79,19 +79,23 @@ class HttpResponse:
         )
 
     async def encoded_headers(self):
-        headers = [
-            (b"content-type", self.content_type.encode(UTF8)),
-        ]
+        headers = [(b"content-type", self.content_type.encode(UTF8))]
 
         for key, value_list in self.headers.items():
-            if isinstance(value_list, list):
-                for value in value_list:
-                    if isinstance(value, str):
-                        value = value.encode(UTF8)
-                    headers.append((key.encode(UTF8), value))
-            else:
-                headers.append((key.encode(UTF8), value_list))
+            headers.extend(self.encode_header(key, value_list))
+
         return headers
+
+    def encode_header(self, key, value_list):
+        if not isinstance(value_list, list):
+            value_list = [value_list]
+
+        return [(key.encode(UTF8), self.encode_value(value)) for value in value_list]
+
+    def encode_value(self, value):
+        if isinstance(value, str):
+            return value.encode(UTF8)
+        return value
 
     async def serialize_content(self):
         if self.content is not None:

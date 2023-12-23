@@ -281,7 +281,7 @@ async def test_encoded_headers():
 
     expected_result = [
         (b"content-type", TEXT_PLAIN.encode(UTF8)),
-        (b"Key1", "Value1"),
+        (b"Key1", b"Value1"),
         (b"Key2", b"Value2a"),
         (b"Key2", b"Value2b"),
     ]
