@@ -2,7 +2,7 @@
 name = "inspira"
 description = "Inspira is a lightweight framework for building asynchronous web applications."
 readme = "README.md"
-authors = [{name = "Hayri Cicek", email = "hayri@inspira.com"}]
+authors = [{name = "Hayri Cicek", email = "hayri@inspiraframework.com"}]
 license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -43,7 +43,7 @@ dynamic = ["version"]
 inspira = "inspira.cli.cli:cli"
 
 [project.urls]
-Home = "https://inspira.com"
+Home = "https://inspiraframework.com"
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]
