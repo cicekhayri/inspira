@@ -1,4 +1,4 @@
-from inspira.constants import WEBSOCKET_RECEIVE_TYPE, WEBSOCKET_DISCONNECT_TYPE
+from inspira.constants import WEBSOCKET_DISCONNECT_TYPE, WEBSOCKET_RECEIVE_TYPE
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
 from inspira.websockets import WebSocket, WebSocketControllerRegistry
 

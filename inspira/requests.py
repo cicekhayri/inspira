@@ -1,6 +1,6 @@
 import json
 import urllib.parse
-from typing import Callable, Any, Dict
+from typing import Any, Callable, Dict
 
 from inspira.constants import UTF8
 

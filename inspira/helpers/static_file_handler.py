@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
 from inspira.requests import Request
 from inspira.responses import TemplateResponse

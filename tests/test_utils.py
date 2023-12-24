@@ -1,10 +1,5 @@
-from inspira.utils import (
-    singularize,
-    pluralize_word,
-    get_random_secret_key,
-    convert_to_snake_case,
-    convert_to_camel_case,
-)
+from inspira.utils import (convert_to_camel_case, convert_to_snake_case,
+                           get_random_secret_key, pluralize_word, singularize)
 
 
 def test_singularize_word():

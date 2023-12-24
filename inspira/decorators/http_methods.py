@@ -1,7 +1,6 @@
-from inspira.enums import HttpMethod
-
-
 from typing import Callable, Type
+
+from inspira.enums import HttpMethod
 
 
 def get(path: str = "") -> Callable[[Type], Type]:

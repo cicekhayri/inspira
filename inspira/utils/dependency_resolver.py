@@ -1,5 +1,5 @@
 import inspect
-from typing import Type, List, Any, Optional, Callable
+from typing import Any, Callable, List, Optional, Type
 
 
 def resolve_dependencies_automatic(cls: Type) -> Optional[List[Any]]:

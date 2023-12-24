@@ -1,11 +1,9 @@
 import logging
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
 from inspira.helpers.error_templates import (
-    format_method_not_allowed_exception,
-    format_not_found_exception,
-    format_server_exception,
-)
+    format_method_not_allowed_exception, format_not_found_exception,
+    format_server_exception)
 
 
 async def handle_method_not_allowed(

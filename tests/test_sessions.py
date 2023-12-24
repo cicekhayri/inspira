@@ -3,12 +3,8 @@ import datetime
 import hashlib
 import json
 
-from inspira.sessions import (
-    decode_session_data,
-    encode_session_data,
-    get_or_create_session,
-    DateTimeEncoder,
-)
+from inspira.sessions import (DateTimeEncoder, decode_session_data,
+                              encode_session_data, get_or_create_session)
 
 
 def test_datatime_encoder():

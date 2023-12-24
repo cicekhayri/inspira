@@ -3,16 +3,14 @@ import inspect
 import os
 import re
 import sys
-from typing import Callable, Dict, List, Any
+from typing import Any, Callable, Dict, List
 
 from httpx import AsyncClient
 
 from inspira.enums import HttpMethod
-from inspira.helpers.error_handlers import (
-    default_error_handler,
-    handle_method_not_allowed,
-    handle_not_found,
-)
+from inspira.helpers.error_handlers import (default_error_handler,
+                                            handle_method_not_allowed,
+                                            handle_not_found)
 from inspira.helpers.static_file_handler import handle_static_files
 from inspira.requests import Request, RequestContext
 from inspira.sessions import encode_session_data, get_or_create_session
