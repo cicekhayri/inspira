@@ -46,7 +46,7 @@ def decode_session_data(session_id):
 def get_or_create_session(request, secret_key):
     cookies = SimpleCookie(request.get_headers().get("cookie", ""))
     session_id = cookies.get("session")
-    session_data = ""
+    session_data = {}
 
     if session_id:
         try:

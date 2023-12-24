@@ -14,6 +14,15 @@ def app():
 
 
 @pytest.fixture
+def app_with_session():
+    app = Inspira()
+    app.secret_key = "9s09iJ6wAV8m2wKzopWiAutLWwa1rYJGLkOfa8R4PzCghYnU-O"
+    app.session_type = "cookie"
+
+    return app
+
+
+@pytest.fixture
 def request_with_session(mock_scope):
     receive = AsyncMock()
     request = Request(mock_scope, receive)
