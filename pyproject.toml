@@ -1,5 +1,6 @@
 [project]
 name = "inspira"
+version = "0.0.4"
 description = "Inspira is a lightweight framework for building asynchronous web applications."
 readme = "README.md"
 authors = [{name = "Hayri Cicek", email = "hayri@inspiraframework.com"}]
@@ -36,8 +37,6 @@ dependencies = [
     "sqlalchemy-utils",
     "websockets"
 ]
-
-dynamic = ["version"]
 
 [project.scripts]
 inspira = "inspira.cli.cli:cli"
