@@ -4,7 +4,7 @@ from inspira.enums import HttpMethod
 from typing import Callable, Type
 
 
-def get(path: str) -> Callable[[Type], Type]:
+def get(path: str = "") -> Callable[[Type], Type]:
     def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.GET
         handler.__path__ = path
@@ -14,7 +14,7 @@ def get(path: str) -> Callable[[Type], Type]:
     return decorator
 
 
-def post(path: str) -> Callable[[Type], Type]:
+def post(path: str = "") -> Callable[[Type], Type]:
     def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.POST
         handler.__path__ = path
@@ -24,7 +24,7 @@ def post(path: str) -> Callable[[Type], Type]:
     return decorator
 
 
-def put(path: str) -> Callable[[Type], Type]:
+def put(path: str = "") -> Callable[[Type], Type]:
     def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.PUT
         handler.__path__ = path
@@ -34,7 +34,7 @@ def put(path: str) -> Callable[[Type], Type]:
     return decorator
 
 
-def patch(path: str) -> Callable[[Type], Type]:
+def patch(path: str = "") -> Callable[[Type], Type]:
     def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.PATCH
         handler.__path__ = path
@@ -44,7 +44,7 @@ def patch(path: str) -> Callable[[Type], Type]:
     return decorator
 
 
-def delete(path: str) -> Callable[[Type], Type]:
+def delete(path: str = "") -> Callable[[Type], Type]:
     def decorator(handler: Type) -> Type:
         handler.__method__ = HttpMethod.DELETE
         handler.__path__ = path
