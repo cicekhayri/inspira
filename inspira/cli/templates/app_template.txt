@@ -1,4 +1,4 @@
-from inspira.inspira import Inspira
+from inspira import Inspira
 
 
 app = Inspira()
