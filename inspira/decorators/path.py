@@ -1,4 +1,4 @@
-from typing import Type, Callable
+from typing import Callable, Type
 
 
 def path(path: str) -> Callable[[Type], Type]:

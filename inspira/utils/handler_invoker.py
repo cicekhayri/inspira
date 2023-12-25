@@ -1,5 +1,5 @@
 import inspect
-from typing import Dict, Any
+from typing import Any, Dict
 
 from inspira.requests import Request
 from inspira.utils.param_converter import convert_param_type

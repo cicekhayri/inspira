@@ -3,18 +3,15 @@ from unittest.mock import AsyncMock
 import pytest
 
 from inspira.constants import (
-    WEBSOCKET_SEND_TYPE,
-    WEBSOCKET_RECEIVE_TYPE,
-    WEBSOCKET_CLOSE_TYPE,
     WEBSOCKET_ACCEPT_TYPE,
+    WEBSOCKET_CLOSE_TYPE,
     WEBSOCKET_DISCONNECT_TYPE,
+    WEBSOCKET_RECEIVE_TYPE,
+    WEBSOCKET_SEND_TYPE,
     WEBSOCKET_TYPE,
 )
 from inspira.decorators.websocket import websocket
-from inspira.websockets import (
-    WebSocketControllerRegistry,
-    WebSocket,
-)
+from inspira.websockets import WebSocket, WebSocketControllerRegistry
 
 
 @websocket("/test")

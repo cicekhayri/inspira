@@ -3,7 +3,7 @@ import inspect
 import os
 import re
 import sys
-from typing import Callable, Dict, List, Any
+from typing import Any, Callable, Dict, List
 
 from httpx import AsyncClient
 

@@ -1,9 +1,9 @@
 import json
 
 from inspira.constants import (
-    WEBSOCKET_SEND_TYPE,
     WEBSOCKET_ACCEPT_TYPE,
     WEBSOCKET_CLOSE_TYPE,
+    WEBSOCKET_SEND_TYPE,
     WEBSOCKET_TYPE,
 )
 

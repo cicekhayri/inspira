@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
 from inspira.helpers.error_templates import (
     format_method_not_allowed_exception,

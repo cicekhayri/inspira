@@ -4,10 +4,10 @@ import hashlib
 import json
 
 from inspira.sessions import (
+    DateTimeEncoder,
     decode_session_data,
     encode_session_data,
     get_or_create_session,
-    DateTimeEncoder,
 )
 
 
