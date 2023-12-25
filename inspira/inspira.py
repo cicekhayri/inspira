@@ -24,7 +24,7 @@ from inspira.websockets import handle_websocket
 
 
 class Inspira:
-    def __init__(self, secret_key=None, session_type=None):
+    def __init__(self, secret_key=None, session_type="cookie"):
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
