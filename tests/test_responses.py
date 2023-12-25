@@ -65,7 +65,7 @@ async def test_set_cookie_with_route(app):
                       "lMTgzNSI=.8991ce9b78ed5878c22fdb0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Path=/; "
                       "Secure; HttpOnly",
     }
-    print(headers_dict)
+
     assert headers_dict == expected_headers
 
 
