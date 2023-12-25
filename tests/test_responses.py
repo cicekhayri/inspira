@@ -60,14 +60,17 @@ async def test_set_cookie_with_route(app):
 
     expected_headers = {
         "content-type": TEXT_PLAIN,
-        "set-cookie": "my_cookie=my_cookie_value; Path=/",
+        "set-cookie": "my_cookie=my_cookie_value; Path=/, "
+                      "session=ImUzMD0uYTU2OTRkZDdkOTlhMTFmOTNiODAyYzRkMzE3MTZlYTk5OTE0NDA1N2Q2MzFkNWZlZWNmYTg4MDJkOTF"
+                      "lMTgzNSI=.8991ce9b78ed5878c22fdb0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Path=/; "
+                      "Secure; HttpOnly",
     }
 
     assert headers_dict == expected_headers
 
 
 @pytest.mark.asyncio
-async def test_set_multiple_cookie(app):
+async def test_set_multiple_cookie(app_with_session):
     @get("/home")
     async def home(request):
         http_response = HttpResponse("This is a test endpoint")
@@ -76,14 +79,17 @@ async def test_set_multiple_cookie(app):
 
         return http_response
 
-    app.add_route("/home", HttpMethod.GET, home)
+    app_with_session.add_route("/home", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home")
+    response = await app_with_session.test_session(app_with_session, "GET", "/home")
     headers_dict = dict(response.headers)
 
     expected_header = {
         "content-type": TEXT_PLAIN,
-        "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/",
+        "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/, "
+                      "session=ImUzMD0uYWIxZTEzYjM5OWU4NmVlOTQxYzFiMDRiZjM4ODg5YjNmZmM1ZWJjZjBiYjc3ZDFjZjI0YzQxZTY5M"
+                      "2U5NzUwNSI=.94676004da3849de0f181a24441f2b3c9199f761e1392e3ceb1c1bc89267594f; Path=/; "
+                      "Secure; HttpOnly",
     }
 
     assert headers_dict == expected_header
