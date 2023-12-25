@@ -2,8 +2,10 @@ from unittest.mock import mock_open, patch
 
 from inspira.constants import TEXT_HTML
 from inspira.helpers.error_templates import (
-    format_method_not_allowed_exception, format_not_found_exception,
-    format_server_exception)
+    format_method_not_allowed_exception,
+    format_not_found_exception,
+    format_server_exception,
+)
 from inspira.utils.controller_parser import parse_controller_decorators
 
 

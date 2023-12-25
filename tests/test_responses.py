@@ -7,8 +7,12 @@ import pytest
 from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
 from inspira.decorators.http_methods import delete, get, post, put
 from inspira.enums import HttpMethod
-from inspira.responses import (HttpResponse, HttpResponseRedirect,
-                               JsonResponse, TemplateResponse)
+from inspira.responses import (
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    TemplateResponse,
+)
 
 
 def test_should_throw_error_when_same_endpoint_specified_twice(app):
