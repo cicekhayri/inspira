@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List
 from httpx import AsyncClient
 
 from inspira.enums import HttpMethod
+from inspira.globals import set_global_app
 from inspira.helpers.error_handlers import (
     default_error_handler,
     handle_method_not_allowed,
@@ -32,6 +33,7 @@ class Inspira:
         self.secret_key = secret_key
         self.session_type = session_type
         self.discover_controllers()
+        set_global_app(self)
 
     def add_middleware(self, middleware: Callable) -> Callable:
         self.middleware.append(middleware)
