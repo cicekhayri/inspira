@@ -14,7 +14,7 @@ def create_app_file():
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "app_template.txt"
     )
-    output_path = "app.py"
+    output_path = "main.py"
 
     with open(template_path, "r") as template_file, open(
         output_path, "w"

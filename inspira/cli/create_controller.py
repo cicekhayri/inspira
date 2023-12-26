@@ -8,7 +8,7 @@ from inspira.utils import singularize
 
 def create_src_directory():
     src_directory = "src"
-    app_file_path = "app.py"
+    app_file_path = "main.py"
 
     if not os.path.exists(app_file_path):
         generate_project()

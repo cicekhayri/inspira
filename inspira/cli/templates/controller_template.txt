@@ -7,7 +7,7 @@ from inspira.requests import Request
 @path("/{{root_path}}")
 class {{controller_name}}Controller:
 
-    @get("/")
+    @get()
     async def index(self, request: Request):
         context = {"variable": "value"}
 
