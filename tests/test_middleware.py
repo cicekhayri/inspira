@@ -8,7 +8,7 @@ from inspira.responses import JsonResponse
 
 
 @pytest.mark.asyncio
-async def test_middleware(app):
+async def test_middleware(app, client):
     async def sample_middleware(request):
         request.extra_data = "Modified by middleware"
         return request
@@ -22,7 +22,7 @@ async def test_middleware(app):
 
     app.add_route("/test", HttpMethod.GET, test_route)
 
-    response = await app.test_session(app, "GET", "/test")
+    response = await client.get("/test")
 
     assert response.status_code == HTTPStatus.OK
     assert response.json()["message"] == "Modified by middleware"

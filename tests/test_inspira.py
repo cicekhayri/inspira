@@ -12,14 +12,14 @@ from inspira.utils.param_converter import convert_param_type
 
 
 @pytest.mark.asyncio
-async def test_add_route(app):
+async def test_add_route(app, client):
     @get("/example")
     async def example_handler(request):
         return JsonResponse({"message": "Example response"})
 
     app.add_route("/example", HttpMethod.GET, example_handler)
 
-    response = await app.test_session(app, "GET", "/example")
+    response = await client.get("/example")
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "Example response"}

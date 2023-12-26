@@ -11,7 +11,7 @@ from inspira.responses import HttpResponse
 
 
 @pytest.mark.asyncio
-async def test_protected_route(app):
+async def test_protected_route(client, app):
     @get("/auth")
     @login_required
     async def protected_route(request: Request):
@@ -19,7 +19,7 @@ async def test_protected_route(app):
 
     app.add_route("/auth", HttpMethod.GET, protected_route)
 
-    response = await app.test_session(app, "GET", "/auth")
+    response = await client.get("/auth")
 
     assert response.status_code == 401
 
