@@ -6,6 +6,7 @@ import pytest
 
 from inspira import Inspira
 from inspira.requests import Request
+from inspira.testclient import TestClient
 
 
 @pytest.fixture
@@ -20,6 +21,16 @@ def app_with_session():
     app.session_type = "cookie"
 
     return app
+
+
+@pytest.fixture
+def client(app):
+    return TestClient(app)
+
+
+@pytest.fixture
+def client_session(app_with_session):
+    return TestClient(app_with_session)
 
 
 @pytest.fixture

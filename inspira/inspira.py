@@ -5,7 +5,6 @@ import re
 import sys
 from typing import Any, Callable, Dict, List
 
-from httpx import AsyncClient
 
 from inspira.enums import HttpMethod
 from inspira.globals import set_global_app
@@ -202,7 +201,3 @@ class Inspira:
         if self.session_type:
             session = get_or_create_session(request, self.secret_key)
             request.session = session
-
-    async def test_session(self, app, method, path, **kwargs):
-        async with AsyncClient(app=app, base_url="http://testserver") as client:
-            return await getattr(client, method.lower())(path, **kwargs)

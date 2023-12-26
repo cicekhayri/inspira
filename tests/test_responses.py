@@ -4,6 +4,7 @@ from http import HTTPStatus
 
 import pytest
 
+from inspira import Inspira
 from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
 from inspira.decorators.http_methods import delete, get, post, put
 from inspira.enums import HttpMethod
@@ -32,21 +33,21 @@ def test_should_throw_error_when_same_endpoint_specified_twice(app):
 
 
 @pytest.mark.asyncio
-async def test_basic_route(app):
+async def test_basic_route(client, app):
     @get("/home")
     async def home(request):
         return HttpResponse("This is a test endpoint")
 
     app.add_route("/home", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home")
+    response = await client.get("/home")
 
     assert response.status_code == 200
     assert response.text == "This is a test endpoint"
 
 
 @pytest.mark.asyncio
-async def test_set_cookie_with_route(app):
+async def test_set_cookie_with_route(app, client):
     @get("/home")
     async def home(request):
         http_response = HttpResponse("This is a test endpoint")
@@ -55,22 +56,22 @@ async def test_set_cookie_with_route(app):
 
     app.add_route("/home", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home")
+    response = await client.get("/home")
     headers_dict = dict(response.headers)
 
     expected_headers = {
         "content-type": TEXT_PLAIN,
         "set-cookie": "my_cookie=my_cookie_value; Path=/, "
-                      "session=ImUzMD0uYTU2OTRkZDdkOTlhMTFmOTNiODAyYzRkMzE3MTZlYTk5OTE0NDA1N2Q2MzFkNWZlZWNmYTg4MDJkOTF"
-                      "lMTgzNSI=.8991ce9b78ed5878c22fdb0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Path=/; "
-                      "Secure; HttpOnly",
+        "session=ImUzMD0uYTU2OTRkZDdkOTlhMTFmOTNiODAyYzRkMzE3MTZlYTk5OTE0NDA1N2Q2MzFkNWZlZWNmYTg4MDJkOTF"
+        "lMTgzNSI=.8991ce9b78ed5878c22fdb0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Path=/; "
+        "Secure; HttpOnly",
     }
 
     assert headers_dict == expected_headers
 
 
 @pytest.mark.asyncio
-async def test_set_multiple_cookie(app_with_session):
+async def test_set_multiple_cookie(app_with_session, client_session):
     @get("/home")
     async def home(request):
         http_response = HttpResponse("This is a test endpoint")
@@ -81,29 +82,29 @@ async def test_set_multiple_cookie(app_with_session):
 
     app_with_session.add_route("/home", HttpMethod.GET, home)
 
-    response = await app_with_session.test_session(app_with_session, "GET", "/home")
+    response = await client_session.get("/home")
     headers_dict = dict(response.headers)
 
     expected_header = {
         "content-type": TEXT_PLAIN,
         "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/, "
-                      "session=ImUzMD0uYWIxZTEzYjM5OWU4NmVlOTQxYzFiMDRiZjM4ODg5YjNmZmM1ZWJjZjBiYjc3ZDFjZjI0YzQxZTY5M"
-                      "2U5NzUwNSI=.94676004da3849de0f181a24441f2b3c9199f761e1392e3ceb1c1bc89267594f; Path=/; "
-                      "Secure; HttpOnly",
+        "session=ImUzMD0uYWIxZTEzYjM5OWU4NmVlOTQxYzFiMDRiZjM4ODg5YjNmZmM1ZWJjZjBiYjc3ZDFjZjI0YzQxZTY5M"
+        "2U5NzUwNSI=.94676004da3849de0f181a24441f2b3c9199f761e1392e3ceb1c1bc89267594f; Path=/; "
+        "Secure; HttpOnly",
     }
 
     assert headers_dict == expected_header
 
 
 @pytest.mark.asyncio
-async def test_response_json(app):
+async def test_response_json(app, client):
     @get("/home/something")
     async def home(request):
         return JsonResponse({"message": "Hej something"})
 
     app.add_route("/home/something", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home/something")
+    response = await client.get("/home/something")
 
     assert response.status_code == HTTPStatus.OK
     assert response.headers["content-type"] == APPLICATION_JSON
@@ -115,14 +116,14 @@ async def test_response_json(app):
 
 
 @pytest.mark.asyncio
-async def test_response_text(app):
+async def test_response_text(app, client):
     @get("/home/something")
     async def home(request):
         return HttpResponse("Hej something")
 
     app.add_route("/home/something", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home/something")
+    response = await client.get("/home/something")
 
     assert response.status_code == HTTPStatus.OK
 
@@ -132,14 +133,14 @@ async def test_response_text(app):
 
 
 @pytest.mark.asyncio
-async def test_number_parameter(app):
+async def test_number_parameter(app, client):
     @get("/home/1")
     async def home(request):
         return JsonResponse({"id": 1})
 
     app.add_route("/home/1", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home/1")
+    response = await client.get("/home/1")
 
     assert response.status_code == HTTPStatus.OK
 
@@ -149,14 +150,14 @@ async def test_number_parameter(app):
 
 
 @pytest.mark.asyncio
-async def test_endpoint_without_type_defaults_to_string(app):
+async def test_endpoint_without_type_defaults_to_string(app, client):
     @get("/home/1")
     async def home(request):
         return JsonResponse({"id": "1"})
 
     app.add_route("/home/1", HttpMethod.GET, home)
 
-    response = await app.test_session(app, "GET", "/home/1")
+    response = await client.get("/home/1")
 
     assert response.status_code == HTTPStatus.OK
 
@@ -166,7 +167,7 @@ async def test_endpoint_without_type_defaults_to_string(app):
 
 
 @pytest.mark.asyncio
-async def test_posting_json(app):
+async def test_posting_json(app, client):
     payload = {"name": "Hayri", "email": "hayri@inspira.com"}
 
     @post("/posting-json")
@@ -176,14 +177,14 @@ async def test_posting_json(app):
 
     app.add_route("/posting-json", HttpMethod.POST, posting_json)
 
-    response = await app.test_session(app, "POST", "/posting-json", json=payload)
+    response = await client.post("/posting-json", json=payload)
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == payload
 
 
 @pytest.mark.asyncio
-async def test_posting_form_data(app):
+async def test_posting_form_data(client, app):
     payload = {"name": "Hayri", "email": "hayri@inspira.com"}
 
     @post("/posting-form")
@@ -193,54 +194,54 @@ async def test_posting_form_data(app):
 
     app.add_route("/posting-form", HttpMethod.POST, posting_form)
 
-    response = await app.test_session(app, "POST", "/posting-form", data=payload)
+    response = await client.post("/posting-form", data=payload)
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == payload
 
 
 @pytest.mark.asyncio
-async def test_delete_method(app):
+async def test_delete_method(client, app):
     @delete("/delete/1")
     async def deleting(request):
         return HttpResponse(status_code=HTTPStatus.NO_CONTENT)
 
     app.add_route("/delete/1", HttpMethod.DELETE, deleting)
 
-    response = await app.test_session(app, "DELETE", "/delete/1")
+    response = await client.delete("/delete/1")
 
     assert response.status_code == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.asyncio
-async def test_put_method(app):
+async def test_put_method(app, client):
     @put("/update/1")
     async def updating(request):
         return HttpResponse(status_code=HTTPStatus.NO_CONTENT)
 
     app.add_route("/update/1", HttpMethod.PUT, updating)
 
-    response = await app.test_session(app, "PUT", "/update/1")
+    response = await client.put("/update/1")
 
     assert response.status_code == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.asyncio
-async def test_redirect(app):
+async def test_redirect(app, client):
     @get("/")
     async def redirect(request):
         return HttpResponseRedirect("/hello")
 
     app.add_route("/", HttpMethod.GET, redirect)
 
-    response = await app.test_session(app, "GET", "/")
+    response = await client.get("/")
 
     assert response.status_code == HTTPStatus.FOUND
     assert response.headers["location"] == "/hello"
 
 
 @pytest.mark.asyncio
-async def test_template(app):
+async def test_template(client, app):
     template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "templates"))
 
     @get("/example")
@@ -251,7 +252,7 @@ async def test_template(app):
 
     app.add_route("/example", HttpMethod.GET, render_template)
 
-    response = await app.test_session(app, "GET", "/example")
+    response = await client.get("/example")
 
     assert response.status_code == HTTPStatus.OK
     assert response.text == "<h1>test</h1>"
