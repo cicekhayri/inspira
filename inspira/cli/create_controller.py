@@ -14,16 +14,14 @@ def create_src_directory():
         generate_project()
     if not os.path.exists(src_directory):
         os.makedirs(src_directory)
+        create_init_file(src_directory)
 
 
 def create_test_directory(controller_directory):
     test_directory = os.path.join(controller_directory, "tests")
     os.makedirs(test_directory)
 
-    init_file = os.path.join(test_directory, "__init__.py")
-
-    with open(init_file, "w"):
-        pass
+    create_init_file(test_directory)
 
 
 def create_controller_file(name, is_websocket):
@@ -38,10 +36,7 @@ def create_controller_file(name, is_websocket):
     controller_template_file = "controller_template.txt"
 
     # Create __init__.py in the resource directory
-    init_file = os.path.join(controller_directory, "__init__.py")
-
-    with open(init_file, "w"):
-        pass
+    create_init_file(controller_directory)
 
     controller_file = os.path.join(
         controller_directory, f"{singularize_name}_controller.py"
@@ -65,3 +60,9 @@ def create_controller_file(name, is_websocket):
         output_file.write(content)
 
     click.echo(f"Module '{singularize_name}' created successfully.")
+
+
+def create_init_file(directory):
+    init_file = os.path.join(directory, "__init__.py")
+    with open(init_file, "w"):
+        pass
