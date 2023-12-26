@@ -8,12 +8,8 @@ from inspira import Inspira
 from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
 from inspira.decorators.http_methods import delete, get, post, put
 from inspira.enums import HttpMethod
-from inspira.responses import (
-    HttpResponse,
-    HttpResponseRedirect,
-    JsonResponse,
-    TemplateResponse,
-)
+from inspira.responses import (HttpResponse, HttpResponseRedirect,
+                               JsonResponse, TemplateResponse)
 
 
 def test_should_throw_error_when_same_endpoint_specified_twice(app):
@@ -62,9 +58,9 @@ async def test_set_cookie_with_route(app, client):
     expected_headers = {
         "content-type": TEXT_PLAIN,
         "set-cookie": "my_cookie=my_cookie_value; Path=/, "
-                      "session=ImUzMD0uYTU2OTRkZDdkOTlhMTFmOTNiODAyYzRkMzE3MTZlYTk5OTE0NDA1N2Q2MzFkNWZlZWNmYTg4MDJkOTF"
-                      "lMTgzNSI=.8991ce9b78ed5878c22fdb0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Path=/; "
-                      "Secure; HttpOnly",
+        "session=ImUzMD0uYTU2OTRkZDdkOTlhMTFmOTNiODAyYzRkMzE3MTZlYTk5OTE0NDA1N2Q2MzFkNWZlZWNmYTg4MDJkOTF"
+        "lMTgzNSI=.8991ce9b78ed5878c22fdb0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Path=/; "
+        "Secure; HttpOnly",
     }
 
     assert headers_dict == expected_headers
@@ -88,9 +84,9 @@ async def test_set_multiple_cookie(app_with_session, client_session):
     expected_header = {
         "content-type": TEXT_PLAIN,
         "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/, "
-                      "session=ImUzMD0uYWIxZTEzYjM5OWU4NmVlOTQxYzFiMDRiZjM4ODg5YjNmZmM1ZWJjZjBiYjc3ZDFjZjI0YzQxZTY5M"
-                      "2U5NzUwNSI=.94676004da3849de0f181a24441f2b3c9199f761e1392e3ceb1c1bc89267594f; Path=/; "
-                      "Secure; HttpOnly",
+        "session=ImUzMD0uYWIxZTEzYjM5OWU4NmVlOTQxYzFiMDRiZjM4ODg5YjNmZmM1ZWJjZjBiYjc3ZDFjZjI0YzQxZTY5M"
+        "2U5NzUwNSI=.94676004da3849de0f181a24441f2b3c9199f761e1392e3ceb1c1bc89267594f; Path=/; "
+        "Secure; HttpOnly",
     }
 
     assert headers_dict == expected_header

@@ -4,7 +4,6 @@ from inspira.enums import HttpMethod
 
 
 class TestClient:
-
     __test__ = False
 
     def __init__(self, app):
