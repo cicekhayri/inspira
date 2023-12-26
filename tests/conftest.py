@@ -44,7 +44,7 @@ def request_with_session(mock_scope):
 @pytest.fixture
 def teardown_app_file():
     yield
-    os.remove("app.py")
+    os.remove("main.py")
 
 
 @pytest.fixture

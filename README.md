@@ -80,7 +80,7 @@ inspira new module orders
 After running the command to generate a new module (`inspira new module orders`), the directory structure of your project should look like the following:
 
 ```bash
-├── app.py
+├── main.py
 ├── database.py
 └── src
     └── orders
@@ -96,7 +96,7 @@ After running the command to generate a new module (`inspira new module orders`)
 After generating your app and setting up the necessary resources, start the server with the following command:
 
 ```bash
-uvicorn app:app --reload
+uvicorn main:app --reload
 ```
 
 ## Links
