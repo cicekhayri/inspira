@@ -16,12 +16,25 @@ def create_src_directory():
         os.makedirs(src_directory)
 
 
+def create_test_directory(controller_directory):
+    test_directory = os.path.join(controller_directory, "tests")
+    os.makedirs(test_directory)
+
+    init_file = os.path.join(test_directory, "__init__.py")
+
+    with open(init_file, "w"):
+        pass
+
+
 def create_controller_file(name, is_websocket):
     src_directory = "src"
     controller_directory = os.path.join(src_directory, name)
     singularize_name = singularize(name.lower())
 
     os.makedirs(controller_directory)
+
+    create_test_directory(controller_directory)
+
     controller_template_file = "controller_template.txt"
 
     # Create __init__.py in the resource directory
