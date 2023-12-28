@@ -38,7 +38,8 @@ async def test_login_user(app_with_session, mock_scope):
 @pytest.mark.asyncio
 async def test_login_user(app_with_session, mock_scope):
     receive = AsyncMock()
-    request = Request(mock_scope, receive)
+    send = AsyncMock()
+    request = Request(mock_scope, receive, send)
     request.set_session("logged_in", True)
     RequestContext.set_request(request)
 

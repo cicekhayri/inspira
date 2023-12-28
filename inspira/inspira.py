@@ -115,13 +115,19 @@ class Inspira:
             await self.handle_http(scope, receive, send)
 
     async def handle_http(
-        self, scope: Dict[str, Any], receive: Callable, send: Callable
+            self, scope: Dict[str, Any], receive: Callable, send: Callable
     ) -> None:
-        request = await self.create_request(receive, scope)
+        request = await self.create_request(receive, scope, send)
         RequestContext.set_request(request)
 
         await self.set_request_session(request)
-        await self.process_middlewares(request)
+
+        middleware = await self.process_middlewares(request)
+
+        if middleware.is_forbidden():
+            response = ForbiddenResponse.create()
+            await response(scope, receive, send)
+            return
 
         method = scope["method"]
         path = scope["path"]
@@ -193,9 +199,10 @@ class Inspira:
     async def process_middlewares(self, request: Request):
         for middleware in self.middleware:
             request = await middleware(request)
+        return request
 
-    async def create_request(self, receive: Callable, scope: Dict[str, Any]) -> Request:
-        return Request(scope, receive)
+    async def create_request(self, receive: Callable, scope: Dict[str, Any], send: Callable) -> Request:
+        return Request(scope, receive, send)
 
     async def set_request_session(self, request: Request) -> None:
         if self.session_type:
