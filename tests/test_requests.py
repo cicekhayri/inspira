@@ -6,9 +6,12 @@ from inspira.requests import Request, RequestContext
 
 
 def test_set_request(mock_scope):
-    RequestContext.set_request(mock_scope)
+    receive = AsyncMock()
+    send = AsyncMock()
+    request = Request(mock_scope, receive, send)
+    RequestContext.set_request(request)
 
-    assert RequestContext.get_request() == mock_scope
+    assert RequestContext.get_request() == request
 
 
 def test_get_session(request_with_session):
