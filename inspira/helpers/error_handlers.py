@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict
 from inspira.helpers.error_templates import (
     format_method_not_allowed_exception,
     format_not_found_exception,
-    format_server_exception,
+    format_server_exception, format_forbidden_exception,
 )
 
 
@@ -20,6 +20,13 @@ async def handle_not_found(
 ) -> None:
     not_found_response = format_not_found_exception()
     await not_found_response(scope, receive, send)
+
+
+async def handle_forbidden(
+    scope: Dict[str, Any], receive: Callable, send: Callable
+) -> None:
+    forbidden_response = format_forbidden_exception()
+    await forbidden_response(scope, receive, send)
 
 
 async def default_error_handler(exc):
