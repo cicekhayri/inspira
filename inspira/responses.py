@@ -218,3 +218,8 @@ class HttpResponseRedirect(HttpResponse):
     def __init__(self, url: str, status_code=HTTPStatus.FOUND, headers=None):
         super().__init__(content=None, status_code=status_code, headers=headers or {})
         self.headers["Location"] = url
+
+
+class ForbiddenResponse(HttpResponse):
+    def __init__(self, content=None, status_code=HTTPStatus.FORBIDDEN, headers=None):
+        super().__init__(content, status_code, TEXT_PLAIN, headers)

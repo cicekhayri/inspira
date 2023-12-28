@@ -15,6 +15,7 @@ from inspira.helpers.error_handlers import (
 )
 from inspira.helpers.static_file_handler import handle_static_files
 from inspira.requests import Request, RequestContext
+from inspira.responses import ForbiddenResponse
 from inspira.sessions import encode_session_data, get_or_create_session
 from inspira.utils.controller_parser import parse_controller_decorators
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
@@ -125,7 +126,7 @@ class Inspira:
         middleware = await self.process_middlewares(request)
 
         if middleware.is_forbidden():
-            response = ForbiddenResponse.create()
+            response = ForbiddenResponse()
             await response(scope, receive, send)
             return
 
