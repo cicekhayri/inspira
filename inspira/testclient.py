@@ -27,3 +27,6 @@ class TestClient:
 
     async def patch(self, path, **kwargs):
         return await self.request(HttpMethod.PATCH.value, path, **kwargs)
+
+    async def options(self, path, **kwargs):
+        return await self.request(HttpMethod.OPTIONS.value, path, **kwargs)

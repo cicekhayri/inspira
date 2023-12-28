@@ -7,6 +7,7 @@ class HttpMethod(Enum):
     DELETE = "DELETE"
     PUT = "PUT"
     PATCH = "PATCH"
+    OPTIONS = "OPTIONS"
 
 
 SQLALCHEMY_TYPE_MAPPING = {
