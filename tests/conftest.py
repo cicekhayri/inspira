@@ -36,7 +36,8 @@ def client_session(app_with_session):
 @pytest.fixture
 def request_with_session(mock_scope):
     receive = AsyncMock()
-    request = Request(mock_scope, receive)
+    send = AsyncMock()
+    request = Request(mock_scope, receive, send)
     request.session = {"user_id": 123, "username": "john_doe"}
     return request
 

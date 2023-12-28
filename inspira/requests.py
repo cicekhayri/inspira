@@ -18,10 +18,19 @@ class RequestContext:
 
 
 class Request:
-    def __init__(self, scope: Dict[str, Any], receive: Callable):
+    def __init__(self, scope: Dict[str, Any], receive: Callable, send: Callable):
         self.scope = scope
         self.receive = receive
+        self.send = send
         self._session = {}
+        self._headers = {}
+        self._forbidden = False
+
+    def is_forbidden(self):
+        return self._forbidden
+
+    def set_forbidden(self):
+        self._forbidden = True
 
     @property
     def session(self):
@@ -53,6 +62,15 @@ class Request:
         return dict(
             (key.decode(UTF8), value.decode(UTF8))
             for key, value in self.scope.get("headers", [])
+        )
+
+    def set_header(self, key, value):
+        self._headers[key] = value
+
+    def get_request_headers(self):
+        return list(
+            (key.encode(UTF8), value.encode(UTF8))
+            for key, value in self._headers.items()
         )
 
     def cookies(self):

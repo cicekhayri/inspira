@@ -7,6 +7,7 @@ from http import HTTPStatus
 from jinja2 import Environment, FileSystemLoader
 
 from inspira.constants import APPLICATION_JSON, NOT_FOUND, TEXT_HTML, TEXT_PLAIN, UTF8
+from inspira.requests import RequestContext
 
 
 class HttpResponse:
@@ -79,7 +80,11 @@ class HttpResponse:
         )
 
     async def encoded_headers(self):
+        request_headers = RequestContext().get_request().get_request_headers()
+
         headers = [(b"content-type", self.content_type.encode(UTF8))]
+
+        headers.extend(request_headers)
 
         for key, value_list in self.headers.items():
             headers.extend(self.encode_header(key, value_list))
@@ -218,3 +223,8 @@ class HttpResponseRedirect(HttpResponse):
     def __init__(self, url: str, status_code=HTTPStatus.FOUND, headers=None):
         super().__init__(content=None, status_code=status_code, headers=headers or {})
         self.headers["Location"] = url
+
+
+class ForbiddenResponse(HttpResponse):
+    def __init__(self, content=None, status_code=HTTPStatus.FORBIDDEN, headers=None):
+        super().__init__(content, status_code, TEXT_PLAIN, headers)

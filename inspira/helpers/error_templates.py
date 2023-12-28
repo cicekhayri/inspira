@@ -70,6 +70,15 @@ def format_not_found_exception() -> HttpResponse:
     return HttpResponse(content=msg, status_code=404, content_type=TEXT_HTML)
 
 
+def format_forbidden_exception() -> HttpResponse:
+    msg = template.format(
+        title="Forbidden",
+        message="Forbidden",
+        status_code=403,
+    )
+    return HttpResponse(content=msg, status_code=403, content_type=TEXT_HTML)
+
+
 def format_method_not_allowed_exception() -> HttpResponse:
     msg = template.format(
         title="Method Not Allowed",
