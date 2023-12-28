@@ -116,7 +116,7 @@ class Inspira:
             await self.handle_http(scope, receive, send)
 
     async def handle_http(
-            self, scope: Dict[str, Any], receive: Callable, send: Callable
+        self, scope: Dict[str, Any], receive: Callable, send: Callable
     ) -> None:
         request = await self.create_request(receive, scope, send)
         RequestContext.set_request(request)
@@ -202,7 +202,9 @@ class Inspira:
             request = await middleware(request)
         return request
 
-    async def create_request(self, receive: Callable, scope: Dict[str, Any], send: Callable) -> Request:
+    async def create_request(
+        self, receive: Callable, scope: Dict[str, Any], send: Callable
+    ) -> Request:
         return Request(scope, receive, send)
 
     async def set_request_session(self, request: Request) -> None:

@@ -49,9 +49,14 @@ async def test_cors_middleware(app, client):
 
     app.add_route("/test", HttpMethod.GET, test_route)
 
-    response_allowed = await client.get("/test", headers={'Origin': 'http://localhost:8000'})
+    response_allowed = await client.get(
+        "/test", headers={"Origin": "http://localhost:8000"}
+    )
 
-    assert response_allowed.headers['Access-Control-Allow-Origin'] == 'http://localhost:8000'
+    assert (
+        response_allowed.headers["Access-Control-Allow-Origin"]
+        == "http://localhost:8000"
+    )
     assert response_allowed.status_code == HTTPStatus.OK
 
 
@@ -74,6 +79,8 @@ async def test_cors_middleware_origin(app, client):
 
     app.add_route("/test", HttpMethod.GET, test_route)
 
-    not_response_allowed = await client.get("/test", headers={'Origin': 'http://localhost:3000'})
+    not_response_allowed = await client.get(
+        "/test", headers={"Origin": "http://localhost:3000"}
+    )
 
     assert not_response_allowed.status_code == HTTPStatus.FORBIDDEN

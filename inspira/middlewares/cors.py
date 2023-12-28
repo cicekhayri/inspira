@@ -24,9 +24,10 @@ class CORSMiddleware:
             return request
 
         request.set_header("Access-Control-Allow-Origin", origin)
-        request.set_header("Access-Control-Allow-Credentials", str(self.allow_credentials).lower())
+        request.set_header(
+            "Access-Control-Allow-Credentials", str(self.allow_credentials).lower()
+        )
         request.set_header("Access-Control-Allow-Methods", ",".join(self.allow_methods))
         request.set_header("Access-Control-Allow-Headers", ",".join(self.allow_headers))
 
         return request
-
