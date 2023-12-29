@@ -73,7 +73,8 @@ def test_encode_session_data_empty():
 def test_decode_session_data():
     session_id = "eyJlbWFpbCI6ICJoYXlyaUBpbnNwaXJhZnJhbWV3b3JrLmNvbSJ9.6686454bb770d5e5e84baa7d2abb6746a112ecf1c8f91d9a00e091c1cc30b288"
 
-    actual_result = decode_session_data(session_id)
+    secret_key = "your_secret_key"
+    actual_result = decode_session_data(session_id, secret_key)
     expected_result = {"email": "hayri@inspiraframework.com"}
 
     assert actual_result == expected_result
@@ -95,5 +96,5 @@ def test_get_or_create_session():
 
     actual_result = get_or_create_session(mock_request, secret_key)
 
-    decoded_session_data = decode_session_data(session_id)
+    decoded_session_data = decode_session_data(session_id, secret_key)
     assert actual_result == decoded_session_data == expected_result
