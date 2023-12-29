@@ -191,7 +191,7 @@ class Inspira:
 
     async def process_middlewares(self, scope: Dict[str, Any], receive: Callable, send: Callable, handler):
         for middleware in reversed(self.middleware):
-            handler = middleware(handler)
+            handler = await middleware(handler)
         response = await handler(scope, receive, send)
         return response
 

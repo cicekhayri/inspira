@@ -17,7 +17,7 @@ class CORSMiddleware:
         self.allow_methods = allow_methods or []
         self.allow_headers = allow_headers or []
 
-    def __call__(self, handler):
+    async def __call__(self, handler):
         async def middleware(scope: Dict[str, Any], receive: Callable, send: Callable):
             request = Request(scope, receive, send)
             origin = request.get_headers().get("origin")
