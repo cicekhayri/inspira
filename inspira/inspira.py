@@ -15,7 +15,6 @@ from inspira.helpers.error_handlers import (
 )
 from inspira.helpers.static_file_handler import handle_static_files
 from inspira.requests import Request, RequestContext
-from inspira.responses import ForbiddenResponse
 from inspira.sessions import encode_session_data, get_or_create_session
 from inspira.utils.controller_parser import parse_controller_decorators
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
@@ -113,7 +112,7 @@ class Inspira:
         if scope["type"] == "websocket":
             await handle_websocket(scope, receive, send)
         elif scope["type"] == "http":
-            await self.handle_http(scope, receive, send)
+            await self.process_middlewares(scope, receive, send, self.handle_http)
 
     async def handle_http(
         self, scope: Dict[str, Any], receive: Callable, send: Callable
@@ -122,13 +121,6 @@ class Inspira:
         RequestContext.set_request(request)
 
         await self.set_request_session(request)
-
-        middleware = await self.process_middlewares(request)
-
-        if middleware.is_forbidden():
-            response = ForbiddenResponse()
-            await response(scope, receive, send)
-            return
 
         method = scope["method"]
         path = scope["path"]
@@ -197,10 +189,11 @@ class Inspira:
             error_response = await self.error_handler(exc)
             await error_response(scope, receive, send)
 
-    async def process_middlewares(self, request: Request):
-        for middleware in self.middleware:
-            request = await middleware(request)
-        return request
+    async def process_middlewares(self, scope: Dict[str, Any], receive: Callable, send: Callable, handler):
+        for middleware in reversed(self.middleware):
+            handler = middleware(handler)
+        response = await handler(scope, receive, send)
+        return response
 
     async def create_request(
         self, receive: Callable, scope: Dict[str, Any], send: Callable
