@@ -5,7 +5,7 @@ import re
 import sys
 from typing import Any, Callable, Dict, List
 
-
+from inspira.config import Config
 from inspira.enums import HttpMethod
 from inspira.globals import set_global_app
 from inspira.helpers.error_handlers import (
@@ -32,6 +32,7 @@ class Inspira:
         self.secret_key = secret_key
         self.session_type = session_type
         self.discover_controllers()
+        self.config = Config()
         set_global_app(self)
 
     def add_middleware(self, middleware: Callable) -> Callable:
