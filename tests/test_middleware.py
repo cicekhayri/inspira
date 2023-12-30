@@ -10,27 +10,6 @@ from inspira.responses import JsonResponse, HttpResponse
 
 
 @pytest.mark.asyncio
-async def test_middleware(app, client):
-    async def sample_middleware(request: Request):
-        request.extra_data = "Modified by middleware"
-        return request
-
-    # Use the middleware
-    app.add_middleware(sample_middleware)
-
-    @get("/test")
-    async def test_route(request: Request):
-        return JsonResponse({"message": request.extra_data})
-
-    app.add_route("/test", HttpMethod.GET, test_route)
-
-    response = await client.get("/test")
-
-    assert response.status_code == HTTPStatus.OK
-    assert response.json()["message"] == "Modified by middleware"
-
-
-@pytest.mark.asyncio
 async def test_cors_middleware(app, client):
     origins = ["http://localhost:8000"]
 

@@ -5,7 +5,7 @@ import re
 import sys
 from typing import Any, Callable, Dict, List
 
-
+from inspira.config import Config
 from inspira.enums import HttpMethod
 from inspira.globals import set_global_app
 from inspira.helpers.error_handlers import (
@@ -15,7 +15,6 @@ from inspira.helpers.error_handlers import (
 )
 from inspira.helpers.static_file_handler import handle_static_files
 from inspira.requests import Request, RequestContext
-from inspira.responses import ForbiddenResponse
 from inspira.sessions import encode_session_data, get_or_create_session
 from inspira.utils.controller_parser import parse_controller_decorators
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
@@ -33,6 +32,7 @@ class Inspira:
         self.secret_key = secret_key
         self.session_type = session_type
         self.discover_controllers()
+        self.config = Config()
         set_global_app(self)
 
     def add_middleware(self, middleware: Callable) -> Callable:
@@ -113,7 +113,7 @@ class Inspira:
         if scope["type"] == "websocket":
             await handle_websocket(scope, receive, send)
         elif scope["type"] == "http":
-            await self.handle_http(scope, receive, send)
+            await self.process_middlewares(scope, receive, send, self.handle_http)
 
     async def handle_http(
         self, scope: Dict[str, Any], receive: Callable, send: Callable
@@ -122,13 +122,6 @@ class Inspira:
         RequestContext.set_request(request)
 
         await self.set_request_session(request)
-
-        middleware = await self.process_middlewares(request)
-
-        if middleware.is_forbidden():
-            response = ForbiddenResponse()
-            await response(scope, receive, send)
-            return
 
         method = scope["method"]
         path = scope["path"]
@@ -181,26 +174,51 @@ class Inspira:
         send: Callable,
     ):
         try:
-            handler = self.routes[method][path]
-            response = await invoke_handler(handler, request, scope)
-
-            if self.session_type:
-                encoded_and_signed_data = encode_session_data(
-                    request.session, self.secret_key
-                )
-                response.set_cookie(
-                    "session", encoded_and_signed_data, secure=True, httponly=True
-                )
-
+            handler = self.get_handler(method, path)
+            response = await self.invoke_handler(handler, request, scope)
+            await self.handle_session(response, request)
             await response(scope, receive, send)
         except Exception as exc:
-            error_response = await self.error_handler(exc)
-            await error_response(scope, receive, send)
+            await self.handle_error(exc, scope, receive, send)
 
-    async def process_middlewares(self, request: Request):
-        for middleware in self.middleware:
-            request = await middleware(request)
-        return request
+    def get_handler(self, method: str, path: str):
+        return self.routes[method][path]
+
+    async def invoke_handler(self, handler, request: Request, scope: Dict[str, Any]):
+        return await invoke_handler(handler, request, scope)
+
+    async def handle_session(self, response, request: Request):
+        if self.session_type == "cookie":
+            encoded_and_signed_data = encode_session_data(
+                request.session, self.secret_key
+            )
+            self.set_session_cookie(response, encoded_and_signed_data)
+
+    def set_session_cookie(self, response, encoded_data):
+        cookie_params = {
+            "secure": self.config["SESSION_COOKIE_SECURE"],
+            "httponly": self.config["SESSION_COOKIE_HTTPONLY"],
+            "path": self.config["SESSION_COOKIE_PATH"],
+            "max_age": self.config["SESSION_MAX_AGE"],
+            "domain": self.config["SESSION_COOKIE_DOMAIN"],
+            "samesite": self.config["SESSION_COOKIE_SAMESITE"],
+        }
+
+        response.set_cookie(
+            self.config["SESSION_COOKIE_NAME"], encoded_data, **cookie_params
+        )
+
+    async def handle_error(self, exc, scope, receive, send):
+        error_response = await self.error_handler(exc)
+        await error_response(scope, receive, send)
+
+    async def process_middlewares(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable, handler
+    ):
+        for middleware in reversed(self.middleware):
+            handler = await middleware(handler)
+        response = await handler(scope, receive, send)
+        return response
 
     async def create_request(
         self, receive: Callable, scope: Dict[str, Any], send: Callable
