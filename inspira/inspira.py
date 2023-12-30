@@ -174,23 +174,47 @@ class Inspira:
         send: Callable,
     ):
         try:
-            handler = self.routes[method][path]
-            response = await invoke_handler(handler, request, scope)
-
-            if self.session_type:
-                encoded_and_signed_data = encode_session_data(
-                    request.session, self.secret_key
-                )
-                response.set_cookie(
-                    "session", encoded_and_signed_data, secure=True, httponly=True
-                )
-
+            handler = self.get_handler(method, path)
+            response = await self.invoke_handler(handler, request, scope)
+            await self.handle_session(response, request)
             await response(scope, receive, send)
         except Exception as exc:
-            error_response = await self.error_handler(exc)
-            await error_response(scope, receive, send)
+            await self.handle_error(exc, scope, receive, send)
 
-    async def process_middlewares(self, scope: Dict[str, Any], receive: Callable, send: Callable, handler):
+    def get_handler(self, method: str, path: str):
+        return self.routes[method][path]
+
+    async def invoke_handler(self, handler, request: Request, scope: Dict[str, Any]):
+        return await invoke_handler(handler, request, scope)
+
+    async def handle_session(self, response, request: Request):
+        if self.session_type == "cookie":
+            encoded_and_signed_data = encode_session_data(
+                request.session, self.secret_key
+            )
+            self.set_session_cookie(response, encoded_and_signed_data)
+
+    def set_session_cookie(self, response, encoded_data):
+        cookie_params = {
+            "secure": self.config["SESSION_COOKIE_SECURE"],
+            "httponly": self.config["SESSION_COOKIE_HTTPONLY"],
+            "path": self.config["SESSION_COOKIE_PATH"],
+            "max_age": self.config["SESSION_MAX_AGE"],
+            "domain": self.config["SESSION_COOKIE_DOMAIN"],
+            "samesite": self.config["SESSION_COOKIE_SAMESITE"],
+        }
+
+        response.set_cookie(
+            self.config["SESSION_COOKIE_NAME"], encoded_data, **cookie_params
+        )
+
+    async def handle_error(self, exc, scope, receive, send):
+        error_response = await self.error_handler(exc)
+        await error_response(scope, receive, send)
+
+    async def process_middlewares(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable, handler
+    ):
         for middleware in reversed(self.middleware):
             handler = await middleware(handler)
         response = await handler(scope, receive, send)
