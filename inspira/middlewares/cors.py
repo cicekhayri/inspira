@@ -23,21 +23,38 @@ class CORSMiddleware:
             origin = request.get_headers().get("origin")
 
             if origin is not None and (
-                    origin not in self.allow_origins and "*" not in self.allow_origins
+                origin not in self.allow_origins and "*" not in self.allow_origins
             ):
                 return await handle_forbidden(scope, receive, send)
 
             async def send_wrapper(message):
-                if message['type'] == 'http.response.start':
-                    headers = message.get('headers', [])
+                if message["type"] == "http.response.start":
+                    headers = message.get("headers", [])
 
                     if origin in self.allow_origins:
-                        headers.append((b'Access-Control-Allow-Origin', origin.encode()))
-                        headers.append((b'Access-Control-Allow-Credentials', str(self.allow_credentials).lower().encode()))
-                        headers.append((b'Access-Control-Allow-Methods', ','.join(self.allow_methods).encode()))
-                        headers.append((b'Access-Control-Allow-Headers', ','.join(self.allow_headers).encode()))
+                        headers.append(
+                            (b"Access-Control-Allow-Origin", origin.encode())
+                        )
+                        headers.append(
+                            (
+                                b"Access-Control-Allow-Credentials",
+                                str(self.allow_credentials).lower().encode(),
+                            )
+                        )
+                        headers.append(
+                            (
+                                b"Access-Control-Allow-Methods",
+                                ",".join(self.allow_methods).encode(),
+                            )
+                        )
+                        headers.append(
+                            (
+                                b"Access-Control-Allow-Headers",
+                                ",".join(self.allow_headers).encode(),
+                            )
+                        )
 
-                    message['headers'] = headers
+                    message["headers"] = headers
 
                 await send(message)
 
