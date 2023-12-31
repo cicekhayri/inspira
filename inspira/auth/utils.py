@@ -10,5 +10,5 @@ def logout_user():
     request = RequestContext.get_request()
     session = request.session
 
-    if "logged_in" in session:
+    if session and "logged_in" in session:
         request.remove_session("logged_in")

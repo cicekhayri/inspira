@@ -61,9 +61,7 @@ async def test_set_cookie_with_route(app, client):
 
     expected_headers = {
         "content-type": TEXT_PLAIN,
-        "set-cookie": "my_cookie=my_cookie_value; Path=/, session=ImUzMD0uYTU2OTRkZDdkOTlhMTFmOTNiODAyY"
-        "zRkMzE3MTZlYTk5OTE0NDA1N2Q2MzFkNWZlZWNmYTg4MDJkOTFlMTgzNSI=.8991ce9b78ed5878c22fdb"
-        "0d757137409a61c26daf53e9c4ea41ab0a5fe8c8f9; Max-Age=3600; Secure; HttpOnly",
+        "set-cookie": "my_cookie=my_cookie_value; Path=/",
     }
 
     assert headers_dict == expected_headers
@@ -86,10 +84,7 @@ async def test_set_multiple_cookie(app_with_session, client_session):
 
     expected_header = {
         "content-type": TEXT_PLAIN,
-        "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; "
-        "Path=/, session=ImUzMD0uYWIxZTEzYjM5OWU4NmVlOTQxYzFiMDRiZjM4ODg5YjNmZmM1ZWJjZjBiYjc"
-        "3ZDFjZjI0YzQxZTY5M2U5NzUwNSI=.94676004da3849de0f181a24441f2b3c9199f761e1392e3ceb1c1bc89"
-        "267594f; Max-Age=3600; Secure; HttpOnly",
+        "set-cookie": "my_cookie=my_cookie_value; Path=/, my_second_cookie=my_second_cookie_value; Path=/",
     }
 
     assert headers_dict == expected_header

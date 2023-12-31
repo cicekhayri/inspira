@@ -64,6 +64,6 @@ def get_or_create_session(request, secret_key):
     else:
         print("No session in cookies")
 
-    # Create a new session if not found or invalid
-    encoded_payload = encode_session_data(session_data, secret_key)
-    return encoded_payload
+    if request.session:
+        encoded_payload = encode_session_data(session_data, secret_key)
+        return encoded_payload
