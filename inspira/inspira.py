@@ -188,7 +188,7 @@ class Inspira:
         return await invoke_handler(handler, request, scope)
 
     async def handle_session(self, response, request: Request):
-        if self.session_type == "cookie":
+        if request.session and self.session_type == "cookie":
             encoded_and_signed_data = encode_session_data(
                 request.session, self.secret_key
             )
