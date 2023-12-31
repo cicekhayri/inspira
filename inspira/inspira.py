@@ -15,7 +15,7 @@ from inspira.helpers.error_handlers import (
 )
 from inspira.helpers.static_file_handler import handle_static_files
 from inspira.requests import Request, RequestContext
-from inspira.sessions import encode_session_data, get_or_create_session
+from inspira.utils.session_utils import get_or_create_session
 from inspira.utils.controller_parser import parse_controller_decorators
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
 from inspira.utils.handler_invoker import invoke_handler
@@ -118,9 +118,7 @@ class Inspira:
     async def handle_http(
         self, scope: Dict[str, Any], receive: Callable, send: Callable
     ) -> None:
-        request = await self.create_request(receive, scope, send)
-        RequestContext.set_request(request)
-
+        request = RequestContext.get_request()
         await self.set_request_session(request)
 
         method = scope["method"]
@@ -176,7 +174,6 @@ class Inspira:
         try:
             handler = self.get_handler(method, path)
             response = await self.invoke_handler(handler, request, scope)
-            await self.handle_session(response, request)
             await response(scope, receive, send)
         except Exception as exc:
             await self.handle_error(exc, scope, receive, send)
@@ -187,27 +184,6 @@ class Inspira:
     async def invoke_handler(self, handler, request: Request, scope: Dict[str, Any]):
         return await invoke_handler(handler, request, scope)
 
-    async def handle_session(self, response, request: Request):
-        if request.session and self.session_type == "cookie":
-            encoded_and_signed_data = encode_session_data(
-                request.session, self.secret_key
-            )
-            self.set_session_cookie(response, encoded_and_signed_data)
-
-    def set_session_cookie(self, response, encoded_data):
-        cookie_params = {
-            "secure": self.config["SESSION_COOKIE_SECURE"],
-            "httponly": self.config["SESSION_COOKIE_HTTPONLY"],
-            "path": self.config["SESSION_COOKIE_PATH"],
-            "max_age": self.config["SESSION_MAX_AGE"],
-            "domain": self.config["SESSION_COOKIE_DOMAIN"],
-            "samesite": self.config["SESSION_COOKIE_SAMESITE"],
-        }
-
-        response.set_cookie(
-            self.config["SESSION_COOKIE_NAME"], encoded_data, **cookie_params
-        )
-
     async def handle_error(self, exc, scope, receive, send):
         error_response = await self.error_handler(exc)
         await error_response(scope, receive, send)
@@ -215,6 +191,9 @@ class Inspira:
     async def process_middlewares(
         self, scope: Dict[str, Any], receive: Callable, send: Callable, handler
     ):
+        request = await self.create_request(receive, scope, send)
+        RequestContext.set_request(request)
+
         for middleware in reversed(self.middleware):
             handler = await middleware(handler)
         response = await handler(scope, receive, send)

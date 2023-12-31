@@ -1,12 +1,15 @@
 from http import HTTPStatus
+from http.cookies import SimpleCookie
 
 import pytest
 
 from inspira.decorators.http_methods import get
 from inspira.enums import HttpMethod
 from inspira.middlewares.cors import CORSMiddleware
+from inspira.middlewares.sessions import SessionMiddleware
 from inspira.requests import Request
 from inspira.responses import JsonResponse, HttpResponse
+from inspira.utils.session_utils import decode_session_data
 
 
 @pytest.mark.asyncio
@@ -87,3 +90,62 @@ async def test_cors_middleware_without_origin_header(app, client):
     not_response_allowed = await client.get("/test")
 
     assert not_response_allowed.status_code == HTTPStatus.OK
+
+
+@pytest.mark.asyncio
+async def test_session_middleware(app, client):
+    cors_middleware = SessionMiddleware(
+        secret_key="dummy"
+    )
+
+    app.add_middleware(cors_middleware)
+
+    @get("/test")
+    async def test_route(request: Request):
+        request.set_session("message", "Hej")
+        return HttpResponse("hello")
+
+    app.add_route("/test", HttpMethod.GET, test_route)
+
+    response = await client.get("/test")
+    set_cookie_header = response.headers.get("set-cookie", "")
+
+    cookies = SimpleCookie(set_cookie_header)
+    session_cookie = cookies.get("session")
+
+    assert session_cookie is not None
+
+    decoded_session = decode_session_data(session_cookie.value, "dummy")
+    expected_session = {"message": "Hej"}
+
+    assert decoded_session == expected_session
+    assert response.status_code == HTTPStatus.OK
+
+
+@pytest.mark.asyncio
+async def test_invalid_signature_exception(app, client):
+    cors_middleware = SessionMiddleware(
+        secret_key="dummy"
+    )
+
+    app.add_middleware(cors_middleware)
+
+    @get("/test")
+    async def test_route(request: Request):
+        request.set_session("message", "Hej")
+        return HttpResponse("hello")
+
+    app.add_route("/test", HttpMethod.GET, test_route)
+
+    response = await client.get("/test")
+    set_cookie_header = response.headers.get("set-cookie", "")
+
+    cookies = SimpleCookie(set_cookie_header)
+    session_cookie = cookies.get("session")
+
+    assert session_cookie is not None
+
+    with pytest.raises(ValueError, match="Invalid signature"):
+        decode_session_data(session_cookie.value, "wrong_token")
+
+    assert response.status_code == HTTPStatus.OK
