@@ -94,9 +94,7 @@ async def test_cors_middleware_without_origin_header(app, client):
 
 @pytest.mark.asyncio
 async def test_session_middleware(app, client):
-    cors_middleware = SessionMiddleware(
-        secret_key="dummy"
-    )
+    cors_middleware = SessionMiddleware(secret_key="dummy")
 
     app.add_middleware(cors_middleware)
 
@@ -124,9 +122,7 @@ async def test_session_middleware(app, client):
 
 @pytest.mark.asyncio
 async def test_invalid_signature_exception(app, client):
-    cors_middleware = SessionMiddleware(
-        secret_key="dummy"
-    )
+    cors_middleware = SessionMiddleware(secret_key="dummy")
 
     app.add_middleware(cors_middleware)
 
@@ -149,3 +145,32 @@ async def test_invalid_signature_exception(app, client):
         decode_session_data(session_cookie.value, "wrong_token")
 
     assert response.status_code == HTTPStatus.OK
+
+
+@pytest.mark.asyncio
+async def test_remove_session_success(app, client):
+    cors_middleware = SessionMiddleware(secret_key="dummy")
+
+    app.add_middleware(cors_middleware)
+
+    @get("/test")
+    async def test_route(request: Request):
+        request.set_session("message", "Hej")
+        return HttpResponse("hello")
+
+    @get("/remove")
+    async def remove_route(request: Request):
+        request.remove_session("message")
+        return HttpResponse("hello")
+
+    app.add_route("/test", HttpMethod.GET, test_route)
+
+    response1 = await client.get("/test")
+
+    assert "set-cookie" in response1.headers
+
+    app.add_route("/remove", HttpMethod.GET, remove_route)
+    response2 = await client.get("/remove")
+
+    assert response2.status_code == HTTPStatus.OK
+    assert "set-cookie" not in response2.headers

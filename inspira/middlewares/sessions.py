@@ -22,25 +22,35 @@ class SessionMiddleware:
 
                     if request.session:
                         cookies = SimpleCookie(request.get_headers().get("cookie", ""))
-                        session_cookie = cookies.get(self.config['SESSION_COOKIE_NAME'])
+                        session_cookie = cookies.get(self.config["SESSION_COOKIE_NAME"])
 
                         # Check if session is not present in the session cookie
                         if not session_cookie:
-                            encoded_payload = encode_session_data(request.session, self.secret_key)
-                            expires_date = datetime.datetime.utcnow() + datetime.timedelta(
-                                seconds=self.config['SESSION_MAX_AGE'])
-                            formatted_expires = expires_date.strftime('%a, %d %b %Y %H:%M:%S GMT')
+                            encoded_payload = encode_session_data(
+                                request.session, self.secret_key
+                            )
+                            expires_date = (
+                                datetime.datetime.utcnow()
+                                + datetime.timedelta(
+                                    seconds=self.config["SESSION_MAX_AGE"]
+                                )
+                            )
+                            formatted_expires = expires_date.strftime(
+                                "%a, %d %b %Y %H:%M:%S GMT"
+                            )
 
                             # Build the "Set-Cookie" header with session configurations
                             cookie_value = f"{self.config['SESSION_COOKIE_NAME']}={encoded_payload}; Expires={formatted_expires}; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
 
-                            if self.config['SESSION_COOKIE_DOMAIN']:
-                                cookie_value += f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
+                            if self.config["SESSION_COOKIE_DOMAIN"]:
+                                cookie_value += (
+                                    f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
+                                )
 
-                            if self.config['SESSION_COOKIE_SECURE']:
+                            if self.config["SESSION_COOKIE_SECURE"]:
                                 cookie_value += "; Secure"
 
-                            if self.config['SESSION_COOKIE_SAMESITE']:
+                            if self.config["SESSION_COOKIE_SAMESITE"]:
                                 cookie_value += f"; SameSite={self.config['SESSION_COOKIE_SAMESITE']}"
 
                             headers.append((b"Set-Cookie", cookie_value.encode()))
