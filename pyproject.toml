@@ -1,6 +1,6 @@
 [project]
 name = "inspira"
-version = "0.5.1"
+version = "0.5.2"
 description = "Inspira is a lightweight framework for building asynchronous web applications."
 readme = "README.md"
 authors = [{name = "Hayri Cicek", email = "hayri@inspiraframework.com"}]
