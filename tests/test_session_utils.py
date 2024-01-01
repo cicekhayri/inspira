@@ -3,7 +3,7 @@ import datetime
 import hashlib
 import json
 
-from inspira.sessions import (
+from inspira.utils.session_utils import (
     DateTimeEncoder,
     decode_session_data,
     encode_session_data,
