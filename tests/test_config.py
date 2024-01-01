@@ -29,5 +29,4 @@ def test_unknown_key_returns_none(sample_config):
 
 def test_default_max_age():
     expected_result = 24 * 60 * 60 * 31
-    print(expected_result)
     assert default_max_age() == expected_result
