@@ -122,9 +122,9 @@ async def test_set_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_invalid_signature_exception(app, client):
-    cors_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware(secret_key="dummy")
 
-    app.add_middleware(cors_middleware)
+    app.add_middleware(session_middleware)
 
     @get("/test")
     async def test_route(request: Request):
@@ -178,7 +178,7 @@ async def test_remove_session_success(app, client):
     cookies = SimpleCookie(set_cookie_header)
     session_cookie = cookies.get("session")
 
-    assert session_cookie.value == ''
+    assert session_cookie.value == ""
     assert response2.status_code == HTTPStatus.OK
 
 
@@ -199,6 +199,7 @@ async def test_get_session_success(app, client):
     response = await client.get("/get")
 
     assert response.content == b"User ID: 123"
+
 
 @pytest.mark.asyncio
 async def test_remove_nonexistent_key(app, client):
@@ -221,5 +222,5 @@ async def test_remove_nonexistent_key(app, client):
     cookies = SimpleCookie(set_cookie_header)
     session_cookie = cookies.get("session")
 
-    assert session_cookie.value == ''
+    assert session_cookie.value == ""
     assert response.status_code == HTTPStatus.OK

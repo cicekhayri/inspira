@@ -15,9 +15,8 @@ class SessionMiddleware:
 
     def build_set_cookie_header(self, session_data):
         encoded_payload = encode_session_data(session_data, self.secret_key)
-        expires_date = (
-            datetime.datetime.utcnow()
-            + datetime.timedelta(seconds=self.config["SESSION_MAX_AGE"])
+        expires_date = datetime.datetime.utcnow() + datetime.timedelta(
+            seconds=self.config["SESSION_MAX_AGE"]
         )
         formatted_expires = expires_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
