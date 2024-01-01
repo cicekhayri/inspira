@@ -233,6 +233,7 @@ async def test_patch_method(app, client):
 
     assert response.status_code == HTTPStatus.NO_CONTENT
 
+
 @pytest.mark.asyncio
 async def test_redirect(app, client):
     @get("/")

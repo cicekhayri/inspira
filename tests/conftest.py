@@ -76,6 +76,7 @@ def mock_scope():
         "headers": [(b"content-type", b"application/json")],
     }
 
+
 @pytest.fixture
 def sample_config():
     return Config()

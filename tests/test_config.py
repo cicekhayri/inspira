@@ -10,6 +10,7 @@ def test_set_item(sample_config):
     assert sample_config["SESSION_COOKIE_NAME"] == "new_session"
     assert sample_config["NEW_KEY"] == "this_new_key"
 
+
 def test_default_values(sample_config):
     assert sample_config["SESSION_MAX_AGE"] == 3600
     assert sample_config["SESSION_COOKIE_DOMAIN"] is None
