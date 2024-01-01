@@ -181,4 +181,3 @@ async def test_remove_session_success(app, client):
 
     assert decoded_session is None
     assert response2.status_code == HTTPStatus.OK
-
