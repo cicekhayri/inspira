@@ -6,8 +6,9 @@ import pytest
 
 from inspira import Inspira
 from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
-from inspira.decorators.http_methods import delete, get, post, put
+from inspira.decorators.http_methods import delete, get, post, put, patch
 from inspira.enums import HttpMethod
+from inspira.requests import Request
 from inspira.responses import (
     HttpResponse,
     HttpResponseRedirect,
@@ -219,6 +220,18 @@ async def test_put_method(app, client):
 
     assert response.status_code == HTTPStatus.NO_CONTENT
 
+
+@pytest.mark.asyncio
+async def test_patch_method(app, client):
+    @patch("/test/1")
+    async def test_patch(request: Request):
+        return HttpResponse(status_code=HTTPStatus.NO_CONTENT)
+
+    app.add_route("/test/1", HttpMethod.PATCH, test_patch)
+
+    response = await client.patch("/test/1")
+
+    assert response.status_code == HTTPStatus.NO_CONTENT
 
 @pytest.mark.asyncio
 async def test_redirect(app, client):
