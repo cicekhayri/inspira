@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from inspira import Inspira
+from inspira.config import Config
 from inspira.requests import Request
 from inspira.testclient import TestClient
 
@@ -74,3 +75,8 @@ def mock_scope():
     return {
         "headers": [(b"content-type", b"application/json")],
     }
+
+
+@pytest.fixture
+def sample_config():
+    return Config()

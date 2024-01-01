@@ -27,7 +27,8 @@ async def test_protected_route(client, app):
 @pytest.mark.asyncio
 async def test_login_user(app_with_session, mock_scope):
     receive = AsyncMock()
-    request = Request(mock_scope, receive)
+    send = AsyncMock()
+    request = Request(mock_scope, receive, send)
     RequestContext.set_request(request)
 
     login_user()
@@ -36,7 +37,7 @@ async def test_login_user(app_with_session, mock_scope):
 
 
 @pytest.mark.asyncio
-async def test_login_user(app_with_session, mock_scope):
+async def test_login_out_user(app_with_session, mock_scope):
     receive = AsyncMock()
     send = AsyncMock()
     request = Request(mock_scope, receive, send)
