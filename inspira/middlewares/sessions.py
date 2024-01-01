@@ -26,7 +26,9 @@ class SessionMiddleware:
                         decoded_session = None
 
                         if session_cookie:
-                            decoded_session = decode_session_data(session_cookie.value, self.secret_key)
+                            decoded_session = decode_session_data(
+                                session_cookie.value, self.secret_key
+                            )
 
                         # Check if session is not present in the session cookie
                         if not session_cookie or decoded_session != request:
