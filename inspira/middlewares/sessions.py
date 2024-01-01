@@ -13,6 +13,29 @@ class SessionMiddleware:
         self.secret_key = secret_key
         self.config = get_global_app().config or Config()
 
+    def build_set_cookie_header(self, session_data):
+        encoded_payload = encode_session_data(session_data, self.secret_key)
+        expires_date = datetime.datetime.utcnow() + datetime.timedelta(
+            seconds=self.config["SESSION_MAX_AGE"]
+        )
+        formatted_expires = expires_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+        cookie_value = (
+            f"{self.config['SESSION_COOKIE_NAME']}={encoded_payload}; "
+            f"Expires={formatted_expires}; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
+        )
+
+        if self.config["SESSION_COOKIE_DOMAIN"]:
+            cookie_value += f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
+
+        if self.config["SESSION_COOKIE_SECURE"]:
+            cookie_value += "; Secure"
+
+        if self.config["SESSION_COOKIE_SAMESITE"]:
+            cookie_value += f"; SameSite={self.config['SESSION_COOKIE_SAMESITE']}"
+
+        return cookie_value
+
     async def __call__(self, handler):
         async def middleware(scope: Dict[str, Any], receive: Callable, send: Callable):
             async def send_wrapper(message):
@@ -29,35 +52,15 @@ class SessionMiddleware:
                             session_cookie.value, self.secret_key
                         )
 
-                    if decoded_session != request.session:
-                        # Check if session is not present in the session cookie
-                        encoded_payload = encode_session_data(
-                            request.session, self.secret_key
-                        )
-                        expires_date = datetime.datetime.utcnow() + datetime.timedelta(
-                            seconds=self.config["SESSION_MAX_AGE"]
-                        )
-                        formatted_expires = expires_date.strftime(
-                            "%a, %d %b %Y %H:%M:%S GMT"
-                        )
+                    if not request.session or decoded_session != request.session:
+                        if request.session:
+                            cookie_value = self.build_set_cookie_header(request.session)
 
-                        # Build the "Set-Cookie" header with session configurations
-                        cookie_value = f"{self.config['SESSION_COOKIE_NAME']}={encoded_payload}; Expires={formatted_expires}; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
+                            headers.append((b"Set-Cookie", cookie_value.encode()))
+                        else:
+                            cookie_value = f"{self.config['SESSION_COOKIE_NAME']}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
 
-                        if self.config["SESSION_COOKIE_DOMAIN"]:
-                            cookie_value += (
-                                f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
-                            )
-
-                        if self.config["SESSION_COOKIE_SECURE"]:
-                            cookie_value += "; Secure"
-
-                        if self.config["SESSION_COOKIE_SAMESITE"]:
-                            cookie_value += (
-                                f"; SameSite={self.config['SESSION_COOKIE_SAMESITE']}"
-                            )
-
-                        headers.append((b"Set-Cookie", cookie_value.encode()))
+                            headers.append((b"Set-Cookie", cookie_value.encode()))
 
                     message["headers"] = headers
 

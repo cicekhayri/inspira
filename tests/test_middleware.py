@@ -93,10 +93,10 @@ async def test_cors_middleware_without_origin_header(app, client):
 
 
 @pytest.mark.asyncio
-async def test_session_middleware(app, client):
-    cors_middleware = SessionMiddleware(secret_key="dummy")
+async def test_set_session_success(app, client):
+    session_middleware = SessionMiddleware(secret_key="dummy")
 
-    app.add_middleware(cors_middleware)
+    app.add_middleware(session_middleware)
 
     @get("/test")
     async def test_route(request: Request):
@@ -122,9 +122,9 @@ async def test_session_middleware(app, client):
 
 @pytest.mark.asyncio
 async def test_invalid_signature_exception(app, client):
-    cors_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware(secret_key="dummy")
 
-    app.add_middleware(cors_middleware)
+    app.add_middleware(session_middleware)
 
     @get("/test")
     async def test_route(request: Request):
@@ -172,12 +172,55 @@ async def test_remove_session_success(app, client):
     app.add_route("/remove", HttpMethod.GET, remove_route)
     response2 = await client.get("/remove")
 
+    assert "set-cookie" in response2.headers
     set_cookie_header = response2.headers.get("set-cookie", "")
 
     cookies = SimpleCookie(set_cookie_header)
-    session = cookies.get("session")
+    session_cookie = cookies.get("session")
 
-    decoded_session = decode_session_data(session.value, "dummy")
-
-    assert decoded_session is None
+    assert session_cookie.value == ""
     assert response2.status_code == HTTPStatus.OK
+
+
+@pytest.mark.asyncio
+async def test_get_session_success(app, client):
+    session_middleware = SessionMiddleware(secret_key="dummy")
+
+    app.add_middleware(session_middleware)
+
+    @get("/get")
+    async def get_route(request: Request):
+        request.set_session("user_id", 123)
+        user_id = request.get_session("user_id")
+        return HttpResponse(f"User ID: {user_id}")
+
+    app.add_route("/get", HttpMethod.GET, get_route)
+
+    response = await client.get("/get")
+
+    assert response.content == b"User ID: 123"
+
+
+@pytest.mark.asyncio
+async def test_remove_nonexistent_key(app, client):
+    session_middleware = SessionMiddleware(secret_key="dummy")
+
+    app.add_middleware(session_middleware)
+
+    @get("/remove")
+    async def remove_route(request: Request):
+        print(f"Session before removal: {request.session}")
+
+        request.remove_session("nonexistent_key")
+        return HttpResponse("Session key removed successfully")
+
+    app.add_route("/remove", HttpMethod.GET, remove_route)
+
+    response = await client.get("/remove")
+    set_cookie_header = response.headers.get("set-cookie", "")
+
+    cookies = SimpleCookie(set_cookie_header)
+    session_cookie = cookies.get("session")
+
+    assert session_cookie.value == ""
+    assert response.status_code == HTTPStatus.OK
