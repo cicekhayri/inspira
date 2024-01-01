@@ -20,46 +20,45 @@ class SessionMiddleware:
                     headers = message.get("headers", [])
                     request = RequestContext().get_request()
 
-                    if request.session:
-                        cookies = SimpleCookie(request.get_headers().get("cookie", ""))
-                        session_cookie = cookies.get(self.config["SESSION_COOKIE_NAME"])
-                        decoded_session = None
+                    cookies = SimpleCookie(request.get_headers().get("cookie", ""))
+                    session_cookie = cookies.get(self.config["SESSION_COOKIE_NAME"])
+                    decoded_session = {}
 
-                        if session_cookie:
-                            decoded_session = decode_session_data(
-                                session_cookie.value, self.secret_key
-                            )
+                    if session_cookie:
+                        decoded_session = decode_session_data(
+                            session_cookie.value, self.secret_key
+                        )
 
+                    if decoded_session != request.session:
                         # Check if session is not present in the session cookie
-                        if not session_cookie or decoded_session != request:
-                            encoded_payload = encode_session_data(
-                                request.session, self.secret_key
+                        encoded_payload = encode_session_data(
+                            request.session, self.secret_key
+                        )
+                        expires_date = (
+                            datetime.datetime.utcnow()
+                            + datetime.timedelta(
+                                seconds=self.config["SESSION_MAX_AGE"]
                             )
-                            expires_date = (
-                                datetime.datetime.utcnow()
-                                + datetime.timedelta(
-                                    seconds=self.config["SESSION_MAX_AGE"]
-                                )
+                        )
+                        formatted_expires = expires_date.strftime(
+                            "%a, %d %b %Y %H:%M:%S GMT"
+                        )
+
+                        # Build the "Set-Cookie" header with session configurations
+                        cookie_value = f"{self.config['SESSION_COOKIE_NAME']}={encoded_payload}; Expires={formatted_expires}; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
+
+                        if self.config["SESSION_COOKIE_DOMAIN"]:
+                            cookie_value += (
+                                f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
                             )
-                            formatted_expires = expires_date.strftime(
-                                "%a, %d %b %Y %H:%M:%S GMT"
-                            )
 
-                            # Build the "Set-Cookie" header with session configurations
-                            cookie_value = f"{self.config['SESSION_COOKIE_NAME']}={encoded_payload}; Expires={formatted_expires}; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
+                        if self.config["SESSION_COOKIE_SECURE"]:
+                            cookie_value += "; Secure"
 
-                            if self.config["SESSION_COOKIE_DOMAIN"]:
-                                cookie_value += (
-                                    f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
-                                )
+                        if self.config["SESSION_COOKIE_SAMESITE"]:
+                            cookie_value += f"; SameSite={self.config['SESSION_COOKIE_SAMESITE']}"
 
-                            if self.config["SESSION_COOKIE_SECURE"]:
-                                cookie_value += "; Secure"
-
-                            if self.config["SESSION_COOKIE_SAMESITE"]:
-                                cookie_value += f"; SameSite={self.config['SESSION_COOKIE_SAMESITE']}"
-
-                            headers.append((b"Set-Cookie", cookie_value.encode()))
+                        headers.append((b"Set-Cookie", cookie_value.encode()))
 
                     message["headers"] = headers
 
