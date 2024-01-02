@@ -33,7 +33,7 @@ def logout_user():
 def generate_token(user_id):
     payload = {
         'user_id': user_id,
-        'exp': datetime.utcnow() + timedelta(seconds=3600)
+        'exp': datetime.utcnow() + timedelta(seconds=TOKEN_EXPIRATION_TIME)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
