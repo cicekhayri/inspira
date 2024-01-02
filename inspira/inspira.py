@@ -23,17 +23,17 @@ from inspira.websockets import handle_websocket
 
 
 class Inspira:
-    def __init__(self, secret_key=None, session_type="cookie"):
+    def __init__(self, secret_key=None, config=Config(), session_type="cookie"):
+        self.config = config
+        set_global_app(self, secret_key)
+        self.secret_key = secret_key
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
         self.error_handler = default_error_handler
         self.middleware: List[Callable] = []
-        self.secret_key = secret_key
         self.session_type = session_type
         self.discover_controllers()
-        self.config = Config()
-        set_global_app(self)
 
     def add_middleware(self, middleware: Callable) -> Callable:
         self.middleware.append(middleware)

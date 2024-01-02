@@ -16,10 +16,9 @@ def app():
 
 
 @pytest.fixture
-def app_with_session():
+def app_with_secret_token():
     app = Inspira()
     app.secret_key = "9s09iJ6wAV8m2wKzopWiAutLWwa1rYJGLkOfa8R4PzCghYnU-O"
-    app.session_type = "cookie"
 
     return app
 
@@ -30,8 +29,8 @@ def client(app):
 
 
 @pytest.fixture
-def client_session(app_with_session):
-    return TestClient(app_with_session)
+def client_session(app_with_secret_token):
+    return TestClient(app_with_secret_token)
 
 
 @pytest.fixture

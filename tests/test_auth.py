@@ -2,47 +2,52 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from inspira.auth.decorators import login_required
-from inspira.auth.utils import login_user, logout_user
-from inspira.decorators.http_methods import get
-from inspira.enums import HttpMethod
+from inspira.auth.utils import login_user, logout_user, generate_token, decode_token
 from inspira.requests import Request, RequestContext
-from inspira.responses import HttpResponse
 
 
-@pytest.mark.asyncio
-async def test_protected_route(client, app):
-    @get("/auth")
-    @login_required
-    async def protected_route(request: Request):
-        return HttpResponse("This is a test endpoint")
-
-    app.add_route("/auth", HttpMethod.GET, protected_route)
-
-    response = await client.get("/auth")
-
-    assert response.status_code == 401
-
-
-@pytest.mark.asyncio
-async def test_login_user(app_with_session, mock_scope):
+def test_generate_and_decode_token(mock_scope):
     receive = AsyncMock()
     send = AsyncMock()
     request = Request(mock_scope, receive, send)
     RequestContext.set_request(request)
 
-    login_user()
-    assert "logged_in" in request.session
-    assert request.session["logged_in"] is True
+    user_id = 123
+    token = generate_token(user_id)
+    assert token is not None
+
+    decoded_user_id = decode_token(token)
+    assert decoded_user_id == user_id
 
 
 @pytest.mark.asyncio
-async def test_login_out_user(app_with_session, mock_scope):
+async def test_login_user(mock_scope):
     receive = AsyncMock()
     send = AsyncMock()
     request = Request(mock_scope, receive, send)
-    request.set_session("logged_in", True)
     RequestContext.set_request(request)
+
+    user_id = 123
+    login_user(user_id)
+
+    assert "token" in request.session
+
+    token = request.session.get("token")
+    decoded_user_id = decode_token(token)
+
+    assert decoded_user_id == user_id
+
+
+
+@pytest.mark.asyncio
+async def test_logout_user(mock_scope):
+    receive = AsyncMock()
+    send = AsyncMock()
+    request = Request(mock_scope, receive, send)
+    RequestContext.set_request(request)
+
+    request.set_session("token", "dummy_token")
 
     logout_user()
-    assert "logged_in" not in request.session
+
+    assert "token" not in request.session
