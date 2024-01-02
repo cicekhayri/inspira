@@ -105,4 +105,3 @@ async def test_login_required_decorator(mock_scope):
     login_user(user_id)
     response = await protected_route()
     assert response.status_code == 200
-
