@@ -38,7 +38,6 @@ async def test_login_user(mock_scope):
     assert decoded_user_id == user_id
 
 
-
 @pytest.mark.asyncio
 async def test_logout_user(mock_scope):
     receive = AsyncMock()

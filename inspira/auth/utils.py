@@ -10,7 +10,7 @@ app = get_global_app()
 
 if app:
     SECRET_KEY = app.secret_key
-    TOKEN_EXPIRATION_TIME = app.config['TOKEN_EXPIRATION_TIME']
+    TOKEN_EXPIRATION_TIME = app.config["TOKEN_EXPIRATION_TIME"]
 else:
     SECRET_KEY = "dummy"
     TOKEN_EXPIRATION_TIME = 3600
@@ -32,16 +32,16 @@ def logout_user():
 
 def generate_token(user_id):
     payload = {
-        'user_id': user_id,
-        'exp': datetime.utcnow() + timedelta(seconds=TOKEN_EXPIRATION_TIME)
+        "user_id": user_id,
+        "exp": datetime.utcnow() + timedelta(seconds=TOKEN_EXPIRATION_TIME),
     }
-    return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
 
 def decode_token(token):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        return payload['user_id']
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload["user_id"]
     except jwt.ExpiredSignatureError:
         return None
     except jwt.InvalidTokenError:

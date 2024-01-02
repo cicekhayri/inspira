@@ -12,7 +12,7 @@ class Config:
             "SESSION_COOKIE_HTTPONLY": True,
             "SESSION_COOKIE_SECURE": True,
             "SESSION_COOKIE_SAMESITE": None,
-            "TOKEN_EXPIRATION_TIME": 3600
+            "TOKEN_EXPIRATION_TIME": 3600,
         }
 
     def __getitem__(self, key):
