@@ -1,6 +1,6 @@
 from functools import wraps
 
-from inspira.auth.utils import decode_token
+from inspira.auth.auth_utils import decode_token
 from inspira.requests import RequestContext
 from inspira.responses import HttpResponse
 
