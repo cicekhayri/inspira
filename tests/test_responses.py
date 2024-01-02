@@ -69,7 +69,7 @@ async def test_set_cookie_with_route(app, client):
 
 
 @pytest.mark.asyncio
-async def test_set_multiple_cookie(app_with_session, client_session):
+async def test_set_multiple_cookie(app_with_secret_token, client_session):
     @get("/home")
     async def home(request):
         http_response = HttpResponse("This is a test endpoint")
@@ -78,7 +78,7 @@ async def test_set_multiple_cookie(app_with_session, client_session):
 
         return http_response
 
-    app_with_session.add_route("/home", HttpMethod.GET, home)
+    app_with_secret_token.add_route("/home", HttpMethod.GET, home)
 
     response = await client_session.get("/home")
     headers_dict = dict(response.headers)
