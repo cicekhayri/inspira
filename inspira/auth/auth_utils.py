@@ -17,7 +17,7 @@ else:
 
 
 def login_user(user_id):
-    token = generate_token(user_id)
+    token = encode_auth_token(user_id)
     request = RequestContext.get_request()
     request.set_session("token", token)
 
@@ -30,18 +30,19 @@ def logout_user():
         request.remove_session("token")
 
 
-def generate_token(user_id):
+def encode_auth_token(user_id):
     payload = {
-        "user_id": user_id,
+        "iat": datetime.utcnow(),
         "exp": datetime.utcnow() + timedelta(seconds=TOKEN_EXPIRATION_TIME),
+        "sub": user_id,
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
 
-def decode_token(token):
+def decode_auth_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return payload["user_id"]
+        return payload["sub"]
     except jwt.ExpiredSignatureError:
         return None
     except jwt.InvalidTokenError:
