@@ -23,7 +23,7 @@ from inspira.websockets import handle_websocket
 
 
 class Inspira:
-    def __init__(self, secret_key=None, config=Config(), session_type="cookie"):
+    def __init__(self, secret_key=None, config=Config()):
         self.config = config
         set_global_app(self, secret_key)
         self.secret_key = secret_key
@@ -32,7 +32,6 @@ class Inspira:
         }
         self.error_handler = default_error_handler
         self.middleware: List[Callable] = []
-        self.session_type = session_type
         self.discover_controllers()
 
     def add_middleware(self, middleware: Callable) -> Callable:
@@ -205,6 +204,5 @@ class Inspira:
         return Request(scope, receive, send)
 
     async def set_request_session(self, request: Request) -> None:
-        if self.session_type:
-            session = get_or_create_session(request, self.secret_key)
-            request.session = session
+        session = get_or_create_session(request, self.secret_key)
+        request.session = session
