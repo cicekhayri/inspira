@@ -3,10 +3,13 @@ from http.cookies import SimpleCookie
 
 import pytest
 
+from inspira.auth.auth_utils import encode_auth_token, login_user, decode_auth_token
+from inspira.auth.decorators import login_required
 from inspira.decorators.http_methods import get
 from inspira.enums import HttpMethod
 from inspira.middlewares.cors import CORSMiddleware
 from inspira.middlewares.sessions import SessionMiddleware
+from inspira.middlewares.user_loader import UserLoaderMiddleware
 from inspira.requests import Request
 from inspira.responses import JsonResponse, HttpResponse
 from inspira.utils.session_utils import decode_session_data
@@ -224,3 +227,60 @@ async def test_remove_nonexistent_key(app, client):
 
     assert session_cookie.value == ""
     assert response.status_code == HTTPStatus.OK
+
+
+@pytest.mark.asyncio
+async def test_user_loader_middleware(app, client, user_mock, secret_key):
+    session_middleware = SessionMiddleware(secret_key=secret_key)
+
+    user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
+
+    app.add_middleware(session_middleware)
+    app.add_middleware(user_loader_middleware)
+
+    @get("/get")
+    async def get_route(request: Request):
+        user = user_mock(id=1)
+        login_user(user.id)
+        return HttpResponse(f"User ID: 1323")
+
+    app.add_route("/get", HttpMethod.GET, get_route)
+
+    response = await client.get("/get")
+    set_cookie_header = response.headers.get("set-cookie", "")
+
+    assert set_cookie_header is not None
+    assert "session=" in set_cookie_header
+
+    cookies = SimpleCookie(set_cookie_header)
+    session_cookie = cookies.get("session")
+
+    assert session_cookie is not None
+
+    decoded_session = decode_session_data(
+        session_cookie.value, secret_key
+    )
+    get_user_id = decode_auth_token(decoded_session['token'])
+
+    assert get_user_id == 1
+
+
+@pytest.mark.asyncio
+async def test_user_not_logged_in(app, client,secret_key, user_mock):
+    session_middleware = SessionMiddleware(secret_key=secret_key)
+    user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
+    app.add_middleware(session_middleware)
+    app.add_middleware(user_loader_middleware)
+
+    @get("/protected")
+    @login_required
+    async def protected(request: Request):
+        return HttpResponse("Protected Route")
+
+    app.add_route("/protected", HttpMethod.GET, protected)
+
+    response = await client.get("/protected")
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+    assert "Unauthorized" in response.text
+

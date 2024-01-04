@@ -84,3 +84,12 @@ def mock_scope():
 @pytest.fixture
 def sample_config():
     return Config()
+
+
+@pytest.fixture
+def user_mock():
+    class User:
+        def __init__(self, id):
+            self.id = id
+
+    return User
