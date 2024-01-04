@@ -2,7 +2,7 @@ import datetime
 import json
 from http.cookies import SimpleCookie
 
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeSerializer
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -13,7 +13,7 @@ class DateTimeEncoder(json.JSONEncoder):
 
 
 def encode_session_data(session_data, secret_key):
-    serializer = URLSafeTimedSerializer(secret_key)
+    serializer = URLSafeSerializer(secret_key)
     json_session_data = json.dumps(session_data, cls=DateTimeEncoder)
     session_token = serializer.dumps(json_session_data)
     return session_token
@@ -21,7 +21,7 @@ def encode_session_data(session_data, secret_key):
 
 def decode_session_data(session_token, secret_key):
     try:
-        serializer = URLSafeTimedSerializer(secret_key)
+        serializer = URLSafeSerializer(secret_key)
         json_session_data = serializer.loads(session_token)
         decoded_payload = json.loads(json_session_data)
         return decoded_payload
