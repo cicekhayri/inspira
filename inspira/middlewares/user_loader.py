@@ -6,7 +6,10 @@ from inspira.auth.mixins.user_mixin import AnonymousUserMixin
 from inspira.config import Config
 from inspira.globals import get_global_app
 from inspira.requests import RequestContext
-from inspira.utils.session_utils import decode_session_data, get_session_token_from_request
+from inspira.utils.session_utils import (
+    decode_session_data,
+    get_session_token_from_request,
+)
 
 
 class UserLoaderMiddleware:
@@ -17,12 +20,16 @@ class UserLoaderMiddleware:
     async def __call__(self, handler):
         async def middleware(scope: Dict[str, Any], receive: Callable, send: Callable):
             request = RequestContext().get_request()
-            session_cookie = get_session_token_from_request(request, self.app.config["SESSION_COOKIE_NAME"])
+            session_cookie = get_session_token_from_request(
+                request, self.app.config["SESSION_COOKIE_NAME"]
+            )
 
             user = None
 
             if session_cookie:
-                decoded_session = decode_session_data(session_cookie, self.app.secret_key)
+                decoded_session = decode_session_data(
+                    session_cookie, self.app.secret_key
+                )
                 user_id = decode_auth_token(decoded_session.get("token", None))
 
                 if user_id:

@@ -33,7 +33,9 @@ def decode_session_data(session_token, secret_key):
 
 
 def get_or_create_session(request, secret_key):
-    session_cookie = get_session_token_from_request(request, get_global_app().config["SESSION_COOKIE_NAME"])
+    session_cookie = get_session_token_from_request(
+        request, get_global_app().config["SESSION_COOKIE_NAME"]
+    )
     session_data = {}
 
     if session_cookie:
