@@ -16,9 +16,14 @@ def app():
 
 
 @pytest.fixture
-def app_with_secret_token():
+def secret_key():
+    return "your_secret_key"
+
+
+@pytest.fixture
+def app_with_secret_token(secret_key):
     app = Inspira()
-    app.secret_key = "9s09iJ6wAV8m2wKzopWiAutLWwa1rYJGLkOfa8R4PzCghYnU-O"
+    app.secret_key = secret_key
 
     return app
 

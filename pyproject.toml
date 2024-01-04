@@ -36,7 +36,8 @@ dependencies = [
     "inflect",
     "sqlalchemy-utils",
     "websockets",
-    "PyJWT"
+    "PyJWT",
+    "itsdangerous",
 ]
 
 [project.scripts]
