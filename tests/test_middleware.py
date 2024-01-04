@@ -258,16 +258,14 @@ async def test_user_loader_middleware(app, client, user_mock, secret_key):
 
     assert session_cookie is not None
 
-    decoded_session = decode_session_data(
-        session_cookie.value, secret_key
-    )
-    get_user_id = decode_auth_token(decoded_session['token'])
+    decoded_session = decode_session_data(session_cookie.value, secret_key)
+    get_user_id = decode_auth_token(decoded_session["token"])
 
     assert get_user_id == 1
 
 
 @pytest.mark.asyncio
-async def test_user_not_logged_in(app, client,secret_key, user_mock):
+async def test_user_not_logged_in(app, client, secret_key, user_mock):
     session_middleware = SessionMiddleware(secret_key=secret_key)
     user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
     app.add_middleware(session_middleware)
@@ -287,7 +285,9 @@ async def test_user_not_logged_in(app, client,secret_key, user_mock):
 
 
 @pytest.mark.asyncio
-async def test_user_loader_middleware_anonymous_user(app, client, secret_key, user_mock):
+async def test_user_loader_middleware_anonymous_user(
+    app, client, secret_key, user_mock
+):
     user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
     app.add_middleware(user_loader_middleware)
 

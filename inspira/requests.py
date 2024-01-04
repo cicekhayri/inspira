@@ -25,6 +25,7 @@ class RequestContext:
     def set_current_user(cls, user):
         cls._current_user = user
 
+
 class Request:
     def __init__(self, scope: Dict[str, Any], receive: Callable, send: Callable):
         self.scope = scope

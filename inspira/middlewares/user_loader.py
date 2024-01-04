@@ -9,7 +9,7 @@ from inspira.utils.session_utils import decode_session_data
 
 
 class UserLoaderMiddleware:
-    def __init__(self, user_model, secret_key, config = Config()):
+    def __init__(self, user_model, secret_key, config=Config()):
         self.user_model = user_model
         self.config = config
         self.secret_key = secret_key
@@ -25,7 +25,7 @@ class UserLoaderMiddleware:
 
             if token:
                 decoded_session = decode_session_data(token.value, self.secret_key)
-                user_id = decode_auth_token(decoded_session.get('token', None))
+                user_id = decode_auth_token(decoded_session.get("token", None))
 
                 if user_id:
                     user = self.user_model.query.get(user_id)
