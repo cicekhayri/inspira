@@ -25,3 +25,17 @@ class UserMixin:
 
     def check_password_hash(self, password):
         return bcrypt.checkpw(password.encode(UTF8), self.password.encode(UTF8))
+
+
+class AnonymousUserMixin:
+    @property
+    def is_authenticated(self):
+        return False
+
+    @property
+    def is_active(self):
+        return False
+
+    @property
+    def is_anonymous(self):
+        return True

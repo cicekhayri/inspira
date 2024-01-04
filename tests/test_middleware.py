@@ -3,14 +3,15 @@ from http.cookies import SimpleCookie
 
 import pytest
 
-from inspira.auth.auth_utils import encode_auth_token, login_user, decode_auth_token
+from inspira.auth.auth_utils import login_user, decode_auth_token
 from inspira.auth.decorators import login_required
+from inspira.auth.mixins.user_mixin import AnonymousUserMixin
 from inspira.decorators.http_methods import get
 from inspira.enums import HttpMethod
 from inspira.middlewares.cors import CORSMiddleware
 from inspira.middlewares.sessions import SessionMiddleware
 from inspira.middlewares.user_loader import UserLoaderMiddleware
-from inspira.requests import Request
+from inspira.requests import Request, RequestContext
 from inspira.responses import JsonResponse, HttpResponse
 from inspira.utils.session_utils import decode_session_data
 
@@ -284,3 +285,23 @@ async def test_user_not_logged_in(app, client,secret_key, user_mock):
     assert response.status_code == HTTPStatus.UNAUTHORIZED.value
     assert "Unauthorized" in response.text
 
+
+@pytest.mark.asyncio
+async def test_user_loader_middleware_anonymous_user(app, client, secret_key, user_mock):
+    user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
+    app.add_middleware(user_loader_middleware)
+
+    @get("/protected")
+    async def protected(request: Request):
+        user_authenticated = request.user.is_authenticated
+        return JsonResponse({"user_authenticated": user_authenticated})
+
+    app.add_route("/protected", HttpMethod.GET, protected)
+
+    response = await client.get("/protected")
+
+    assert response.status_code == 200
+    assert response.json() == {"user_authenticated": False}
+
+    user_in_method = RequestContext.get_current_user()
+    assert isinstance(user_in_method, AnonymousUserMixin)
