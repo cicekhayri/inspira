@@ -234,7 +234,7 @@ async def test_remove_nonexistent_key(app, client):
 async def test_user_loader_middleware(app, client, user_mock, secret_key):
     session_middleware = SessionMiddleware(secret_key=secret_key)
 
-    user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
+    user_loader_middleware = UserLoaderMiddleware(user_mock)
 
     app.add_middleware(session_middleware)
     app.add_middleware(user_loader_middleware)
@@ -267,7 +267,7 @@ async def test_user_loader_middleware(app, client, user_mock, secret_key):
 @pytest.mark.asyncio
 async def test_user_not_logged_in(app, client, secret_key, user_mock):
     session_middleware = SessionMiddleware(secret_key=secret_key)
-    user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
+    user_loader_middleware = UserLoaderMiddleware(user_mock)
     app.add_middleware(session_middleware)
     app.add_middleware(user_loader_middleware)
 
@@ -288,7 +288,7 @@ async def test_user_not_logged_in(app, client, secret_key, user_mock):
 async def test_user_loader_middleware_anonymous_user(
     app, client, secret_key, user_mock
 ):
-    user_loader_middleware = UserLoaderMiddleware(user_mock, secret_key)
+    user_loader_middleware = UserLoaderMiddleware(user_mock)
     app.add_middleware(user_loader_middleware)
 
     @get("/protected")
