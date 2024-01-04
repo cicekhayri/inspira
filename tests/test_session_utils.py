@@ -9,7 +9,8 @@ from inspira.utils.session_utils import (
     DateTimeEncoder,
     decode_session_data,
     encode_session_data,
-    get_or_create_session, get_session_token_from_request,
+    get_or_create_session,
+    get_session_token_from_request,
 )
 
 
@@ -81,12 +82,15 @@ def test_get_or_create_session_with_invalid_session(secret_key):
         get_or_create_session(mock_request, secret_key)
 
 
-@pytest.mark.parametrize("cookie_value, expected_token", [
-    ("session=your_token_value", "your_token_value"),
-    ("other_cookie=other_value; session=your_token_value", "your_token_value"),
-    ("other_cookie=other_value", None),
-    ("", None),
-])
+@pytest.mark.parametrize(
+    "cookie_value, expected_token",
+    [
+        ("session=your_token_value", "your_token_value"),
+        ("other_cookie=other_value; session=your_token_value", "your_token_value"),
+        ("other_cookie=other_value", None),
+        ("", None),
+    ],
+)
 def test_get_session_token_from_request(cookie_value, expected_token):
     class MockRequest:
         def __init__(self, cookie_value):
