@@ -10,6 +10,7 @@ from inspira.utils.session_utils import (
     decode_session_data,
     encode_session_data,
     get_or_create_session,
+    get_session_token_from_request,
 )
 
 
@@ -79,3 +80,27 @@ def test_get_or_create_session_with_invalid_session(secret_key):
 
     with pytest.raises(ValueError, match="Invalid signature"):
         get_or_create_session(mock_request, secret_key)
+
+
+@pytest.mark.parametrize(
+    "cookie_value, expected_token",
+    [
+        ("session=your_token_value", "your_token_value"),
+        ("other_cookie=other_value; session=your_token_value", "your_token_value"),
+        ("other_cookie=other_value", None),
+        ("", None),
+    ],
+)
+def test_get_session_token_from_request(cookie_value, expected_token):
+    class MockRequest:
+        def __init__(self, cookie_value):
+            self.headers = {"cookie": cookie_value}
+
+        def get_headers(self):
+            return self.headers
+
+    session_cookie_name = "session"
+    mock_request = MockRequest(cookie_value)
+    result = get_session_token_from_request(mock_request, session_cookie_name)
+
+    assert result == expected_token
