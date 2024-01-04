@@ -5,7 +5,7 @@ from typing import Dict, Any, Callable
 from inspira.config import Config
 from inspira.globals import get_global_app
 from inspira.inspira import RequestContext
-from inspira.utils.session_utils import encode_session_data, decode_session_data
+from inspira.utils.session_utils import encode_session_data, decode_session_data, get_session_token_from_request
 
 
 class SessionMiddleware:
@@ -41,14 +41,13 @@ class SessionMiddleware:
                 if message["type"] == "http.response.start":
                     headers = message.get("headers", [])
                     request = RequestContext().get_request()
+                    session_cookie = get_session_token_from_request(request, self.app.config["SESSION_COOKIE_NAME"])
 
-                    cookies = SimpleCookie(request.get_headers().get("cookie", ""))
-                    session_cookie = cookies.get(self.app.config["SESSION_COOKIE_NAME"])
                     decoded_session = {}
 
                     if session_cookie:
                         decoded_session = decode_session_data(
-                            session_cookie.value, self.app.secret_key
+                            session_cookie, self.app.secret_key
                         )
 
                     if not request.session or decoded_session != request.session:

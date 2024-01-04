@@ -4,6 +4,8 @@ from http.cookies import SimpleCookie
 
 from itsdangerous import URLSafeSerializer
 
+from inspira.globals import get_global_app
+
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -31,13 +33,12 @@ def decode_session_data(session_token, secret_key):
 
 
 def get_or_create_session(request, secret_key):
-    cookies = SimpleCookie(request.get_headers().get("cookie", ""))
-    session_id = cookies.get("session")
+    session_cookie = get_session_token_from_request(request, get_global_app().config["SESSION_COOKIE_NAME"])
     session_data = {}
 
-    if session_id:
+    if session_cookie:
         try:
-            session_data = decode_session_data(session_id.value, secret_key)
+            session_data = decode_session_data(session_cookie, secret_key)
             return session_data
         except ValueError:
             print("Invalid signature when decoding session")
@@ -48,3 +49,10 @@ def get_or_create_session(request, secret_key):
     if request.session:
         encoded_payload = encode_session_data(session_data, secret_key)
         return encoded_payload
+
+
+def get_session_token_from_request(request, session_cookie_name):
+    cookies = SimpleCookie(request.get_headers().get("cookie", ""))
+    token_cookie = cookies.get(session_cookie_name)
+
+    return token_cookie.value if token_cookie else None
