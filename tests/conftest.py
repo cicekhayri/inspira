@@ -14,6 +14,7 @@ from inspira.testclient import TestClient
 def app():
     return Inspira()
 
+
 @pytest.fixture
 def secret_key():
     return "your_secret_key"

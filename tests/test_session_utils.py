@@ -37,6 +37,7 @@ def test_datatime_encoder_non_datetime_object():
     encoded_non_dt = encoder.encode(non_dt_object)
     assert encoded_non_dt == '{"key": "value"}'
 
+
 def test_encode_decode_session_data(secret_key):
     session_data = {"email": "hayri@inspiraframework.com"}
     session_token = encode_session_data(session_data, secret_key)
@@ -61,6 +62,7 @@ def test_get_or_create_session_with_valid_cookie(secret_key):
     result = get_or_create_session(mock_request, secret_key)
 
     assert result == session_data
+
 
 def test_get_or_create_session_with_invalid_session(secret_key):
     session_id = "invalid_session"

@@ -11,6 +11,7 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return super().default(obj)
 
+
 def encode_session_data(session_data, secret_key):
     serializer = URLSafeTimedSerializer(secret_key)
     json_session_data = json.dumps(session_data, cls=DateTimeEncoder)
@@ -27,6 +28,7 @@ def decode_session_data(session_token, secret_key):
     except Exception as e:
         print(f"Error decoding session: {e}")
         raise ValueError("Invalid signature") from e
+
 
 def get_or_create_session(request, secret_key):
     cookies = SimpleCookie(request.get_headers().get("cookie", ""))
