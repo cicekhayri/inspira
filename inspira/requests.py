@@ -7,6 +7,7 @@ from inspira.constants import UTF8
 
 class RequestContext:
     _current_request = None
+    _current_user = None
 
     @classmethod
     def set_request(cls, request):
@@ -15,6 +16,14 @@ class RequestContext:
     @classmethod
     def get_request(cls):
         return cls._current_request
+
+    @classmethod
+    def get_current_user(cls):
+        return cls._current_user
+
+    @classmethod
+    def set_current_user(cls, user):
+        cls._current_user = user
 
 
 class Request:
@@ -25,6 +34,7 @@ class Request:
         self._session = {}
         self._headers = {}
         self._forbidden = False
+        self.user = None
 
     def is_forbidden(self):
         return self._forbidden

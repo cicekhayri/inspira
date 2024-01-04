@@ -3,11 +3,15 @@ from http.cookies import SimpleCookie
 
 import pytest
 
+from inspira.auth.auth_utils import login_user, decode_auth_token
+from inspira.auth.decorators import login_required
+from inspira.auth.mixins.user_mixin import AnonymousUserMixin
 from inspira.decorators.http_methods import get
 from inspira.enums import HttpMethod
 from inspira.middlewares.cors import CORSMiddleware
 from inspira.middlewares.sessions import SessionMiddleware
-from inspira.requests import Request
+from inspira.middlewares.user_loader import UserLoaderMiddleware
+from inspira.requests import Request, RequestContext
 from inspira.responses import JsonResponse, HttpResponse
 from inspira.utils.session_utils import decode_session_data
 
@@ -93,8 +97,8 @@ async def test_cors_middleware_without_origin_header(app, client):
 
 
 @pytest.mark.asyncio
-async def test_set_session_success(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+async def test_set_session_success(app, secret_key, client):
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -113,7 +117,7 @@ async def test_set_session_success(app, client):
 
     assert session_cookie is not None
 
-    decoded_session = decode_session_data(session_cookie.value, "dummy")
+    decoded_session = decode_session_data(session_cookie.value, secret_key)
     expected_session = {"message": "Hej"}
 
     assert decoded_session == expected_session
@@ -122,7 +126,7 @@ async def test_set_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_invalid_signature_exception(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -149,7 +153,7 @@ async def test_invalid_signature_exception(app, client):
 
 @pytest.mark.asyncio
 async def test_remove_session_success(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -184,7 +188,7 @@ async def test_remove_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_get_session_success(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -203,7 +207,7 @@ async def test_get_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_remove_nonexistent_key(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -224,3 +228,80 @@ async def test_remove_nonexistent_key(app, client):
 
     assert session_cookie.value == ""
     assert response.status_code == HTTPStatus.OK
+
+
+@pytest.mark.asyncio
+async def test_user_loader_middleware(app, client, user_mock, secret_key):
+    session_middleware = SessionMiddleware()
+
+    user_loader_middleware = UserLoaderMiddleware(user_mock)
+
+    app.add_middleware(session_middleware)
+    app.add_middleware(user_loader_middleware)
+
+    @get("/get")
+    async def get_route(request: Request):
+        user = user_mock(id=1)
+        login_user(user.id)
+        return HttpResponse(f"User ID: 1323")
+
+    app.add_route("/get", HttpMethod.GET, get_route)
+
+    response = await client.get("/get")
+    set_cookie_header = response.headers.get("set-cookie", "")
+
+    assert set_cookie_header is not None
+    assert "session=" in set_cookie_header
+
+    cookies = SimpleCookie(set_cookie_header)
+    session_cookie = cookies.get("session")
+
+    assert session_cookie is not None
+
+    decoded_session = decode_session_data(session_cookie.value, secret_key)
+    get_user_id = decode_auth_token(decoded_session["token"])
+
+    assert get_user_id == 1
+
+
+@pytest.mark.asyncio
+async def test_user_not_logged_in(app, client, secret_key, user_mock):
+    session_middleware = SessionMiddleware()
+    user_loader_middleware = UserLoaderMiddleware(user_mock)
+    app.add_middleware(session_middleware)
+    app.add_middleware(user_loader_middleware)
+
+    @get("/protected")
+    @login_required
+    async def protected(request: Request):
+        return HttpResponse("Protected Route")
+
+    app.add_route("/protected", HttpMethod.GET, protected)
+
+    response = await client.get("/protected")
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+    assert "Unauthorized" in response.text
+
+
+@pytest.mark.asyncio
+async def test_user_loader_middleware_anonymous_user(
+    app, client, secret_key, user_mock
+):
+    user_loader_middleware = UserLoaderMiddleware(user_mock)
+    app.add_middleware(user_loader_middleware)
+
+    @get("/protected")
+    async def protected(request: Request):
+        user_authenticated = request.user.is_authenticated
+        return JsonResponse({"user_authenticated": user_authenticated})
+
+    app.add_route("/protected", HttpMethod.GET, protected)
+
+    response = await client.get("/protected")
+
+    assert response.status_code == 200
+    assert response.json() == {"user_authenticated": False}
+
+    user_in_method = RequestContext.get_current_user()
+    assert isinstance(user_in_method, AnonymousUserMixin)
