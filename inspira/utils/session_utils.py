@@ -32,10 +32,11 @@ def decode_session_data(session_token, secret_key):
         raise ValueError("Invalid signature") from e
 
 
-def get_or_create_session(request, secret_key):
+def get_or_create_session(request):
     session_cookie = get_session_token_from_request(
         request, get_global_app().config["SESSION_COOKIE_NAME"]
     )
+    secret_key = get_global_app().secret_key
     session_data = {}
 
     if session_cookie:

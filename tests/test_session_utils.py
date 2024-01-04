@@ -1,7 +1,4 @@
-import base64
 import datetime
-import hashlib
-import json
 
 import pytest
 
@@ -60,7 +57,7 @@ def test_get_or_create_session_with_valid_cookie(secret_key):
             return self.headers
 
     mock_request = MockRequest(f"session={encoded_session_token}")
-    result = get_or_create_session(mock_request, secret_key)
+    result = get_or_create_session(mock_request)
 
     assert result == session_data
 
@@ -79,7 +76,7 @@ def test_get_or_create_session_with_invalid_session(secret_key):
     mock_request = MockRequest(f"session={session_id}")
 
     with pytest.raises(ValueError, match="Invalid signature"):
-        get_or_create_session(mock_request, secret_key)
+        get_or_create_session(mock_request)
 
 
 @pytest.mark.parametrize(
