@@ -9,30 +9,29 @@ from inspira.utils.session_utils import encode_session_data, decode_session_data
 
 
 class SessionMiddleware:
-    def __init__(self, secret_key):
-        self.secret_key = secret_key
-        self.config = get_global_app().config or Config()
+    def __init__(self):
+        self.app = get_global_app()
 
     def build_set_cookie_header(self, session_data):
-        encoded_payload = encode_session_data(session_data, self.secret_key)
+        encoded_payload = encode_session_data(session_data, self.app.secret_key)
         expires_date = datetime.datetime.utcnow() + datetime.timedelta(
-            seconds=self.config["SESSION_MAX_AGE"]
+            seconds=self.app.config["SESSION_MAX_AGE"]
         )
         formatted_expires = expires_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
         cookie_value = (
-            f"{self.config['SESSION_COOKIE_NAME']}={encoded_payload}; "
-            f"Expires={formatted_expires}; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
+            f"{self.app.config['SESSION_COOKIE_NAME']}={encoded_payload}; "
+            f"Expires={formatted_expires}; Path={self.app.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
         )
 
-        if self.config["SESSION_COOKIE_DOMAIN"]:
-            cookie_value += f"; Domain={self.config['SESSION_COOKIE_DOMAIN']}"
+        if self.app.config["SESSION_COOKIE_DOMAIN"]:
+            cookie_value += f"; Domain={self.app.config['SESSION_COOKIE_DOMAIN']}"
 
-        if self.config["SESSION_COOKIE_SECURE"]:
+        if self.app.config["SESSION_COOKIE_SECURE"]:
             cookie_value += "; Secure"
 
-        if self.config["SESSION_COOKIE_SAMESITE"]:
-            cookie_value += f"; SameSite={self.config['SESSION_COOKIE_SAMESITE']}"
+        if self.app.config["SESSION_COOKIE_SAMESITE"]:
+            cookie_value += f"; SameSite={self.app.config['SESSION_COOKIE_SAMESITE']}"
 
         return cookie_value
 
@@ -44,12 +43,12 @@ class SessionMiddleware:
                     request = RequestContext().get_request()
 
                     cookies = SimpleCookie(request.get_headers().get("cookie", ""))
-                    session_cookie = cookies.get(self.config["SESSION_COOKIE_NAME"])
+                    session_cookie = cookies.get(self.app.config["SESSION_COOKIE_NAME"])
                     decoded_session = {}
 
                     if session_cookie:
                         decoded_session = decode_session_data(
-                            session_cookie.value, self.secret_key
+                            session_cookie.value, self.app.secret_key
                         )
 
                     if not request.session or decoded_session != request.session:
@@ -58,7 +57,7 @@ class SessionMiddleware:
 
                             headers.append((b"Set-Cookie", cookie_value.encode()))
                         else:
-                            cookie_value = f"{self.config['SESSION_COOKIE_NAME']}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path={self.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
+                            cookie_value = f"{self.app.config['SESSION_COOKIE_NAME']}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path={self.app.config['SESSION_COOKIE_PATH'] or '/'}; HttpOnly"
 
                             headers.append((b"Set-Cookie", cookie_value.encode()))
 

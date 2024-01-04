@@ -11,21 +11,13 @@ from inspira.testclient import TestClient
 
 
 @pytest.fixture
-def app():
-    return Inspira()
-
-
-@pytest.fixture
 def secret_key():
     return "your_secret_key"
 
 
 @pytest.fixture
-def app_with_secret_token(secret_key):
-    app = Inspira()
-    app.secret_key = secret_key
-
-    return app
+def app(secret_key):
+    return Inspira(secret_key)
 
 
 @pytest.fixture
@@ -34,8 +26,8 @@ def client(app):
 
 
 @pytest.fixture
-def client_session(app_with_secret_token):
-    return TestClient(app_with_secret_token)
+def client_session(app):
+    return TestClient(app)
 
 
 @pytest.fixture

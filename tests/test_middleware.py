@@ -97,8 +97,8 @@ async def test_cors_middleware_without_origin_header(app, client):
 
 
 @pytest.mark.asyncio
-async def test_set_session_success(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+async def test_set_session_success(app, secret_key, client):
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -117,7 +117,7 @@ async def test_set_session_success(app, client):
 
     assert session_cookie is not None
 
-    decoded_session = decode_session_data(session_cookie.value, "dummy")
+    decoded_session = decode_session_data(session_cookie.value, secret_key)
     expected_session = {"message": "Hej"}
 
     assert decoded_session == expected_session
@@ -126,7 +126,7 @@ async def test_set_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_invalid_signature_exception(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -153,7 +153,7 @@ async def test_invalid_signature_exception(app, client):
 
 @pytest.mark.asyncio
 async def test_remove_session_success(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -188,7 +188,7 @@ async def test_remove_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_get_session_success(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -207,7 +207,7 @@ async def test_get_session_success(app, client):
 
 @pytest.mark.asyncio
 async def test_remove_nonexistent_key(app, client):
-    session_middleware = SessionMiddleware(secret_key="dummy")
+    session_middleware = SessionMiddleware()
 
     app.add_middleware(session_middleware)
 
@@ -232,7 +232,7 @@ async def test_remove_nonexistent_key(app, client):
 
 @pytest.mark.asyncio
 async def test_user_loader_middleware(app, client, user_mock, secret_key):
-    session_middleware = SessionMiddleware(secret_key=secret_key)
+    session_middleware = SessionMiddleware()
 
     user_loader_middleware = UserLoaderMiddleware(user_mock)
 
@@ -266,7 +266,7 @@ async def test_user_loader_middleware(app, client, user_mock, secret_key):
 
 @pytest.mark.asyncio
 async def test_user_not_logged_in(app, client, secret_key, user_mock):
-    session_middleware = SessionMiddleware(secret_key=secret_key)
+    session_middleware = SessionMiddleware()
     user_loader_middleware = UserLoaderMiddleware(user_mock)
     app.add_middleware(session_middleware)
     app.add_middleware(user_loader_middleware)
