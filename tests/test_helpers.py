@@ -4,13 +4,13 @@ from inspira.constants import TEXT_HTML
 from inspira.helpers.error_templates import (
     format_method_not_allowed_exception,
     format_not_found_exception,
-    format_server_exception,
+    format_internal_server_error,
 )
 from inspira.utils.controller_parser import parse_controller_decorators
 
 
 def test_format_server_exception():
-    response = format_server_exception()
+    response = format_internal_server_error()
     assert response.content_type == TEXT_HTML
     assert response.status_code == 500
     assert "Internal Server Error" in response.content

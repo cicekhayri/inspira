@@ -1,10 +1,10 @@
-from http.cookies import SimpleCookie
 from typing import Dict, Any, Callable
 
 from inspira.auth.auth_utils import decode_auth_token
 from inspira.auth.mixins.user_mixin import AnonymousUserMixin
-from inspira.config import Config
 from inspira.globals import get_global_app
+from inspira.helpers.error_handlers import handle_internal_server_error
+from inspira.logging import log
 from inspira.requests import RequestContext
 from inspira.utils.session_utils import (
     decode_session_data,
@@ -30,10 +30,14 @@ class UserLoaderMiddleware:
                 decoded_session = decode_session_data(
                     session_cookie, self.app.secret_key
                 )
-                user_id = decode_auth_token(decoded_session.get("token", None))
+                if decoded_session is None:
+                    log.error("Invalid session format.")
+                    return await handle_internal_server_error(scope, receive, send)
+                else:
+                    user_id = decode_auth_token(decoded_session.get("token", None))
 
-                if user_id:
-                    user = self.user_model.query.get(user_id)
+                    if user_id:
+                        user = self.user_model.query.get(user_id)
             RequestContext.set_current_user(user or AnonymousUserMixin())
             request.user = RequestContext.get_current_user()
 

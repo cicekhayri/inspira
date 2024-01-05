@@ -151,9 +151,9 @@ async def test_invalid_signature_exception(app, client):
 
     assert session_cookie is not None
 
-    with pytest.raises(ValueError, match="Invalid signature"):
-        decode_session_data(session_cookie.value, "wrong_token")
+    decoded_session = decode_session_data(session_cookie.value, "wrong_token")
 
+    assert decoded_session is None
     assert response.status_code == HTTPStatus.OK
 
 
