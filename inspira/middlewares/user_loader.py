@@ -3,7 +3,7 @@ from typing import Dict, Any, Callable
 from inspira.auth.auth_utils import decode_auth_token
 from inspira.auth.mixins.user_mixin import AnonymousUserMixin
 from inspira.globals import get_global_app
-from inspira.helpers.error_handlers import handle_internal_server_error
+from inspira.helpers.error_handlers import handle_forbidden
 from inspira.logging import log
 from inspira.requests import RequestContext
 from inspira.utils.session_utils import (
@@ -32,7 +32,7 @@ class UserLoaderMiddleware:
                 )
                 if decoded_session is None:
                     log.error("Invalid session format.")
-                    return await handle_internal_server_error(scope, receive, send)
+                    return await handle_forbidden(scope, receive, send)
                 else:
                     user_id = decode_auth_token(decoded_session.get("token", None))
 
