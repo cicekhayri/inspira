@@ -26,7 +26,6 @@ class Inspira:
     def __init__(self, secret_key=None, config=Config()):
         self.config = config
         set_global_app(self, secret_key)
-        self.secret_key = secret_key
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
@@ -204,5 +203,5 @@ class Inspira:
         return Request(scope, receive, send)
 
     async def set_request_session(self, request: Request) -> None:
-        session = get_or_create_session(request, self.secret_key)
+        session = get_or_create_session(request)
         request.session = session

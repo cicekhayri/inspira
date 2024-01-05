@@ -120,8 +120,14 @@ async def test_set_session_success(app, secret_key, client):
     decoded_session = decode_session_data(session_cookie.value, secret_key)
     expected_session = {"message": "Hej"}
 
+    expiration_time = decoded_session.pop("expiration_time", None)
+    session_id = decoded_session.pop("session_id", None)
+
     assert decoded_session == expected_session
     assert response.status_code == HTTPStatus.OK
+    assert expiration_time is not None
+    assert session_id is not None
+
 
 
 @pytest.mark.asyncio
