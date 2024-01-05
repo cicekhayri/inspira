@@ -129,7 +129,6 @@ async def test_set_session_success(app, secret_key, client):
     assert session_id is not None
 
 
-
 @pytest.mark.asyncio
 async def test_invalid_signature_exception(app, client):
     session_middleware = SessionMiddleware()

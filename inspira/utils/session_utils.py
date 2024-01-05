@@ -16,17 +16,14 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-
-
 def encode_session_data(session_data, secret_key):
-    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=get_global_app().config['SESSION_MAX_AGE'])
+    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(
+        seconds=get_global_app().config["SESSION_MAX_AGE"]
+    )
 
     serializer = URLSafeTimedSerializer(secret_key)
 
-    payload = {
-        **session_data,
-        "expiration_time": expiration_time
-    }
+    payload = {**session_data, "expiration_time": expiration_time}
 
     json_session_data = json.dumps(payload, cls=DateTimeEncoder)
 
@@ -44,6 +41,7 @@ def decode_session_data(session_token, secret_key):
     except Exception as e:
         log.error(f"Error decoding session: {e}")
         return None
+
 
 def get_or_create_session(request):
     session_cookie = get_session_token_from_request(

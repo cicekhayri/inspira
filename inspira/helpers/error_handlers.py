@@ -5,7 +5,8 @@ from inspira.helpers.error_templates import (
     format_method_not_allowed_exception,
     format_not_found_exception,
     format_internal_server_error,
-    format_forbidden_exception, format_unauthorized_exception,
+    format_forbidden_exception,
+    format_unauthorized_exception,
 )
 
 
@@ -35,6 +36,7 @@ async def handle_unauthorized(
 ) -> None:
     unauthorized_response = format_unauthorized_exception()
     await unauthorized_response(scope, receive, send)
+
 
 async def handle_internal_server_error(
     scope: Dict[str, Any], receive: Callable, send: Callable

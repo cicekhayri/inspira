@@ -83,7 +83,6 @@ def test_get_or_create_session_with_invalid_session(secret_key):
 
     mock_request = MockRequest(f"session={session_id}")
 
-
     session = get_or_create_session(mock_request)
 
     assert session is None
