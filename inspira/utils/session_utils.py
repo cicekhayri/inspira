@@ -2,7 +2,7 @@ import datetime
 import json
 from http.cookies import SimpleCookie
 
-from itsdangerous import URLSafeSerializer
+from itsdangerous import URLSafeTimedSerializer
 
 from inspira.globals import get_global_app
 
@@ -14,16 +14,28 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+
+
 def encode_session_data(session_data, secret_key):
-    serializer = URLSafeSerializer(secret_key)
-    json_session_data = json.dumps(session_data, cls=DateTimeEncoder)
+    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=get_global_app().config['SESSION_MAX_AGE'])
+
+    serializer = URLSafeTimedSerializer(secret_key)
+
+    payload = {
+        **session_data,
+        "expiration_time": expiration_time
+    }
+
+    json_session_data = json.dumps(payload, cls=DateTimeEncoder)
+
     session_token = serializer.dumps(json_session_data)
+
     return session_token
 
 
 def decode_session_data(session_token, secret_key):
     try:
-        serializer = URLSafeSerializer(secret_key)
+        serializer = URLSafeTimedSerializer(secret_key)
         json_session_data = serializer.loads(session_token)
         decoded_payload = json.loads(json_session_data)
         return decoded_payload
@@ -37,7 +49,6 @@ def get_or_create_session(request):
         request, get_global_app().config["SESSION_COOKIE_NAME"]
     )
     secret_key = get_global_app().secret_key
-    session_data = {}
 
     if session_cookie:
         try:
@@ -49,13 +60,8 @@ def get_or_create_session(request):
     else:
         print("No session in cookies")
 
-    if request.session:
-        encoded_payload = encode_session_data(session_data, secret_key)
-        return encoded_payload
-
 
 def get_session_token_from_request(request, session_cookie_name):
     cookies = SimpleCookie(request.get_headers().get("cookie", ""))
     token_cookie = cookies.get(session_cookie_name)
-
     return token_cookie.value if token_cookie else None

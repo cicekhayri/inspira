@@ -42,6 +42,9 @@ def test_encode_decode_session_data(secret_key):
 
     decoded_session_data = decode_session_data(session_token, secret_key)
 
+    expiration_time = decoded_session_data.pop("expiration_time", None)
+
+    assert expiration_time is not None
     assert decoded_session_data == session_data
 
 
@@ -59,7 +62,12 @@ def test_get_or_create_session_with_valid_cookie(secret_key):
     mock_request = MockRequest(f"session={encoded_session_token}")
     result = get_or_create_session(mock_request)
 
-    assert result == session_data
+    expected_result = {"email": "hayri@inspiraframework.com"}
+
+    expiration_time = result.pop("expiration_time", None)
+
+    assert result == expected_result
+    assert expiration_time is not None
 
 
 def test_get_or_create_session_with_invalid_session(secret_key):
