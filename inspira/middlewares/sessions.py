@@ -3,7 +3,9 @@ import uuid
 from typing import Dict, Any, Callable
 
 from inspira.globals import get_global_app
+from inspira.helpers.error_handlers import handle_forbidden
 from inspira.inspira import RequestContext
+from inspira.logging import log
 from inspira.utils.session_utils import (
     encode_session_data,
     decode_session_data,
@@ -57,6 +59,10 @@ class SessionMiddleware:
                         decoded_session = decode_session_data(
                             session_cookie, self.app.secret_key
                         )
+
+                        if decoded_session is None:
+                            log.error("Invalid session format.")
+                            return await handle_forbidden(scope, receive, send)
 
                     if not request.session or decoded_session != request.session:
                         if request.session:

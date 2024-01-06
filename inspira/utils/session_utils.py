@@ -1,10 +1,12 @@
 import datetime
 import json
+
 from http.cookies import SimpleCookie
 
 from itsdangerous import URLSafeTimedSerializer
 
 from inspira.globals import get_global_app
+from inspira.logging import log
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -14,17 +16,14 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-
-
 def encode_session_data(session_data, secret_key):
-    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=get_global_app().config['SESSION_MAX_AGE'])
+    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(
+        seconds=get_global_app().config["SESSION_MAX_AGE"]
+    )
 
     serializer = URLSafeTimedSerializer(secret_key)
 
-    payload = {
-        **session_data,
-        "expiration_time": expiration_time
-    }
+    payload = {**session_data, "expiration_time": expiration_time}
 
     json_session_data = json.dumps(payload, cls=DateTimeEncoder)
 
@@ -40,8 +39,8 @@ def decode_session_data(session_token, secret_key):
         decoded_payload = json.loads(json_session_data)
         return decoded_payload
     except Exception as e:
-        print(f"Error decoding session: {e}")
-        raise ValueError("Invalid signature") from e
+        log.error(f"Error decoding session: {e}")
+        return None
 
 
 def get_or_create_session(request):

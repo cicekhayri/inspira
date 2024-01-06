@@ -51,7 +51,7 @@ h1, a{{
 """
 
 
-def format_server_exception() -> HttpResponse:
+def format_internal_server_error() -> HttpResponse:
     msg = template.format(
         title="Internal Server Error",
         message="Internal Server Error"
@@ -77,6 +77,15 @@ def format_forbidden_exception() -> HttpResponse:
         status_code=403,
     )
     return HttpResponse(content=msg, status_code=403, content_type=TEXT_HTML)
+
+
+def format_unauthorized_exception() -> HttpResponse:
+    msg = template.format(
+        title="Unauthorized",
+        message="Unauthorized",
+        status_code=401,
+    )
+    return HttpResponse(content=msg, status_code=401, content_type=TEXT_HTML)
 
 
 def format_method_not_allowed_exception() -> HttpResponse:
