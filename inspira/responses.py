@@ -7,6 +7,7 @@ from http import HTTPStatus
 from jinja2 import Environment, FileSystemLoader
 
 from inspira.constants import APPLICATION_JSON, NOT_FOUND, TEXT_HTML, TEXT_PLAIN, UTF8
+from inspira.logging import log
 from inspira.requests import RequestContext
 
 
@@ -146,7 +147,7 @@ class TemplateResponse(HttpResponse):
 
     async def render_template(self, scope, receive, send):
         if self.template_name is None:
-            print("Template name is not provided.")
+            log.error("Template name is not provided.")
             not_found_response = JsonResponse(
                 {"error": NOT_FOUND}, status_code=HTTPStatus.NOT_FOUND
             )
@@ -156,7 +157,7 @@ class TemplateResponse(HttpResponse):
         template_path = os.path.join(self.template_dir, self.template_name)
 
         if not os.path.exists(template_path):
-            print("Template not found:", template_path)
+            log.error("Template not found:", template_path)
             not_found_response = JsonResponse(
                 {"error": NOT_FOUND}, status_code=HTTPStatus.NOT_FOUND
             )
@@ -202,7 +203,7 @@ class TemplateResponse(HttpResponse):
                     }
                 )
             else:
-                print("File not found:", file_path)
+                log.error("File not found:", file_path)
 
                 # Return a 404 response for non-existing static files
                 not_found_response = JsonResponse(
@@ -210,7 +211,7 @@ class TemplateResponse(HttpResponse):
                 )
                 await not_found_response(scope, receive, send)
         else:
-            print("Unexpected path:", path_info)
+            log.error("Unexpected path:", path_info)
 
             # Return a 404 response for unexpected paths
             not_found_response = JsonResponse(

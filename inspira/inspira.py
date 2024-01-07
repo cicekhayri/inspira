@@ -14,6 +14,7 @@ from inspira.helpers.error_handlers import (
     handle_not_found,
 )
 from inspira.helpers.static_file_handler import handle_static_files
+from inspira.logging import log
 from inspira.requests import Request, RequestContext
 from inspira.utils.session_utils import get_or_create_session
 from inspira.utils.controller_parser import parse_controller_decorators
@@ -71,7 +72,7 @@ class Inspira:
                 if inspect.isclass(obj) and hasattr(obj, "__path__"):
                     self._add_class_routes(obj)
         except ImportError as e:
-            print(f"Error importing module {file_path}: {e}")
+            log.error(f"Error importing module {file_path}: {e}")
         finally:
             # Remove the 'src' directory from the Python path after importing
             sys.path.pop(0)

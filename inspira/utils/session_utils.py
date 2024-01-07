@@ -54,10 +54,10 @@ def get_or_create_session(request):
             session_data = decode_session_data(session_cookie, secret_key)
             return session_data
         except ValueError:
-            print("Invalid signature when decoding session")
+            log.error("Invalid signature when decoding session")
             raise ValueError("Invalid signature")
     else:
-        print("No session in cookies")
+        log.error("No session in cookies")
 
 
 def get_session_token_from_request(request, session_cookie_name):

@@ -8,6 +8,7 @@ from inspira.auth.decorators import login_required
 from inspira.auth.mixins.user_mixin import AnonymousUserMixin
 from inspira.decorators.http_methods import get
 from inspira.enums import HttpMethod
+from inspira.logging import log
 from inspira.middlewares.cors import CORSMiddleware
 from inspira.middlewares.sessions import SessionMiddleware
 from inspira.middlewares.user_loader import UserLoaderMiddleware
@@ -218,7 +219,7 @@ async def test_remove_nonexistent_key(app, client):
 
     @get("/remove")
     async def remove_route(request: Request):
-        print(f"Session before removal: {request.session}")
+        log.info(f"Session before removal: {request.session}")
 
         request.remove_session("nonexistent_key")
         return HttpResponse("Session key removed successfully")

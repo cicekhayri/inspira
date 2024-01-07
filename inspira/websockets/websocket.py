@@ -6,6 +6,7 @@ from inspira.constants import (
     WEBSOCKET_SEND_TYPE,
     WEBSOCKET_TYPE,
 )
+from inspira.logging import log
 
 
 class WebSocket:
@@ -31,4 +32,4 @@ class WebSocket:
         try:
             await self._send({"type": WEBSOCKET_CLOSE_TYPE})
         except Exception as e:
-            print(f"Error sending close message: {e}")
+            log.error(f"Error sending close message: {e}")
