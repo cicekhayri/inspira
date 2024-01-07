@@ -227,5 +227,11 @@ class HttpResponseRedirect(HttpResponse):
 
 
 class ForbiddenResponse(HttpResponse):
-    def __init__(self, content=None, status_code=HTTPStatus.FORBIDDEN, headers=None):
-        super().__init__(content, status_code, TEXT_PLAIN, headers)
+    def __init__(
+        self,
+        content=None,
+        content_type=TEXT_PLAIN,
+        status_code=HTTPStatus.FORBIDDEN,
+        headers=None,
+    ):
+        super().__init__(content, status_code, content_type, headers)

@@ -14,6 +14,7 @@ from inspira.responses import (
     HttpResponseRedirect,
     JsonResponse,
     TemplateResponse,
+    ForbiddenResponse,
 )
 
 
@@ -313,3 +314,34 @@ async def test_set_cookie():
     assert "user=john_doe" in headers[0]
     assert "Max-Age=3600" in headers[0]
     assert "Path=/" in headers[0]
+
+
+def test_forbidden_response_default_value():
+    response = ForbiddenResponse()
+
+    assert response.content is None
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.content_type == TEXT_PLAIN
+
+
+def test_forbidden_response_custom_values():
+    content = "This is forbidden"
+    custom_status_code = HTTPStatus.UNAUTHORIZED
+    custom_headers = {"Custom-Header": "Value"}
+
+    response = ForbiddenResponse(
+        content=content, status_code=custom_status_code, headers=custom_headers
+    )
+
+    assert response.content == content
+    assert response.status_code == custom_status_code
+    assert response.content_type == TEXT_PLAIN
+    assert response.headers == custom_headers
+
+
+def test_forbidden_response_content_type_json():
+    content = {"message": "You don't have access"}
+    response = ForbiddenResponse(content=content, content_type=APPLICATION_JSON)
+
+    assert response.content == content
+    assert response.content_type == APPLICATION_JSON
