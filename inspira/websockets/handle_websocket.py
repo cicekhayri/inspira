@@ -1,4 +1,5 @@
 from inspira.constants import WEBSOCKET_DISCONNECT_TYPE, WEBSOCKET_RECEIVE_TYPE
+from inspira.logging import log
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
 from inspira.websockets import WebSocket, WebSocketControllerRegistry
 
@@ -8,7 +9,7 @@ async def handle_websocket(scope, receive, send):
     controller_cls = WebSocketControllerRegistry.get_controller(path)
 
     if not controller_cls:
-        print(f"No WebSocket controller registered for path: {path}")
+        log.info(f"No WebSocket controller registered for path: {path}")
         return
 
     websocket_cls = WebSocket(scope, receive, send)
@@ -31,6 +32,6 @@ async def handle_websocket(scope, receive, send):
                 await instance.on_message(websocket_cls, message)
 
     except Exception as e:
-        print(f"WebSocket connection error: {e}")
+        log.info(f"WebSocket connection error: {e}")
     finally:
         await instance.on_close(websocket_cls)
