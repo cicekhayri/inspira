@@ -13,9 +13,15 @@ def test_singularize_word():
     assert singularize(word) == expected
 
 
-def test_pluralize_word():
+def test_pluralize_singular_word():
     word = "order"
     expected = "orders"
+    assert pluralize_word(word) == expected
+
+
+def test_pluralize_word():
+    word = "users"
+    expected = "users"
     assert pluralize_word(word) == expected
 
 
