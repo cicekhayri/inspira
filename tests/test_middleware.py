@@ -46,7 +46,6 @@ async def test_cors_middleware(app, client):
     )
     assert response_allowed.status_code == HTTPStatus.OK
 
-
 @pytest.mark.asyncio
 async def test_cors_middleware_origin(app, client):
     origins = ["http://localhost:8000"]

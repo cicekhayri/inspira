@@ -22,9 +22,10 @@ class CORSMiddleware:
             request = Request(scope, receive, send)
             origin = request.get_headers().get("origin")
 
-            if origin is not None and (
-                origin not in self.allow_origins and "*" not in self.allow_origins
-            ):
+            if scope["method"] == "OPTIONS":
+                return await self.handle_options(scope, receive, send, origin)
+
+            if origin is not None and not self.is_origin_allowed(origin):
                 return await handle_forbidden(scope, receive, send)
 
             async def send_wrapper(message):
@@ -32,27 +33,7 @@ class CORSMiddleware:
                     headers = message.get("headers", [])
 
                     if origin in self.allow_origins:
-                        headers.append(
-                            (b"Access-Control-Allow-Origin", origin.encode())
-                        )
-                        headers.append(
-                            (
-                                b"Access-Control-Allow-Credentials",
-                                str(self.allow_credentials).lower().encode(),
-                            )
-                        )
-                        headers.append(
-                            (
-                                b"Access-Control-Allow-Methods",
-                                ",".join(self.allow_methods).encode(),
-                            )
-                        )
-                        headers.append(
-                            (
-                                b"Access-Control-Allow-Headers",
-                                ",".join(self.allow_headers).encode(),
-                            )
-                        )
+                        headers.extend(self.get_cors_headers(origin))
 
                     message["headers"] = headers
 
@@ -61,3 +42,26 @@ class CORSMiddleware:
             await handler(scope, receive, send_wrapper)
 
         return middleware
+
+    def is_origin_allowed(self, origin):
+        return origin is not None and (origin in self.allow_origins or "*" in self.allow_origins)
+
+    def get_cors_headers(self, origin):
+        return [
+            (b"Access-Control-Allow-Origin", origin.encode()),
+            (b"Access-Control-Allow-Credentials", str(self.allow_credentials).lower().encode()),
+            (b"Access-Control-Allow-Methods", ",".join(self.allow_methods).encode()),
+            (b"Access-Control-Allow-Headers", ",".join(self.allow_headers).encode()),
+        ]
+
+    async def handle_options(self, scope, receive, send, origin):
+        headers = self.get_cors_headers(origin)
+        headers.append((b"Access-Control-Allow-Headers", ",".join(self.allow_headers + ["Content-Type"]).encode()))
+        response_message = {
+            "type": "http.response.start",
+            "status": 200,
+            "headers": headers,
+        }
+
+        await send(response_message)
+        await send({"type": "http.response.body", "body": b""})
