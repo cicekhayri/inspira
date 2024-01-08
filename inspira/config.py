@@ -13,6 +13,7 @@ class Config:
             "SESSION_COOKIE_SECURE": True,
             "SESSION_COOKIE_SAMESITE": None,
             "TOKEN_EXPIRATION_TIME": 3600,
+            "SECRET_KEY": "change_me"
         }
 
     def __getitem__(self, key):
