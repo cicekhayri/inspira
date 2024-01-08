@@ -44,19 +44,29 @@ class CORSMiddleware:
         return middleware
 
     def is_origin_allowed(self, origin):
-        return origin is not None and (origin in self.allow_origins or "*" in self.allow_origins)
+        return origin is not None and (
+            origin in self.allow_origins or "*" in self.allow_origins
+        )
 
     def get_cors_headers(self, origin):
         return [
             (b"Access-Control-Allow-Origin", origin.encode()),
-            (b"Access-Control-Allow-Credentials", str(self.allow_credentials).lower().encode()),
+            (
+                b"Access-Control-Allow-Credentials",
+                str(self.allow_credentials).lower().encode(),
+            ),
             (b"Access-Control-Allow-Methods", ",".join(self.allow_methods).encode()),
             (b"Access-Control-Allow-Headers", ",".join(self.allow_headers).encode()),
         ]
 
     async def handle_options(self, scope, receive, send, origin):
         headers = self.get_cors_headers(origin)
-        headers.append((b"Access-Control-Allow-Headers", ",".join(self.allow_headers + ["Content-Type"]).encode()))
+        headers.append(
+            (
+                b"Access-Control-Allow-Headers",
+                ",".join(self.allow_headers + ["Content-Type"]).encode(),
+            )
+        )
         response_message = {
             "type": "http.response.start",
             "status": 200,
