@@ -2,13 +2,14 @@ from typing import Literal
 
 import inflect
 
+p = inflect.engine()
+
 
 def singularize(word: str) -> str | Literal[False]:
-    p = inflect.engine()
     return p.singular_noun(word) or word
 
 
 def pluralize_word(word: str) -> str:
-    p = inflect.engine()
-
+    if word.endswith("s"):
+        return word
     return p.plural(word) or word
