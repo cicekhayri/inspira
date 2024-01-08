@@ -24,9 +24,11 @@ from inspira.websockets import handle_websocket
 
 
 class Inspira:
-    def __init__(self, secret_key=None, config=Config()):
-        self.config = config
-        set_global_app(self, secret_key)
+    def __init__(self, secret_key=None, config=None):
+        self.config = config if config is not None else Config()
+        self.secret_key = secret_key if secret_key is not None else self.config['SECRET_KEY']
+        set_global_app(self, self.secret_key)
+
         self.routes: Dict[str, Dict[str, Callable]] = {
             method.value: {} for method in HttpMethod
         }
