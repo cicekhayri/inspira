@@ -63,7 +63,9 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
     for i, (old_col, new_col) in enumerate(zip(existing_columns, new_columns)):
         if old_col != new_col.key:
             add_underscore = "_" if i < len(new_columns) - 1 else ""
-            sql_statements += f"ALTER TABLE {entity_name} RENAME COLUMN {old_col} TO {new_col.key};"
+            sql_statements += (
+                f"ALTER TABLE {entity_name} RENAME COLUMN {old_col} TO {new_col.key};"
+            )
             migration_name += f"{old_col}_to_{new_col.key}{add_underscore}"
 
     if sql_statements:

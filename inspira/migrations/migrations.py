@@ -15,7 +15,8 @@ from inspira.migrations.utils import (
     get_columns_from_model,
     generate_add_column_sql,
     generate_drop_column_sql,
-    generate_create_table_sql, generate_rename_column_sql,
+    generate_create_table_sql,
+    generate_rename_column_sql,
 )
 
 PROJECT_ROOT = os.path.abspath(".")
@@ -61,15 +62,23 @@ def create_migrations(entity_name):
     if not existing_columns:
         generate_create_table_sql(module, entity_name)
     else:
-        renamed_columns = [(old_col, new_col.key) for old_col, new_col in zip(existing_columns, new_columns) if old_col != new_col.key]
+        renamed_columns = [
+            (old_col, new_col.key)
+            for old_col, new_col in zip(existing_columns, new_columns)
+            if old_col != new_col.key
+        ]
         if renamed_columns:
             generate_rename_column_sql(entity_name, existing_columns, new_columns)
         else:
-            added_columns = [col for col in new_columns if col.key not in existing_columns]
+            added_columns = [
+                col for col in new_columns if col.key not in existing_columns
+            ]
             if added_columns:
                 generate_add_column_sql(entity_name, existing_columns, added_columns)
             else:
-                removed_columns = [col for col in existing_columns if col not in new_columns]
+                removed_columns = [
+                    col for col in existing_columns if col not in new_columns
+                ]
                 if removed_columns:
                     generate_drop_column_sql(entity_name, existing_columns, new_columns)
 
