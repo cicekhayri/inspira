@@ -86,6 +86,10 @@ CREATE TABLE IF NOT EXISTS {table_name} (
     generate_migration_file(table_name, create_table_sql, migration_file_name)
 
 
+def generate_empty_sql_file(module, migration_name):
+    generate_migration_file(module, "", migration_name)
+
+
 def get_migration_files(migration_dir):
     migration_files = [
         os.path.join(migration_dir, f)

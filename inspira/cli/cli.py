@@ -57,15 +57,21 @@ def database(name, type):
 
 
 @cli.command()
-@click.argument("name")
-def createmigrations(name):
-    create_migrations(name)
+@click.argument("module_name")
+@click.option("--empty", nargs=1, type=str, required=True, help="Generate empty migration file.")
+def createmigrations(module_name, empty):
+    migration_name = None
+
+    if empty:
+        migration_name = empty
+
+    create_migrations(module_name, migration_name)
 
 
 @cli.command()
-@click.argument("name")
-def migrate(name):
-    run_migrations(name)
+@click.argument("module_name")
+def migrate(module_name):
+    run_migrations(module_name)
 
 
 @cli.command()

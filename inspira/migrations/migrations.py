@@ -16,7 +16,7 @@ from inspira.migrations.utils import (
     generate_add_column_sql,
     generate_drop_column_sql,
     generate_create_table_sql,
-    generate_rename_column_sql,
+    generate_rename_column_sql, generate_empty_sql_file,
 )
 
 PROJECT_ROOT = os.path.abspath(".")
@@ -53,7 +53,11 @@ def execute_sql_file(file_path):
                 connection.execute(text(statement))
 
 
-def create_migrations(entity_name):
+def create_migrations(entity_name, empty_migration_file):
+
+    if empty_migration_file:
+        generate_empty_sql_file(entity_name, empty_migration_file)
+
     module = load_model_file(entity_name)
 
     existing_columns = get_existing_columns(entity_name)
