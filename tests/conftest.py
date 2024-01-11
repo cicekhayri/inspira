@@ -67,6 +67,25 @@ def setup_database_file(teardown_database_file):
 
 
 @pytest.fixture
+def create_migration_files(tmpdir):
+    migration_files = [
+        "0001_test.sql",
+        "0002_another.sql",
+        "not_a_migration.txt",
+        "003_missing.sql",
+    ]
+
+    path = "tests/migrations"
+    os.makedirs(path, exist_ok=True)
+
+    for file_name in migration_files:
+        file_path = os.path.join(path, file_name)
+        with open(file_path, 'w') as file:
+            file.write("Sample content")
+
+    return migration_files, path
+
+@pytest.fixture
 def mock_scope():
     return {
         "headers": [(b"content-type", b"application/json")],
