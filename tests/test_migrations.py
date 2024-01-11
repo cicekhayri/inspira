@@ -89,14 +89,11 @@ def test_generate_create_table_sql():
 
 
 def test_get_migration_files(create_migration_files):
-    # Arrange
     migration_files, migration_dir = create_migration_files
 
-    # Act
     with patch("inspira.migrations.utils.os.listdir", return_value=migration_files):
         result = get_migration_files(migration_dir)
 
-    # Assert
     assert result == [
         os.path.join(migration_dir, "0001_test.sql"),
         os.path.join(migration_dir, "0002_another.sql"),
