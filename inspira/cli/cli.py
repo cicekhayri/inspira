@@ -58,7 +58,9 @@ def database(name, type):
 
 @cli.command()
 @click.argument("module_name")
-@click.option("--empty", nargs=1, type=str, required=True, help="Generate empty migration file.")
+@click.option(
+    "--empty", nargs=1, type=str, required=True, help="Generate empty migration file."
+)
 def createmigrations(module_name, empty):
     migration_name = None
 
