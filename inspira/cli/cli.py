@@ -6,6 +6,7 @@ from inspira.cli.generate_database_file import create_database_file
 from inspira.cli.generate_model_file import database_file_exists, generate_model_file
 from inspira.cli.generate_repository_file import generate_repository_file
 from inspira.cli.generate_service_file import generate_service_file
+from inspira.migrations.migrations import create_migrations, run_migrations
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 
@@ -53,6 +54,17 @@ def create_module_files(name, only_controller, is_websocket):
 @click.option("--type", required=True, help="Database type")
 def database(name, type):
     create_database_file(name, type)
+
+
+@cli.command()
+@click.argument('name')
+def createmigrations(name):
+    create_migrations(name)
+
+@cli.command()
+@click.argument('name')
+def migrate(name):
+    run_migrations(name)
 
 
 @cli.command()
