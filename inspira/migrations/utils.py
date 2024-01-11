@@ -82,7 +82,7 @@ def generate_create_table_sql(module, table_name):
     {f',{backslash}{tab}'.join(generate_column_sql(col) for col in columns)}
 );
 
-{f'{backslash}'.join(generate_index_sql(table_name,col) for col in columns)}
+{f'{backslash}'.join(generate_index_sql(getattr(module, module.__name__), table_name, col) for col in columns)}
 """
     migration_file_name = f"create_table_{table_name}"
     generate_migration_file(table_name, create_table_sql, migration_file_name)
@@ -134,10 +134,19 @@ def generate_column_sql(column):
     return f"{column.key} {column.type}"
 
 
-def generate_index_sql(table_name, column):
-    if column.index:
-        return f"CREATE INDEX index_{column.key} ON {table_name} ({column.key});"
-    return ""
+def generate_index_sql(module, table_name, column):
+    indexes = get_indexes_from_model(module)
+    index_sql = ""
+
+    for index in indexes:
+        if column.key in [column.name for column in index.columns]:
+            index_sql += f"CREATE INDEX {index.name} ON {table_name} ({column.key});"
+
+    return index_sql
 
 def get_columns_from_model(model_class):
     return model_class.__table__.columns
+
+
+def get_indexes_from_model(model_class):
+    return model_class.__table__.indexes

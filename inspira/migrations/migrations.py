@@ -1,7 +1,7 @@
 import sys
 
 import click
-from sqlalchemy import select, create_engine
+from sqlalchemy import select, create_engine, inspect
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql.expression import func
 import os
@@ -17,7 +17,7 @@ from inspira.migrations.utils import (
     generate_drop_column_sql,
     generate_create_table_sql,
     generate_rename_column_sql,
-    generate_empty_sql_file,
+    generate_empty_sql_file, get_indexes_from_model,
 )
 
 PROJECT_ROOT = os.path.abspath(".")
