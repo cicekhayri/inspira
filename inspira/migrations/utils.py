@@ -144,6 +144,7 @@ def generate_index_sql(module, table_name, column):
 
     return index_sql
 
+
 def get_columns_from_model(model_class):
     return model_class.__table__.columns
 

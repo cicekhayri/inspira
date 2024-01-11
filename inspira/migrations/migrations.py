@@ -17,7 +17,8 @@ from inspira.migrations.utils import (
     generate_drop_column_sql,
     generate_create_table_sql,
     generate_rename_column_sql,
-    generate_empty_sql_file, get_indexes_from_model,
+    generate_empty_sql_file,
+    get_indexes_from_model,
 )
 
 PROJECT_ROOT = os.path.abspath(".")
