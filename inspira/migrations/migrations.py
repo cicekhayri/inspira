@@ -8,9 +8,15 @@ import os
 from sqlalchemy import MetaData, Column, Integer, String, text
 
 
-from inspira.migrations.utils import get_or_create_migration_directory, \
-    get_migration_files, load_model_file, get_columns_from_model, generate_add_column_sql, generate_drop_column_sql, \
-    generate_create_table_sql
+from inspira.migrations.utils import (
+    get_or_create_migration_directory,
+    get_migration_files,
+    load_model_file,
+    get_columns_from_model,
+    generate_add_column_sql,
+    generate_drop_column_sql,
+    generate_create_table_sql,
+)
 
 PROJECT_ROOT = os.path.abspath(".")
 sys.path.append(PROJECT_ROOT)
@@ -19,8 +25,9 @@ try:
     from database import Base, engine, db_session
 except ImportError:
     Base = declarative_base()
-    engine = create_engine('sqlite:///:memory:')
+    engine = create_engine("sqlite:///:memory:")
     db_session = None
+
 
 class Migration(Base):
     __tablename__ = "migrations"
@@ -34,15 +41,16 @@ def initialize_database(engine):
 
 
 def execute_sql_file(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         sql_content = file.read()
 
-    sql_statements = sql_content.split(';')
+    sql_statements = sql_content.split(";")
 
     with engine.connect() as connection:
         for statement in sql_statements:
             if statement.strip():
                 connection.execute(text(statement))
+
 
 def create_migrations(entity_name):
     module = load_model_file(entity_name)
@@ -57,9 +65,10 @@ def create_migrations(entity_name):
     else:
         generate_create_table_sql(module, entity_name)
 
+
 def run_migrations(module_name):
     with engine.connect() as connection:
-        if not engine.dialect.has_table(connection, 'migrations'):
+        if not engine.dialect.has_table(connection, "migrations"):
             initialize_database(engine)
 
         if not engine.dialect.has_table(connection, module_name):
@@ -71,14 +80,20 @@ def run_migrations(module_name):
         for file in migration_files:
             migration_name = os.path.basename(file).replace(".sql", "")
 
-            current_version = connection.execute(
-                select(func.max(Migration.version))
-                .where(Migration.migration_name == migration_name)
-            ).scalar() or 0
+            current_version = (
+                connection.execute(
+                    select(func.max(Migration.version)).where(
+                        Migration.migration_name == migration_name
+                    )
+                ).scalar()
+                or 0
+            )
 
             if not current_version:
                 execute_sql_file(file)
-                click.echo(f"Applying migration for {migration_name} version {current_version}")
+                click.echo(
+                    f"Applying migration for {migration_name} version {current_version}"
+                )
 
                 insert_migration(current_version, migration_name)
 

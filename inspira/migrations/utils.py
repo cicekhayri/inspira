@@ -56,9 +56,8 @@ def generate_add_column_sql(entity_name, existing_columns, new_columns):
         generate_migration_file(entity_name, sql_statements, migration_file_name)
 
 
-
 def generate_create_table_sql(module, table_name):
-    backslash = '\n\t'
+    backslash = "\n\t"
     columns = get_columns_from_model(getattr(module, module.__name__))
 
     create_table_sql = f"""
@@ -74,7 +73,9 @@ def get_migration_files(migration_dir):
     migration_files = [
         os.path.join(migration_dir, f)
         for f in os.listdir(migration_dir)
-        if f.endswith(".sql") and f.split("_")[0].isdigit() and os.path.isfile(os.path.join(migration_dir, f))
+        if f.endswith(".sql")
+        and f.split("_")[0].isdigit()
+        and os.path.isfile(os.path.join(migration_dir, f))
     ]
     migration_files.sort()
     return migration_files
@@ -88,22 +89,27 @@ def get_latest_migration_number(migration_dir):
     latest_migration = max(int(f.split("_")[0]) for f in migration_files)
     return latest_migration
 
+
 def generate_migration_file(module_name, migration_sql, migration_name):
     migration_dir = get_or_create_migration_directory(module_name)
     latest_migration_number = get_latest_migration_number(migration_dir)
     new_migration_number = latest_migration_number + 1
-    migration_file_path = os.path.join(migration_dir, f"{str(new_migration_number).zfill(4)}_{migration_name}.sql")
+    migration_file_path = os.path.join(
+        migration_dir, f"{str(new_migration_number).zfill(4)}_{migration_name}.sql"
+    )
 
     with open(migration_file_path, "w") as migration_file:
         migration_file.write(migration_sql)
 
-    log.info(f"Migration file '{str(new_migration_number).zfill(4)}_{singularize(module_name)}.sql' created.")
+    log.info(
+        f"Migration file '{str(new_migration_number).zfill(4)}_{singularize(module_name)}.sql' created."
+    )
     return migration_file
+
 
 def generate_column_sql(column):
     return f"{column.key} {column.type}"
 
+
 def get_columns_from_model(model_class):
     return model_class.__table__.columns
-
-

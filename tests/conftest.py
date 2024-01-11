@@ -80,10 +80,11 @@ def create_migration_files(tmpdir):
 
     for file_name in migration_files:
         file_path = os.path.join(path, file_name)
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             file.write("Sample content")
 
     return migration_files, path
+
 
 @pytest.fixture
 def mock_scope():

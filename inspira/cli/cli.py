@@ -57,12 +57,13 @@ def database(name, type):
 
 
 @cli.command()
-@click.argument('name')
+@click.argument("name")
 def createmigrations(name):
     create_migrations(name)
 
+
 @cli.command()
-@click.argument('name')
+@click.argument("name")
 def migrate(name):
     run_migrations(name)
 

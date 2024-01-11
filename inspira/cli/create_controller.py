@@ -59,4 +59,3 @@ def create_controller_file(name, is_websocket):
         output_file.write(content)
 
     click.echo(f"Module '{singularize_name}' created successfully.")
-
