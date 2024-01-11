@@ -74,13 +74,15 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
 
 
 def generate_create_table_sql(module, table_name):
-    backslash = "\n\t"
+    backslash = "\n"
+    tab = "\t"
     columns = get_columns_from_model(getattr(module, module.__name__))
 
-    create_table_sql = f"""
-CREATE TABLE IF NOT EXISTS {table_name} (
-    {f',{backslash}'.join(generate_column_sql(col) for col in columns)}
+    create_table_sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+    {f',{backslash}{tab}'.join(generate_column_sql(col) for col in columns)}
 );
+
+{f'{backslash}'.join(generate_index_sql(table_name,col) for col in columns)}
 """
     migration_file_name = f"create_table_{table_name}"
     generate_migration_file(table_name, create_table_sql, migration_file_name)
@@ -131,6 +133,11 @@ def generate_migration_file(module_name, migration_sql, migration_name):
 def generate_column_sql(column):
     return f"{column.key} {column.type}"
 
+
+def generate_index_sql(table_name, column):
+    if column.index:
+        return f"CREATE INDEX index_{column.key} ON {table_name} ({column.key});"
+    return ""
 
 def get_columns_from_model(model_class):
     return model_class.__table__.columns
