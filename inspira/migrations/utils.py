@@ -56,6 +56,21 @@ def generate_add_column_sql(entity_name, existing_columns, new_columns):
         generate_migration_file(entity_name, sql_statements, migration_file_name)
 
 
+def generate_rename_column_sql(entity_name, existing_columns, new_columns):
+    sql_statements = ""
+    migration_name = ""
+
+    for i, (old_col, new_col) in enumerate(zip(existing_columns, new_columns)):
+        if old_col != new_col.key:
+            add_underscore = "_" if i < len(new_columns) - 1 else ""
+            sql_statements += f"ALTER TABLE {entity_name} RENAME COLUMN {old_col} TO {new_col.key};"
+            migration_name += f"{old_col}_to_{new_col.key}{add_underscore}"
+
+    if sql_statements:
+        migration_file_name = f"rename_column_{migration_name}"
+        generate_migration_file(entity_name, sql_statements, migration_file_name)
+
+
 def generate_create_table_sql(module, table_name):
     backslash = "\n\t"
     columns = get_columns_from_model(getattr(module, module.__name__))

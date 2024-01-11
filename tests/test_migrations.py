@@ -8,7 +8,7 @@ from inspira.migrations.utils import (
     generate_drop_column_sql,
     generate_add_column_sql,
     generate_create_table_sql,
-    get_migration_files,
+    get_migration_files, generate_rename_column_sql,
 )
 
 
@@ -56,6 +56,26 @@ def test_generate_add_column_sql():
         )
         mock_generate_migration_file.assert_called_once_with(
             entity_name, expected_sql, "add_column_column3_column4"
+        )
+
+def test_generate_rename_column_sql():
+    entity_name = "your_entity"
+    existing_columns = ["col1", "col2", "col3"]
+    new_columns = [
+        MagicMock(key="col1", type="VARCHAR(255)"),
+        MagicMock(key="col2", type="INTEGER"),
+        MagicMock(key="new_col3", type="VARCHAR(255)"),
+    ]
+
+    with patch(
+        "inspira.migrations.utils.generate_migration_file", MagicMock()
+    ) as mock_generate_migration_file:
+        generate_rename_column_sql(entity_name, existing_columns, new_columns)
+        expected_sql = (
+            "ALTER TABLE your_entity RENAME COLUMN col3 TO new_col3;"
+        )
+        mock_generate_migration_file.assert_called_once_with(
+            entity_name, expected_sql, "rename_column_col3_to_new_col3"
         )
 
 
