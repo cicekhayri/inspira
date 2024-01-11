@@ -102,7 +102,7 @@ def generate_migration_file(module_name, migration_sql, migration_name):
         migration_file.write(migration_sql)
 
     log.info(
-        f"Migration file '{str(new_migration_number).zfill(4)}_{singularize(module_name)}.sql' created."
+        f"Migration file '{str(new_migration_number).zfill(4)}_{migration_name}.sql' created."
     )
     return migration_file
 
