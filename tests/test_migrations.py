@@ -3,7 +3,12 @@ from unittest.mock import patch, MagicMock
 
 from sqlalchemy import Index, MetaData, Table, Column, Integer, String, inspect
 
-from inspira.migrations.migrations import execute_sql_file, engine, Base, generate_sql_from_model
+from inspira.migrations.migrations import (
+    execute_sql_file,
+    engine,
+    Base,
+    generate_sql_from_model,
+)
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
     generate_drop_column_sql,
@@ -124,8 +129,7 @@ def test_generate_add_index_sql(mock_generate_migration_file):
     )
 
 
-def test_generate_create_table_sql(
-):
+def test_generate_create_table_sql():
     table_name = "users"
 
     class User(Base):
