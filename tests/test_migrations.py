@@ -139,7 +139,7 @@ def test_generate_create_table_sql():
 
     sql_str = generate_create_table_sql(table_name)
 
-    expected_sql = "\nCREATE TABLE users (\n\tid INTEGER NOT NULL, \n\tname VARCHAR(50), \n\tPRIMARY KEY (id)\n)\n\n"
+    expected_sql = "\nCREATE TABLE users (\n\tid INTEGER NOT NULL, \n\tname VARCHAR(50), \n\tPRIMARY KEY (id)\n);\n"
 
     assert sql_str == expected_sql
 

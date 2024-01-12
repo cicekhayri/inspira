@@ -4,7 +4,7 @@ import click
 from sqlalchemy import select, create_engine, inspect
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.sql.ddl import CreateTable
+from sqlalchemy.sql.ddl import CreateTable, CreateIndex
 from sqlalchemy.sql.expression import func
 import os
 from sqlalchemy import MetaData, Column, Integer, String, text
@@ -70,8 +70,13 @@ def execute_sql_file(file_path):
 def generate_create_table_sql(model_name):
     metadata = Base.metadata
     table = metadata.tables[model_name]
-    sql = CreateTable(table)
-    return str(sql.compile(engine))
+    sql = str(CreateTable(table).compile(engine))[:-2] + ";" + "\n"
+    index_sqls = [CreateIndex(index).compile(engine) for index in table.indexes]
+
+    for index_sql in index_sqls:
+        sql += "\n" + str(index_sql) + ";"
+
+    return sql
 
 
 def create_migrations(entity_name, empty_migration_file):
