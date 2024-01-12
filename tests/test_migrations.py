@@ -1,8 +1,9 @@
 import os
 from unittest.mock import patch, MagicMock
 
-from sqlalchemy import Index, MetaData, Table, Column, Integer, String
+from sqlalchemy import Index, MetaData, Table, Column, Integer, String, inspect
 
+from inspira.migrations.migrations import execute_sql_file, engine
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
     generate_drop_column_sql,
@@ -208,3 +209,11 @@ def test_get_latest_migration_number(mock_listdir):
     result = get_latest_migration_number(migration_dir)
 
     assert result == 3
+
+
+def test_execute_sql_file(sample_sql_file, caplog):
+    execute_sql_file(sample_sql_file)
+
+    inspector = inspect(engine)
+
+    assert "users" in inspector.get_table_names()

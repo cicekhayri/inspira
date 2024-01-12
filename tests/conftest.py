@@ -105,3 +105,18 @@ def user_mock():
             self.id = id
 
     return User
+
+
+@pytest.fixture
+def sample_sql_file(tmp_path):
+    sql_content = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY NOT NULL,
+        name VARCHAR(50) NULL,
+        email VARCHAR(120) NULL
+    );
+    """
+    sql_file = tmp_path / "test.sql"
+    with open(sql_file, "w") as file:
+        file.write(sql_content)
+    return str(sql_file)
