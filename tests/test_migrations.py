@@ -9,7 +9,9 @@ from inspira.migrations.migrations import (
     execute_sql_file,
     engine,
     Base,
-    generate_create_table_sql, generate_add_index_sql, generate_drop_index_sql,
+    generate_create_table_sql,
+    generate_add_index_sql,
+    generate_drop_index_sql,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -19,7 +21,8 @@ from inspira.migrations.utils import (
     generate_rename_column_sql,
     load_model_file,
     generate_column_sql,
-    get_latest_migration_number, generate_migration_file,
+    get_latest_migration_number,
+    generate_migration_file,
 )
 
 
