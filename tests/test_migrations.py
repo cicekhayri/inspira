@@ -1,7 +1,7 @@
 import os
-from textwrap import dedent
 from unittest.mock import patch, MagicMock
 
+from sqlalchemy import Index, MetaData, Table, Column, Integer, String
 
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -9,7 +9,7 @@ from inspira.migrations.utils import (
     generate_add_column_sql,
     generate_create_table_sql,
     get_migration_files,
-    generate_rename_column_sql,
+    generate_rename_column_sql, generate_add_index_sql,
 )
 
 
@@ -23,89 +23,68 @@ def test_get_or_create_migration_directory(teardown_src_directory):
     assert os.path.exists(os.path.join(result, "__init__.py"))
 
 
-def test_generate_drop_column_sql():
-    entity_name = "your_entity"
-    existing_columns = ["column1", "column2", "column3"]
-    new_columns = ["column1", "column3"]
-
-    with patch(
-        "inspira.migrations.utils.generate_migration_file", MagicMock()
-    ) as mock_generate_migration_file:
-        generate_drop_column_sql(entity_name, existing_columns, new_columns)
-        mock_generate_migration_file.assert_called_once_with(
-            entity_name,
-            "ALTER TABLE your_entity DROP COLUMN column2;",
-            "drop_column_column2",
-        )
-
-
-def test_generate_add_column_sql():
-    entity_name = "your_entity"
-    existing_columns = ["column1", "column2"]
+@patch('inspira.migrations.utils.generate_migration_file')
+@patch('inspira.migrations.utils.generate_column_sql')
+def test_generate_drop_column_sql(mock_generate_column_sql, mock_generate_migration_file):
+    entity_name = "customers"
+    existing_columns = ["email_dc"]
     new_columns = [
-        MagicMock(key="column3", type="VARCHAR(255)"),
-        MagicMock(key="column4", type="INTEGER"),
+        Column('email_dc', String(255)),
+        Column('name', String(50))
     ]
 
-    with patch(
-        "inspira.migrations.utils.generate_migration_file", MagicMock()
-    ) as mock_generate_migration_file:
-        generate_add_column_sql(entity_name, existing_columns, new_columns)
-        expected_sql = (
-            "ALTER TABLE your_entity ADD COLUMN column3 VARCHAR(255);\n"
-            "ALTER TABLE your_entity ADD COLUMN column4 INTEGER;\n"
-        )
-        mock_generate_migration_file.assert_called_once_with(
-            entity_name, expected_sql, "add_column_column3_column4"
-        )
+    expected_sql_statements = "ALTER TABLE customers DROP COLUMN email_dc;"
+    expected_migration_name = "drop_column_email_dc_"
+
+    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
+    generate_drop_column_sql(entity_name, existing_columns, new_columns)
+
+    mock_generate_migration_file.assert_called_once_with(
+        entity_name, expected_sql_statements, expected_migration_name
+    )
 
 
-def test_generate_rename_column_sql():
-    entity_name = "your_entity"
-    existing_columns = ["col1", "col2", "col3"]
+@patch('inspira.migrations.utils.generate_migration_file')
+@patch('inspira.migrations.utils.generate_column_sql')
+def test_generate_add_column_sql(mock_generate_column_sql, mock_generate_migration_file):
+    entity_name = "customers"
+    existing_columns = ["email_dc"]
     new_columns = [
-        MagicMock(key="col1", type="VARCHAR(255)"),
-        MagicMock(key="col2", type="INTEGER"),
-        MagicMock(key="new_col3", type="VARCHAR(255)"),
+        Column('email_dc', String(255)),
+        Column('name', String(50))
     ]
 
-    with patch(
-        "inspira.migrations.utils.generate_migration_file", MagicMock()
-    ) as mock_generate_migration_file:
-        generate_rename_column_sql(entity_name, existing_columns, new_columns)
-        expected_sql = "ALTER TABLE your_entity RENAME COLUMN col3 TO new_col3;"
-        mock_generate_migration_file.assert_called_once_with(
-            entity_name, expected_sql, "rename_column_col3_to_new_col3"
-        )
+    expected_sql_statements = "ALTER TABLE customers ADD COLUMN name VARCHAR(50);\n"
+    expected_migration_name = "add_column_name"
+
+    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
+    generate_add_column_sql(entity_name, existing_columns, new_columns)
+
+    mock_generate_migration_file.assert_called_once_with(
+        entity_name, expected_sql_statements, expected_migration_name
+    )
 
 
-def test_generate_create_table_sql():
-    module_mock = MagicMock()
-    module_mock.__name__ = "YourModel"
-    table_name = "your_table"
-    columns_mock = [
-        MagicMock(key="column1", type="VARCHAR(255)"),
-        MagicMock(key="column2", type="INTEGER"),
+
+@patch('inspira.migrations.utils.generate_migration_file')
+@patch('inspira.migrations.utils.generate_column_sql')
+def test_generate_rename_column_sql(mock_generate_column_sql, mock_generate_migration_file):
+    entity_name = "customers"
+    existing_columns = ["email_dc", "name"]
+    new_columns = [
+        Column('email', String(255)),
+        Column('name', String(50))
     ]
 
-    with patch(
-        "inspira.migrations.utils.get_columns_from_model", return_value=columns_mock
-    ):
-        with patch(
-            "inspira.migrations.utils.generate_migration_file", MagicMock()
-        ) as mock_generate_migration_file:
-            generate_create_table_sql(module_mock, table_name)
-            expected_sql = dedent(
-                """
-                            CREATE TABLE IF NOT EXISTS your_table (
-                                column1 VARCHAR(255),
-                            \tcolumn2 INTEGER
-                            );
-                        """
-            )
-            mock_generate_migration_file.assert_called_once_with(
-                table_name, expected_sql, "create_table_your_table"
-            )
+    expected_sql_statements = "ALTER TABLE customers RENAME COLUMN email_dc TO email;"
+    expected_migration_name = "rename_column_email_dc_to_email"
+
+    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
+    generate_rename_column_sql(entity_name, existing_columns, new_columns)
+
+    mock_generate_migration_file.assert_called_once_with(
+        entity_name, expected_sql_statements, expected_migration_name
+    )
 
 
 def test_get_migration_files(create_migration_files):
@@ -119,3 +98,54 @@ def test_get_migration_files(create_migration_files):
         os.path.join(migration_dir, "0002_another.sql"),
         os.path.join(migration_dir, "003_missing.sql"),
     ]
+
+
+@patch('inspira.migrations.utils.generate_migration_file')
+def test_generate_add_index_sql(mock_generate_migration_file):
+    entity_name = "customers"
+    existing_indexes = ["ix_customers_email_dc"]
+
+    metadata = MetaData()
+    customers = Table(
+        'customers', metadata,
+        Column('email_dc', Integer),
+        Column('name', Integer)
+    )
+
+    new_indices = [
+        Index('ix_customers_email_dc', customers.c.email_dc),
+        Index('ix_customers_name', customers.c.name)
+    ]
+
+    generate_add_index_sql(entity_name, existing_indexes, new_indices)
+
+    mock_generate_migration_file.assert_called_once_with(
+        entity_name, "CREATE INDEX ix_customers_name ON customers (name);", "add_index_ix_customers_name"
+    )
+
+
+@patch('inspira.migrations.utils.generate_migration_file')
+@patch('inspira.migrations.utils.generate_index_sql', return_value="")
+@patch('inspira.migrations.utils.generate_column_sql')
+@patch('inspira.migrations.utils.get_columns_from_model')
+def test_generate_create_table_sql(mock_get_columns_from_model, mock_generate_column_sql, mock_generate_index_sql, mock_generate_migration_file):
+    table_name = "customers"
+    columns_mock = [
+        Column('email_dc', String(255)),
+        Column('name', String(50))
+    ]
+
+    mock_get_columns_from_model.return_value = columns_mock
+
+    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
+
+    module_mock = MagicMock(__name__="YourModel")
+
+    generate_create_table_sql(module_mock, table_name)
+
+    expected_sql = "CREATE TABLE IF NOT EXISTS customers (\n    email_dc VARCHAR(50),\n\tname VARCHAR(50)\n);\n\n\n\n"
+    expected_migration_name = "create_table_customers"
+
+    mock_generate_migration_file.assert_called_once_with(
+        table_name, expected_sql, expected_migration_name
+    )

@@ -1,6 +1,8 @@
 import importlib
 import os
 
+from sqlalchemy import String, Integer
+
 from inspira.cli.create_controller import create_init_file
 from inspira.logging import log
 from inspira.utils import singularize
@@ -62,7 +64,7 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
 
     for i, (old_col, new_col) in enumerate(zip(existing_columns, new_columns)):
         if old_col != new_col.key:
-            add_underscore = "_" if i < len(new_columns) - 1 else ""
+            add_underscore = "_" if i > 0 else ""
             sql_statements += (
                 f"ALTER TABLE {entity_name} RENAME COLUMN {old_col} TO {new_col.key};"
             )
@@ -74,19 +76,21 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
 
 
 def generate_create_table_sql(module, table_name):
-    backslash = "\n"
-    tab = "\t"
     columns = get_columns_from_model(getattr(module, module.__name__))
+    if not columns:
+        raise ValueError("No columns found for the model.")
+
+    column_sql = ',\n\t'.join(generate_column_sql(col) for col in columns)
+    index_sql = '\n'.join(generate_index_sql(getattr(module, module.__name__), table_name, col) for col in columns)
 
     create_table_sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
-    {f',{backslash}{tab}'.join(generate_column_sql(col) for col in columns)}
+    {column_sql}
 );
 
-{f'{backslash}'.join(generate_index_sql(getattr(module, module.__name__), table_name, col) for col in columns)}
+{index_sql}
 """
     migration_file_name = f"create_table_{table_name}"
     generate_migration_file(table_name, create_table_sql, migration_file_name)
-
 
 def generate_empty_sql_file(module, migration_name):
     generate_migration_file(module, "", migration_name)
@@ -131,8 +135,24 @@ def generate_migration_file(module_name, migration_sql, migration_name):
 
 
 def generate_column_sql(column):
-    return f"{column.key} {column.type}"
+    column_name = column.key
 
+    if isinstance(column.type, String):
+        column_type = f"VARCHAR({column.type.length})"
+    elif isinstance(column.type, Integer):
+        column_type = "INTEGER"
+    else:
+        column_type = str(column.type)
+
+    if column.primary_key:
+        column_type += " PRIMARY KEY"
+
+    if column.nullable:
+        column_type += " NULL"
+    else:
+        column_type += " NOT NULL"
+
+    return f"{column_name} {column_type}"
 
 def generate_index_sql(module, table_name, column):
     indexes = get_indexes_from_model(module)
