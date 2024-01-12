@@ -67,7 +67,7 @@ def execute_sql_file(file_path):
             log.info("Transaction rolled back.")
 
 
-def generate_sql_from_model(model_name):
+def generate_create_table_sql(model_name):
     metadata = Base.metadata
     table = metadata.tables[model_name]
     sql = CreateTable(table)
@@ -84,7 +84,7 @@ def create_migrations(entity_name, empty_migration_file):
     new_columns = get_columns_from_model(getattr(module, module.__name__))
 
     if not existing_columns:
-        sql_str = generate_sql_from_model(entity_name)
+        sql_str = generate_create_table_sql(entity_name)
         generate_migration_file_for_create_table(sql_str, entity_name)
     else:
         renamed_columns = [

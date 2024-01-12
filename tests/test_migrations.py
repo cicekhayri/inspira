@@ -7,7 +7,7 @@ from inspira.migrations.migrations import (
     execute_sql_file,
     engine,
     Base,
-    generate_sql_from_model,
+    generate_create_table_sql,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -137,7 +137,7 @@ def test_generate_create_table_sql():
         id = Column(Integer, primary_key=True)
         name = Column("name", String(50))
 
-    sql_str = generate_sql_from_model(table_name)
+    sql_str = generate_create_table_sql(table_name)
 
     expected_sql = "\nCREATE TABLE users (\n\tid INTEGER NOT NULL, \n\tname VARCHAR(50), \n\tPRIMARY KEY (id)\n)\n\n"
 
