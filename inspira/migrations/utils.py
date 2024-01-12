@@ -158,23 +158,6 @@ def generate_index_sql(module, table_name, column):
     return index_sql
 
 
-def generate_add_index_sql(entity_name, existing_indexes, new_indexes):
-    for new_index in new_indexes:
-        if new_index.name not in existing_indexes:
-            index_sql = f"CREATE INDEX {new_index.name} ON {new_index.table.name} ({new_index.columns[0].name});"
-            migration_file_name = f"add_index_{new_index.name}"
-            generate_migration_file(entity_name, index_sql, migration_file_name)
-
-
-def generate_drop_index_sql(entity_name, existing_indexes, new_indexes):
-    new_index_names = set(index.name for index in new_indexes)
-
-    for removed_index_name in set(existing_indexes) - new_index_names:
-        drop_index_sql = f"DROP INDEX {removed_index_name};"
-        migration_file_name = f"drop_index_{removed_index_name}"
-        generate_migration_file(entity_name, drop_index_sql, migration_file_name)
-
-
 def get_columns_from_model(model_class):
     return model_class.__table__.columns
 

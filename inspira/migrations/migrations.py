@@ -4,7 +4,7 @@ import click
 from sqlalchemy import select, create_engine, inspect
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.sql.ddl import CreateTable, CreateIndex
+from sqlalchemy.sql.ddl import CreateTable, CreateIndex, DropIndex
 from sqlalchemy.sql.expression import func
 import os
 from sqlalchemy import MetaData, Column, Integer, String, text
@@ -21,8 +21,7 @@ from inspira.migrations.utils import (
     generate_rename_column_sql,
     generate_empty_sql_file,
     get_indexes_from_model,
-    generate_add_index_sql,
-    generate_drop_index_sql,
+    generate_migration_file,
 )
 
 PROJECT_ROOT = os.path.abspath(".")
@@ -170,12 +169,24 @@ def insert_migration(current_version, migration_name):
 
 
 def get_existing_indexes(table_name):
-    metadata = MetaData()
-    metadata.reflect(bind=engine)
+    inspector = inspect(engine)
+    indexes = inspector.get_indexes(table_name)
+    return [index["name"] for index in indexes]
 
-    if table_name in metadata.tables:
-        inspector = inspect(engine)
 
-        indexes = inspector.get_indexes(table_name)
+def generate_add_index_sql(entity_name, existing_indexes, new_indexes):
+    for new_index in new_indexes:
+        if new_index.name not in existing_indexes:
+            index_sql = str(CreateIndex(new_index).compile(engine))
 
-        return [index["name"] for index in indexes]
+            migration_file_name = f"add_index_{new_index.name}"
+            generate_migration_file(entity_name, index_sql, migration_file_name)
+
+
+def generate_drop_index_sql(entity_name, existing_indexes, new_indexes):
+    new_index_names = set(index.name for index in new_indexes)
+
+    for removed_index_name in set(existing_indexes) - new_index_names:
+        drop_index_sql = str(DropIndex(removed_index_name).compile(engine))
+        migration_file_name = f"drop_index_{removed_index_name}"
+        generate_migration_file(entity_name, drop_index_sql, migration_file_name)

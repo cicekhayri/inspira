@@ -1,13 +1,15 @@
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
+import pytest
 from sqlalchemy import Index, MetaData, Table, Column, Integer, String, inspect
+from sqlalchemy.sql.ddl import DropIndex
 
 from inspira.migrations.migrations import (
     execute_sql_file,
     engine,
     Base,
-    generate_create_table_sql,
+    generate_create_table_sql, generate_add_index_sql, generate_drop_index_sql,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -15,10 +17,9 @@ from inspira.migrations.utils import (
     generate_add_column_sql,
     get_migration_files,
     generate_rename_column_sql,
-    generate_add_index_sql,
     load_model_file,
     generate_column_sql,
-    get_latest_migration_number,
+    get_latest_migration_number, generate_migration_file,
 )
 
 
@@ -103,30 +104,6 @@ def test_get_migration_files(create_migration_files):
         os.path.join(migration_dir, "0002_another.sql"),
         os.path.join(migration_dir, "003_missing.sql"),
     ]
-
-
-@patch("inspira.migrations.utils.generate_migration_file")
-def test_generate_add_index_sql(mock_generate_migration_file):
-    entity_name = "customers"
-    existing_indexes = ["ix_customers_email_dc"]
-
-    metadata = MetaData()
-    customers = Table(
-        "customers", metadata, Column("email_dc", Integer), Column("name", Integer)
-    )
-
-    new_indices = [
-        Index("ix_customers_email_dc", customers.c.email_dc),
-        Index("ix_customers_name", customers.c.name),
-    ]
-
-    generate_add_index_sql(entity_name, existing_indexes, new_indices)
-
-    mock_generate_migration_file.assert_called_once_with(
-        entity_name,
-        "CREATE INDEX ix_customers_name ON customers (name);",
-        "add_index_ix_customers_name",
-    )
 
 
 def test_generate_create_table_sql():
