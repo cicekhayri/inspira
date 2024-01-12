@@ -1,17 +1,13 @@
 import os
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock
 
-import pytest
-from sqlalchemy import Index, MetaData, Table, Column, Integer, String, inspect
-from sqlalchemy.sql.ddl import DropIndex
+from sqlalchemy import Column, Integer, String, inspect
 
 from inspira.migrations.migrations import (
     execute_sql_file,
     engine,
     Base,
     generate_create_table_sql,
-    generate_add_index_sql,
-    generate_drop_index_sql,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -22,7 +18,6 @@ from inspira.migrations.utils import (
     load_model_file,
     generate_column_sql,
     get_latest_migration_number,
-    generate_migration_file,
 )
 
 
