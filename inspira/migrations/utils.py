@@ -80,8 +80,11 @@ def generate_create_table_sql(module, table_name):
     if not columns:
         raise ValueError("No columns found for the model.")
 
-    column_sql = ',\n\t'.join(generate_column_sql(col) for col in columns)
-    index_sql = '\n'.join(generate_index_sql(getattr(module, module.__name__), table_name, col) for col in columns)
+    column_sql = ",\n\t".join(generate_column_sql(col) for col in columns)
+    index_sql = "\n".join(
+        generate_index_sql(getattr(module, module.__name__), table_name, col)
+        for col in columns
+    )
 
     create_table_sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
     {column_sql}
@@ -91,6 +94,7 @@ def generate_create_table_sql(module, table_name):
 """
     migration_file_name = f"create_table_{table_name}"
     generate_migration_file(table_name, create_table_sql, migration_file_name)
+
 
 def generate_empty_sql_file(module, migration_name):
     generate_migration_file(module, "", migration_name)
@@ -154,6 +158,7 @@ def generate_column_sql(column):
 
     return f"{column_name} {column_type}"
 
+
 def generate_index_sql(module, table_name, column):
     indexes = get_indexes_from_model(module)
     index_sql = ""
@@ -163,6 +168,7 @@ def generate_index_sql(module, table_name, column):
             index_sql += f"CREATE INDEX {index.name} ON {table_name} ({column.key});"
 
     return index_sql
+
 
 def generate_add_index_sql(entity_name, existing_indexes, new_indexes):
     for new_index in new_indexes:

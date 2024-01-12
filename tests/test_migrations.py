@@ -9,7 +9,8 @@ from inspira.migrations.utils import (
     generate_add_column_sql,
     generate_create_table_sql,
     get_migration_files,
-    generate_rename_column_sql, generate_add_index_sql,
+    generate_rename_column_sql,
+    generate_add_index_sql,
 )
 
 
@@ -23,15 +24,14 @@ def test_get_or_create_migration_directory(teardown_src_directory):
     assert os.path.exists(os.path.join(result, "__init__.py"))
 
 
-@patch('inspira.migrations.utils.generate_migration_file')
-@patch('inspira.migrations.utils.generate_column_sql')
-def test_generate_drop_column_sql(mock_generate_column_sql, mock_generate_migration_file):
+@patch("inspira.migrations.utils.generate_migration_file")
+@patch("inspira.migrations.utils.generate_column_sql")
+def test_generate_drop_column_sql(
+    mock_generate_column_sql, mock_generate_migration_file
+):
     entity_name = "customers"
     existing_columns = ["email_dc"]
-    new_columns = [
-        Column('email_dc', String(255)),
-        Column('name', String(50))
-    ]
+    new_columns = [Column("email_dc", String(255)), Column("name", String(50))]
 
     expected_sql_statements = "ALTER TABLE customers DROP COLUMN email_dc;"
     expected_migration_name = "drop_column_email_dc_"
@@ -44,15 +44,14 @@ def test_generate_drop_column_sql(mock_generate_column_sql, mock_generate_migrat
     )
 
 
-@patch('inspira.migrations.utils.generate_migration_file')
-@patch('inspira.migrations.utils.generate_column_sql')
-def test_generate_add_column_sql(mock_generate_column_sql, mock_generate_migration_file):
+@patch("inspira.migrations.utils.generate_migration_file")
+@patch("inspira.migrations.utils.generate_column_sql")
+def test_generate_add_column_sql(
+    mock_generate_column_sql, mock_generate_migration_file
+):
     entity_name = "customers"
     existing_columns = ["email_dc"]
-    new_columns = [
-        Column('email_dc', String(255)),
-        Column('name', String(50))
-    ]
+    new_columns = [Column("email_dc", String(255)), Column("name", String(50))]
 
     expected_sql_statements = "ALTER TABLE customers ADD COLUMN name VARCHAR(50);\n"
     expected_migration_name = "add_column_name"
@@ -65,16 +64,14 @@ def test_generate_add_column_sql(mock_generate_column_sql, mock_generate_migrati
     )
 
 
-
-@patch('inspira.migrations.utils.generate_migration_file')
-@patch('inspira.migrations.utils.generate_column_sql')
-def test_generate_rename_column_sql(mock_generate_column_sql, mock_generate_migration_file):
+@patch("inspira.migrations.utils.generate_migration_file")
+@patch("inspira.migrations.utils.generate_column_sql")
+def test_generate_rename_column_sql(
+    mock_generate_column_sql, mock_generate_migration_file
+):
     entity_name = "customers"
     existing_columns = ["email_dc", "name"]
-    new_columns = [
-        Column('email', String(255)),
-        Column('name', String(50))
-    ]
+    new_columns = [Column("email", String(255)), Column("name", String(50))]
 
     expected_sql_statements = "ALTER TABLE customers RENAME COLUMN email_dc TO email;"
     expected_migration_name = "rename_column_email_dc_to_email"
@@ -100,40 +97,42 @@ def test_get_migration_files(create_migration_files):
     ]
 
 
-@patch('inspira.migrations.utils.generate_migration_file')
+@patch("inspira.migrations.utils.generate_migration_file")
 def test_generate_add_index_sql(mock_generate_migration_file):
     entity_name = "customers"
     existing_indexes = ["ix_customers_email_dc"]
 
     metadata = MetaData()
     customers = Table(
-        'customers', metadata,
-        Column('email_dc', Integer),
-        Column('name', Integer)
+        "customers", metadata, Column("email_dc", Integer), Column("name", Integer)
     )
 
     new_indices = [
-        Index('ix_customers_email_dc', customers.c.email_dc),
-        Index('ix_customers_name', customers.c.name)
+        Index("ix_customers_email_dc", customers.c.email_dc),
+        Index("ix_customers_name", customers.c.name),
     ]
 
     generate_add_index_sql(entity_name, existing_indexes, new_indices)
 
     mock_generate_migration_file.assert_called_once_with(
-        entity_name, "CREATE INDEX ix_customers_name ON customers (name);", "add_index_ix_customers_name"
+        entity_name,
+        "CREATE INDEX ix_customers_name ON customers (name);",
+        "add_index_ix_customers_name",
     )
 
 
-@patch('inspira.migrations.utils.generate_migration_file')
-@patch('inspira.migrations.utils.generate_index_sql', return_value="")
-@patch('inspira.migrations.utils.generate_column_sql')
-@patch('inspira.migrations.utils.get_columns_from_model')
-def test_generate_create_table_sql(mock_get_columns_from_model, mock_generate_column_sql, mock_generate_index_sql, mock_generate_migration_file):
+@patch("inspira.migrations.utils.generate_migration_file")
+@patch("inspira.migrations.utils.generate_index_sql", return_value="")
+@patch("inspira.migrations.utils.generate_column_sql")
+@patch("inspira.migrations.utils.get_columns_from_model")
+def test_generate_create_table_sql(
+    mock_get_columns_from_model,
+    mock_generate_column_sql,
+    mock_generate_index_sql,
+    mock_generate_migration_file,
+):
     table_name = "customers"
-    columns_mock = [
-        Column('email_dc', String(255)),
-        Column('name', String(50))
-    ]
+    columns_mock = [Column("email_dc", String(255)), Column("name", String(50))]
 
     mock_get_columns_from_model.return_value = columns_mock
 
