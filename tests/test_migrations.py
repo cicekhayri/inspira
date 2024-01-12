@@ -1,6 +1,7 @@
 import os
 from unittest.mock import patch, MagicMock
 
+import pytest
 from sqlalchemy import Column, Integer, String, inspect
 
 from inspira.migrations.migrations import (
@@ -8,6 +9,7 @@ from inspira.migrations.migrations import (
     engine,
     Base,
     generate_create_table_sql,
+    get_existing_columns,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -176,9 +178,21 @@ def test_get_latest_migration_number(mock_listdir):
     assert result == 3
 
 
-def test_execute_sql_file(sample_sql_file, caplog):
+def test_execute_sql_file(sample_sql_file):
     execute_sql_file(sample_sql_file)
 
     inspector = inspect(engine)
 
     assert "users" in inspector.get_table_names()
+
+
+def test_get_existing_columns_table_exists(sample_sql_file):
+    execute_sql_file(sample_sql_file)
+    result = get_existing_columns("users")
+    assert result == ["id", "name", "email"]
+
+
+def test_get_existing_columns_table_does_not_exist():
+    table_name = "non_existent_table"
+    result = get_existing_columns(table_name)
+    assert result is None
