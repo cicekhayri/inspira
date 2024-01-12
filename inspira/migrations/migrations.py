@@ -87,6 +87,11 @@ def create_migrations(entity_name, empty_migration_file):
                 if removed_columns:
                     generate_drop_column_sql(entity_name, existing_columns, new_columns)
 
+        existing_indexes = get_existing_indexes(entity_name)
+        new_indexes = get_indexes_from_model(getattr(module, module.__name__))
+        generate_add_index_sql(entity_name, existing_indexes, new_indexes)
+        generate_drop_index_sql(entity_name, existing_indexes, new_indexes)
+
 
 def run_migrations(module_name):
     with engine.connect() as connection:
@@ -137,3 +142,15 @@ def insert_migration(current_version, migration_name):
     migration.migration_name = migration_name
     db_session.add(migration)
     db_session.commit()
+
+
+def get_existing_indexes(table_name):
+    metadata = MetaData()
+    metadata.reflect(bind=engine)
+
+    if table_name in metadata.tables:
+        inspector = inspect(engine)
+
+        indexes = inspector.get_indexes(table_name)
+
+        return [index["name"] for index in indexes]
