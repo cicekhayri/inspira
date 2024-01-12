@@ -120,3 +120,28 @@ def sample_sql_file(tmp_path):
     with open(sql_file, "w") as file:
         file.write(sql_content)
     return str(sql_file)
+
+
+@pytest.fixture
+def add_index_users(tmp_path):
+    sql_content = """
+    CREATE INDEX ix_users_name ON users (name);
+    """
+
+    sql_file = tmp_path / "test.sql"
+    with open(sql_file, "w") as file:
+        file.write(sql_content)
+    return str(sql_file)
+
+
+@pytest.fixture
+def setup_teardown_db_session():
+    from inspira.migrations.migrations import (
+        engine,
+        db_session,
+        initialize_database,
+    )
+
+    initialize_database(engine)
+    yield db_session
+    db_session.rollback()

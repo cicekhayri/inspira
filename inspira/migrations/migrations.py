@@ -3,7 +3,7 @@ import sys
 import click
 from sqlalchemy import select, create_engine, inspect
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
 from sqlalchemy.sql.ddl import CreateTable, CreateIndex, DropIndex
 from sqlalchemy.sql.expression import func
 import os
@@ -32,7 +32,9 @@ try:
 except ImportError:
     Base = declarative_base()
     engine = create_engine("sqlite:///:memory:")
-    db_session = None
+    db_session = scoped_session(
+        sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    )
 
 
 class Migration(Base):
