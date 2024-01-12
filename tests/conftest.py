@@ -125,8 +125,11 @@ def sample_sql_file(tmp_path):
 @pytest.fixture
 def setup_teardown_db_session():
     from inspira.migrations.migrations import (
-        engine, db_session, initialize_database,
+        engine,
+        db_session,
+        initialize_database,
     )
+
     initialize_database(engine)
     yield db_session
     db_session.rollback()

@@ -33,8 +33,8 @@ except ImportError:
     Base = declarative_base()
     engine = create_engine("sqlite:///:memory:")
     db_session = scoped_session(
-    sessionmaker(autocommit=False, autoflush=False, bind=engine)
-)
+        sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    )
 
 
 class Migration(Base):
