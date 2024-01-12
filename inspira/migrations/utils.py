@@ -75,25 +75,9 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
         generate_migration_file(entity_name, sql_statements, migration_file_name)
 
 
-def generate_create_table_sql(module, table_name):
-    columns = get_columns_from_model(getattr(module, module.__name__))
-    if not columns:
-        raise ValueError("No columns found for the model.")
-
-    column_sql = ",\n\t".join(generate_column_sql(col) for col in columns)
-    index_sql = "\n".join(
-        generate_index_sql(getattr(module, module.__name__), table_name, col)
-        for col in columns
-    )
-
-    create_table_sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
-    {column_sql}
-);
-
-{index_sql}
-"""
+def generate_migration_file_for_create_table(sql_str, table_name):
     migration_file_name = f"create_table_{table_name}"
-    generate_migration_file(table_name, create_table_sql, migration_file_name)
+    generate_migration_file(table_name, sql_str, migration_file_name)
 
 
 def generate_empty_sql_file(module, migration_name):
@@ -140,6 +124,7 @@ def generate_migration_file(module_name, migration_sql, migration_name):
 
 def generate_column_sql(column):
     column_name = column.key
+    constraints = []
 
     if isinstance(column.type, String):
         column_type = f"VARCHAR({column.type.length})"
@@ -156,35 +141,10 @@ def generate_column_sql(column):
     else:
         column_type += " NOT NULL"
 
-    return f"{column_name} {column_type}"
+    if column.unique:
+        constraints.append("UNIQUE")
 
-
-def generate_index_sql(module, table_name, column):
-    indexes = get_indexes_from_model(module)
-    index_sql = ""
-
-    for index in indexes:
-        if column.key in [column.name for column in index.columns]:
-            index_sql += f"CREATE INDEX {index.name} ON {table_name} ({column.key});"
-
-    return index_sql
-
-
-def generate_add_index_sql(entity_name, existing_indexes, new_indexes):
-    for new_index in new_indexes:
-        if new_index.name not in existing_indexes:
-            index_sql = f"CREATE INDEX {new_index.name} ON {new_index.table.name} ({new_index.columns[0].name});"
-            migration_file_name = f"add_index_{new_index.name}"
-            generate_migration_file(entity_name, index_sql, migration_file_name)
-
-
-def generate_drop_index_sql(entity_name, existing_indexes, new_indexes):
-    new_index_names = set(index.name for index in new_indexes)
-
-    for removed_index_name in set(existing_indexes) - new_index_names:
-        drop_index_sql = f"DROP INDEX {removed_index_name};"
-        migration_file_name = f"drop_index_{removed_index_name}"
-        generate_migration_file(entity_name, drop_index_sql, migration_file_name)
+    return f"{column_name} {column_type} {''.join(constraints)}"
 
 
 def get_columns_from_model(model_class):
