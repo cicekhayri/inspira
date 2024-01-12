@@ -10,7 +10,7 @@ from inspira.migrations.utils import (
     generate_create_table_sql,
     get_migration_files,
     generate_rename_column_sql,
-    generate_add_index_sql,
+    generate_add_index_sql, load_model_file, generate_column_sql, get_latest_migration_number,
 )
 
 
@@ -148,3 +148,54 @@ def test_generate_create_table_sql(
     mock_generate_migration_file.assert_called_once_with(
         table_name, expected_sql, expected_migration_name
     )
+
+
+@patch('inspira.migrations.utils.importlib.util.module_from_spec')
+@patch('inspira.migrations.utils.importlib.util.spec_from_file_location')
+@patch('inspira.migrations.utils.os.path.join')
+@patch('inspira.migrations.utils.singularize')
+def test_load_model_file(mock_singularize, mock_join, mock_spec_from_file_location, mock_module_from_spec):
+    entity_name = "customers"
+
+    mock_singularize.return_value = "customer"
+    mock_join.return_value = "src/your_entity/your_entity_singular.py"
+    mock_spec = MagicMock()
+    mock_module = MagicMock()
+    mock_spec_from_file_location.return_value = mock_spec
+    mock_module_from_spec.return_value = mock_module
+
+    result = load_model_file(entity_name)
+
+    mock_join.assert_any_call("src", entity_name.replace(".", "/" + entity_name))
+    mock_join.assert_any_call(mock_join.return_value, f"{mock_singularize.return_value}.py")
+    mock_spec_from_file_location.assert_called_once_with(mock_singularize.return_value.capitalize(), mock_join.return_value)
+    mock_module_from_spec.assert_called_once_with(mock_spec)
+    mock_spec.loader.exec_module.assert_called_once_with(mock_module)
+
+    assert result == mock_module
+
+
+def test_generate_column_sql():
+    column1 = Column('id', Integer, primary_key=True)
+    column2 = Column('name', String(50), nullable=False)
+    column3 = Column('email', String(255), nullable=True)
+
+    result1 = generate_column_sql(column1)
+    result2 = generate_column_sql(column2)
+    result3 = generate_column_sql(column3)
+
+    assert result1 == "id INTEGER PRIMARY KEY NOT NULL"
+    assert result2 == "name VARCHAR(50) NOT NULL"
+    assert result3 == "email VARCHAR(255) NULL"
+
+
+@patch('inspira.migrations.utils.os.listdir')
+def test_get_latest_migration_number(mock_listdir):
+    migration_dir = "tests/migrations"
+    migration_files = ["0001_test.sql", "0002_another.sql", "003_missing.sql"]
+
+    mock_listdir.return_value = migration_files
+
+    result = get_latest_migration_number(migration_dir)
+
+    assert result == 3
