@@ -50,7 +50,9 @@ def execute_sql_file(file_path):
     with open(file_path, "r") as file:
         sql_content = file.read()
 
-    sql_statements = [statement.strip() for statement in sql_content.split(";") if statement.strip()]
+    sql_statements = [
+        statement.strip() for statement in sql_content.split(";") if statement.strip()
+    ]
 
     with engine.connect() as connection:
         try:
@@ -62,6 +64,7 @@ def execute_sql_file(file_path):
             log.error("Error:", e)
             connection.rollback()
             log.info("Transaction rolled back.")
+
 
 def create_migrations(entity_name, empty_migration_file):
     if empty_migration_file:
