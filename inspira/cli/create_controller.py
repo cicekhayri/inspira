@@ -3,6 +3,7 @@ import os
 import click
 
 from inspira.cli.create_app import generate_project
+from inspira.cli.init_file import create_init_file
 from inspira.utils import singularize
 
 
@@ -34,8 +35,6 @@ def create_controller_file(name, is_websocket):
     create_test_directory(controller_directory)
 
     controller_template_file = "controller_template.txt"
-
-    # Create __init__.py in the resource directory
     create_init_file(controller_directory)
 
     controller_file = os.path.join(
@@ -60,9 +59,3 @@ def create_controller_file(name, is_websocket):
         output_file.write(content)
 
     click.echo(f"Module '{singularize_name}' created successfully.")
-
-
-def create_init_file(directory):
-    init_file = os.path.join(directory, "__init__.py")
-    with open(init_file, "w"):
-        pass

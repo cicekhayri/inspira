@@ -67,6 +67,26 @@ def setup_database_file(teardown_database_file):
 
 
 @pytest.fixture
+def create_migration_files(tmpdir):
+    migration_files = [
+        "0001_test.sql",
+        "0002_another.sql",
+        "not_a_migration.txt",
+        "003_missing.sql",
+    ]
+
+    path = "tests/migrations"
+    os.makedirs(path, exist_ok=True)
+
+    for file_name in migration_files:
+        file_path = os.path.join(path, file_name)
+        with open(file_path, "w") as file:
+            file.write("Sample content")
+
+    return migration_files, path
+
+
+@pytest.fixture
 def mock_scope():
     return {
         "headers": [(b"content-type", b"application/json")],
@@ -85,3 +105,18 @@ def user_mock():
             self.id = id
 
     return User
+
+
+@pytest.fixture
+def sample_sql_file(tmp_path):
+    sql_content = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY NOT NULL,
+        name VARCHAR(50) NULL,
+        email VARCHAR(120) NULL
+    );
+    """
+    sql_file = tmp_path / "test.sql"
+    with open(sql_file, "w") as file:
+        file.write(sql_content)
+    return str(sql_file)

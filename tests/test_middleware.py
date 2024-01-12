@@ -249,7 +249,7 @@ async def test_user_loader_middleware(app, client, user_mock, secret_key):
     async def get_route(request: Request):
         user = user_mock(id=1)
         login_user(user.id)
-        return HttpResponse(f"User ID: 1323")
+        return HttpResponse(f"User ID: {user.id}")
 
     app.add_route("/get", HttpMethod.GET, get_route)
 
