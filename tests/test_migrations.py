@@ -3,12 +3,11 @@ from unittest.mock import patch, MagicMock
 
 from sqlalchemy import Index, MetaData, Table, Column, Integer, String, inspect
 
-from inspira.migrations.migrations import execute_sql_file, engine
+from inspira.migrations.migrations import execute_sql_file, engine, Base, generate_sql_from_model
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
     generate_drop_column_sql,
     generate_add_column_sql,
-    generate_create_table_sql,
     get_migration_files,
     generate_rename_column_sql,
     generate_add_index_sql,
@@ -125,33 +124,20 @@ def test_generate_add_index_sql(mock_generate_migration_file):
     )
 
 
-@patch("inspira.migrations.utils.generate_migration_file")
-@patch("inspira.migrations.utils.generate_index_sql", return_value="")
-@patch("inspira.migrations.utils.generate_column_sql")
-@patch("inspira.migrations.utils.get_columns_from_model")
 def test_generate_create_table_sql(
-    mock_get_columns_from_model,
-    mock_generate_column_sql,
-    mock_generate_index_sql,
-    mock_generate_migration_file,
 ):
-    table_name = "customers"
-    columns_mock = [Column("email_dc", String(255)), Column("name", String(50))]
+    table_name = "users"
 
-    mock_get_columns_from_model.return_value = columns_mock
+    class User(Base):
+        __tablename__ = table_name
+        id = Column(Integer, primary_key=True)
+        name = Column("name", String(50))
 
-    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
+    sql_str = generate_sql_from_model(table_name)
 
-    module_mock = MagicMock(__name__="YourModel")
+    expected_sql = "\nCREATE TABLE users (\n\tid INTEGER NOT NULL, \n\tname VARCHAR(50), \n\tPRIMARY KEY (id)\n)\n\n"
 
-    generate_create_table_sql(module_mock, table_name)
-
-    expected_sql = "CREATE TABLE IF NOT EXISTS customers (\n    email_dc VARCHAR(50),\n\tname VARCHAR(50)\n);\n\n\n\n"
-    expected_migration_name = "create_table_customers"
-
-    mock_generate_migration_file.assert_called_once_with(
-        table_name, expected_sql, expected_migration_name
-    )
+    assert sql_str == expected_sql
 
 
 @patch("inspira.migrations.utils.importlib.util.module_from_spec")
@@ -194,9 +180,9 @@ def test_generate_column_sql():
     result2 = generate_column_sql(column2)
     result3 = generate_column_sql(column3)
 
-    assert result1 == "id INTEGER PRIMARY KEY NOT NULL"
-    assert result2 == "name VARCHAR(50) NOT NULL"
-    assert result3 == "email VARCHAR(255) NULL"
+    assert result1 == "id INTEGER PRIMARY KEY NOT NULL "
+    assert result2 == "name VARCHAR(50) NOT NULL "
+    assert result3 == "email VARCHAR(255) NULL "
 
 
 @patch("inspira.migrations.utils.os.listdir")

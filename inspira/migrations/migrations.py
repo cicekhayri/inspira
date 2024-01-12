@@ -4,6 +4,7 @@ import click
 from sqlalchemy import select, create_engine, inspect
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.sql.ddl import CreateTable
 from sqlalchemy.sql.expression import func
 import os
 from sqlalchemy import MetaData, Column, Integer, String, text
@@ -66,6 +67,13 @@ def execute_sql_file(file_path):
             log.info("Transaction rolled back.")
 
 
+def generate_sql_from_model(model_name):
+    metadata = Base.metadata
+    table = metadata.tables[model_name]
+    sql = CreateTable(table)
+    return str(sql.compile(engine))
+
+
 def create_migrations(entity_name, empty_migration_file):
     if empty_migration_file:
         generate_empty_sql_file(entity_name, empty_migration_file)
@@ -76,7 +84,8 @@ def create_migrations(entity_name, empty_migration_file):
     new_columns = get_columns_from_model(getattr(module, module.__name__))
 
     if not existing_columns:
-        generate_create_table_sql(module, entity_name)
+        sql_str = generate_sql_from_model(entity_name)
+        generate_create_table_sql(sql_str, entity_name)
     else:
         renamed_columns = [
             (old_col, new_col.key)

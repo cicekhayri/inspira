@@ -75,25 +75,9 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
         generate_migration_file(entity_name, sql_statements, migration_file_name)
 
 
-def generate_create_table_sql(module, table_name):
-    columns = get_columns_from_model(getattr(module, module.__name__))
-    if not columns:
-        raise ValueError("No columns found for the model.")
-
-    column_sql = ",\n\t".join(generate_column_sql(col) for col in columns)
-    index_sql = "\n".join(
-        generate_index_sql(getattr(module, module.__name__), table_name, col)
-        for col in columns
-    )
-
-    create_table_sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
-    {column_sql}
-);
-
-{index_sql}
-"""
+def generate_create_table_sql(sql_str, table_name):
     migration_file_name = f"create_table_{table_name}"
-    generate_migration_file(table_name, create_table_sql, migration_file_name)
+    generate_migration_file(table_name, sql_str, migration_file_name)
 
 
 def generate_empty_sql_file(module, migration_name):
@@ -160,7 +144,7 @@ def generate_column_sql(column):
     if column.unique:
         constraints.append("UNIQUE")
 
-    return f"{column_name} {column_type} {' '.join(constraints)}"
+    return f"{column_name} {column_type} {''.join(constraints)}"
 
 
 def generate_index_sql(module, table_name, column):
