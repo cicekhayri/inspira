@@ -11,7 +11,8 @@ from inspira.migrations.migrations import (
     get_existing_columns,
     insert_migration,
     db_session,
-    Migration, get_existing_indexes,
+    Migration,
+    get_existing_indexes,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -213,6 +214,7 @@ def test_insert_migration(setup_teardown_db_session):
 
     assert result.version == 1
     assert result.migration_name == migration_name
+
 
 def test_get_existing_indexes(add_index_users):
     execute_sql_file(add_index_users)
