@@ -2,12 +2,13 @@ import sys
 
 import click
 from sqlalchemy import select, create_engine, inspect
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql.expression import func
 import os
 from sqlalchemy import MetaData, Column, Integer, String, text
 
-
+from inspira.logging import log
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
     get_migration_files,
@@ -49,13 +50,18 @@ def execute_sql_file(file_path):
     with open(file_path, "r") as file:
         sql_content = file.read()
 
-    sql_statements = sql_content.split(";")
+    sql_statements = [statement.strip() for statement in sql_content.split(";") if statement.strip()]
 
     with engine.connect() as connection:
-        for statement in sql_statements:
-            if statement.strip():
+        try:
+            for statement in sql_statements:
                 connection.execute(text(statement))
-
+            connection.commit()
+            log.info("Table creation successful.")
+        except SQLAlchemyError as e:
+            log.error("Error:", e)
+            connection.rollback()
+            log.info("Transaction rolled back.")
 
 def create_migrations(entity_name, empty_migration_file):
     if empty_migration_file:
