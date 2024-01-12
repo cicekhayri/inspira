@@ -1,7 +1,6 @@
 import os
 from unittest.mock import patch, MagicMock
 
-import pytest
 from sqlalchemy import Column, Integer, String, inspect
 
 from inspira.migrations.migrations import (
@@ -9,7 +8,7 @@ from inspira.migrations.migrations import (
     engine,
     Base,
     generate_create_table_sql,
-    get_existing_columns,
+    get_existing_columns, insert_migration, db_session, Migration,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -196,3 +195,14 @@ def test_get_existing_columns_table_does_not_exist():
     table_name = "non_existent_table"
     result = get_existing_columns(table_name)
     assert result is None
+
+
+def test_insert_migration(setup_teardown_db_session):
+    current_version = 0
+    migration_name = 'example_migration'
+    insert_migration(current_version, migration_name)
+
+    result = db_session.query(Migration).filter_by(version=current_version + 1, migration_name=migration_name).first()
+
+    assert result.version == 1
+    assert result.migration_name == migration_name
