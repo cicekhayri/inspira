@@ -140,6 +140,7 @@ def generate_migration_file(module_name, migration_sql, migration_name):
 
 def generate_column_sql(column):
     column_name = column.key
+    constraints = []
 
     if isinstance(column.type, String):
         column_type = f"VARCHAR({column.type.length})"
@@ -156,7 +157,10 @@ def generate_column_sql(column):
     else:
         column_type += " NOT NULL"
 
-    return f"{column_name} {column_type}"
+    if column.unique:
+        constraints.append("UNIQUE")
+
+    return f"{column_name} {column_type} {' '.join(constraints)}"
 
 
 def generate_index_sql(module, table_name, column):
