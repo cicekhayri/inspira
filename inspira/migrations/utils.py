@@ -75,7 +75,7 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
         generate_migration_file(entity_name, sql_statements, migration_file_name)
 
 
-def generate_create_table_sql(sql_str, table_name):
+def generate_migration_file_for_create_table(sql_str, table_name):
     migration_file_name = f"create_table_{table_name}"
     generate_migration_file(table_name, sql_str, migration_file_name)
 

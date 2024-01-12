@@ -17,7 +17,7 @@ from inspira.migrations.utils import (
     get_columns_from_model,
     generate_add_column_sql,
     generate_drop_column_sql,
-    generate_create_table_sql,
+    generate_migration_file_for_create_table,
     generate_rename_column_sql,
     generate_empty_sql_file,
     get_indexes_from_model,
@@ -85,7 +85,7 @@ def create_migrations(entity_name, empty_migration_file):
 
     if not existing_columns:
         sql_str = generate_sql_from_model(entity_name)
-        generate_create_table_sql(sql_str, entity_name)
+        generate_migration_file_for_create_table(sql_str, entity_name)
     else:
         renamed_columns = [
             (old_col, new_col.key)
