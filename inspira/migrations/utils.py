@@ -147,17 +147,6 @@ def generate_column_sql(column):
     return f"{column_name} {column_type} {''.join(constraints)}"
 
 
-def generate_index_sql(module, table_name, column):
-    indexes = get_indexes_from_model(module)
-    index_sql = ""
-
-    for index in indexes:
-        if column.key in [column.name for column in index.columns]:
-            index_sql += f"CREATE INDEX {index.name} ON {table_name} ({column.key});"
-
-    return index_sql
-
-
 def get_columns_from_model(model_class):
     return model_class.__table__.columns
 
