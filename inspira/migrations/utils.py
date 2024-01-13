@@ -12,6 +12,11 @@ from inspira.utils import singularize
 def get_or_create_migration_directory(name: str):
     controller_directory = os.path.join(SRC_DIRECTORY, name)
     migration_directory = os.path.join(controller_directory, "migrations")
+
+    if not os.path.exists(migration_directory):
+        log.error(f"Module '{name}' doesn't exists.")
+        return
+
     os.makedirs(migration_directory, exist_ok=True)
 
     create_init_file(migration_directory)
