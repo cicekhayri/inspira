@@ -85,38 +85,48 @@ def create_migrations(entity_name, empty_migration_file):
         generate_empty_sql_file(entity_name, empty_migration_file)
 
     module = load_model_file(entity_name)
+    model = getattr(module, module.__name__)
 
+    if not get_existing_columns(entity_name):
+        generate_migration_file_for_create_table(
+            generate_create_table_sql(entity_name),
+            entity_name
+        )
+        return
+
+    handle_columns(entity_name, model)
+    handle_indexes(entity_name, model)
+
+
+def handle_columns(entity_name, model):
     existing_columns = get_existing_columns(entity_name)
-    new_columns = get_columns_from_model(getattr(module, module.__name__))
+    new_columns = get_columns_from_model(model)
 
-    if not existing_columns:
-        sql_str = generate_create_table_sql(entity_name)
-        generate_migration_file_for_create_table(sql_str, entity_name)
-    else:
-        renamed_columns = [
-            (old_col, new_col.key)
-            for old_col, new_col in zip(existing_columns, new_columns)
-            if old_col != new_col.key
-        ]
-        if renamed_columns:
-            generate_rename_column_sql(entity_name, existing_columns, new_columns)
-        else:
-            added_columns = [
-                col for col in new_columns if col.key not in existing_columns
-            ]
-            if added_columns:
-                generate_add_column_sql(entity_name, existing_columns, added_columns)
-            else:
-                removed_columns = [
-                    col for col in existing_columns if col not in new_columns
-                ]
-                if removed_columns:
-                    generate_drop_column_sql(entity_name, existing_columns, new_columns)
+    renamed_columns = [
+        (old_col, new_col.key)
+        for old_col, new_col in zip(existing_columns, new_columns)
+        if old_col != new_col.key
+    ]
 
-        existing_indexes = get_existing_indexes(entity_name)
-        new_indexes = get_indexes_from_model(getattr(module, module.__name__))
-        generate_add_index_sql(entity_name, existing_indexes, new_indexes)
-        generate_drop_index_sql(entity_name, existing_indexes, new_indexes)
+    if renamed_columns:
+        generate_rename_column_sql(entity_name, existing_columns, new_columns)
+        return
+
+    added_columns = [col for col in new_columns if col.key not in existing_columns]
+    if added_columns:
+        generate_add_column_sql(entity_name, existing_columns, added_columns)
+        return
+
+    removed_columns = [col for col in existing_columns if col not in new_columns]
+    if removed_columns:
+        generate_drop_column_sql(entity_name, existing_columns, new_columns)
+
+def handle_indexes(entity_name, model):
+    existing_indexes = get_existing_indexes(entity_name)
+    new_indexes = get_indexes_from_model(model)
+
+    generate_add_index_sql(entity_name, existing_indexes, new_indexes)
+    generate_drop_index_sql(entity_name, existing_indexes, new_indexes)
 
 
 def run_migrations(module_name):
