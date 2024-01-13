@@ -29,36 +29,41 @@ def load_model_file(entity_name):
     return module
 
 
-def generate_drop_column_sql(entity_name, existing_columns, new_columns):
+def generate_drop_column_sql(table_name, existing_columns, new_columns):
     sql_statements = ""
     migration_name = ""
 
     for i, col in enumerate(existing_columns):
         if col not in new_columns:
             add_underscore = "_" if i < len(new_columns) - 1 else ""
-            sql_statements += f"ALTER TABLE {entity_name} DROP COLUMN {col};"
+            sql_statements += f"ALTER TABLE {table_name} DROP COLUMN {col};"
             migration_name += col + add_underscore
 
     if sql_statements:
         migration_file_name = f"drop_column_{migration_name}"
-        generate_migration_file(entity_name, sql_statements, migration_file_name)
+        if migration_file_exist(table_name, migration_file_name):
+            return
+
+        generate_migration_file(table_name, sql_statements, migration_file_name)
 
 
-def generate_add_column_sql(entity_name, existing_columns, new_columns):
+def generate_add_column_sql(table_name, existing_columns, new_columns):
     sql_statements = ""
     migration_name = ""
     for i, col in enumerate(new_columns):
         if col.key not in existing_columns:
             add_underscore = "_" if i < len(new_columns) - 1 else ""
-            sql_statements += f"ALTER TABLE {entity_name} ADD COLUMN {generate_column_sql(col).strip()};\n"
+            sql_statements += f"ALTER TABLE {table_name} ADD COLUMN {generate_column_sql(col).strip()};\n"
             migration_name += col.key + add_underscore
 
     if sql_statements:
         migration_file_name = f"add_column_{migration_name}"
-        generate_migration_file(entity_name, sql_statements, migration_file_name)
+        if migration_file_exist(table_name, migration_file_name):
+            return
+        generate_migration_file(table_name, sql_statements, migration_file_name)
 
 
-def generate_rename_column_sql(entity_name, existing_columns, new_columns):
+def generate_rename_column_sql(table_name, existing_columns, new_columns):
     sql_statements = ""
     migration_name = ""
 
@@ -66,18 +71,37 @@ def generate_rename_column_sql(entity_name, existing_columns, new_columns):
         if old_col != new_col.key:
             add_underscore = "_" if i > 0 else ""
             sql_statements += (
-                f"ALTER TABLE {entity_name} RENAME COLUMN {old_col} TO {new_col.key};"
+                f"ALTER TABLE {table_name} RENAME COLUMN {old_col} TO {new_col.key};"
             )
             migration_name += f"{old_col}_to_{new_col.key}{add_underscore}"
 
     if sql_statements:
         migration_file_name = f"rename_column_{migration_name}"
-        generate_migration_file(entity_name, sql_statements, migration_file_name)
+        if migration_file_exist(table_name, migration_file_name):
+            return
+
+        generate_migration_file(table_name, sql_statements, migration_file_name)
 
 
 def generate_migration_file_for_create_table(sql_str, table_name):
+
     migration_file_name = f"create_table_{table_name}"
+
+    if migration_file_exist(table_name, migration_file_name):
+        return
+
     generate_migration_file(table_name, sql_str, migration_file_name)
+
+
+def migration_file_exist(table_name: str, migration_file_name: str) -> bool:
+    migration_dir = get_or_create_migration_directory(table_name)
+    migration_files = get_migration_files(migration_dir)
+
+    migration_exists = any(migration_file_name in migration for migration in migration_files)
+    if migration_exists:
+        log.info(f"Migration {migration_file_name} already exists. Skipping...")
+
+    return migration_exists
 
 
 def generate_empty_sql_file(module, migration_name):

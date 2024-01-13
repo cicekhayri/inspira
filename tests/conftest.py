@@ -123,7 +123,7 @@ def sample_sql_file(tmp_path):
 
 
 @pytest.fixture
-def add_index_users(tmp_path):
+def add_index_users(tmp_path, teardown_src_directory):
     sql_content = """
     CREATE INDEX ix_users_name ON users (name);
     """
