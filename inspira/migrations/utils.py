@@ -84,7 +84,6 @@ def generate_rename_column_sql(table_name, existing_columns, new_columns):
 
 
 def generate_migration_file_for_create_table(sql_str, table_name):
-
     migration_file_name = f"create_table_{table_name}"
 
     if migration_file_exist(table_name, migration_file_name):
@@ -97,7 +96,9 @@ def migration_file_exist(table_name: str, migration_file_name: str) -> bool:
     migration_dir = get_or_create_migration_directory(table_name)
     migration_files = get_migration_files(migration_dir)
 
-    migration_exists = any(migration_file_name in migration for migration in migration_files)
+    migration_exists = any(
+        migration_file_name in migration for migration in migration_files
+    )
     if migration_exists:
         log.info(f"Migration {migration_file_name} already exists. Skipping...")
 
