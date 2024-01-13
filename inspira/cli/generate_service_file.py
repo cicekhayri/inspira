@@ -32,7 +32,9 @@ def generate_service_file(module_name):
 
 def add_service_dependency_to_controller(module_name):
     controller_file_path = os.path.join(
-        SRC_DIRECTORY, module_name.lower(), f"{singularize(module_name.lower())}_controller.py"
+        SRC_DIRECTORY,
+        module_name.lower(),
+        f"{singularize(module_name.lower())}_controller.py",
     )
     module_name_capitalized = singularize(module_name.lower()).capitalize()
     singularized_module_name = singularize(module_name.lower())

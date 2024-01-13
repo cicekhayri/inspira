@@ -25,7 +25,9 @@ def get_or_create_migration_directory(name: str):
 
 
 def load_model_file(entity_name):
-    module_path = os.path.join(SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name))
+    module_path = os.path.join(
+        SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name)
+    )
     model_file_path = os.path.join(module_path, f"{singularize(entity_name)}.py")
     model_name = singularize(entity_name).capitalize()
     spec = importlib.util.spec_from_file_location(model_name, model_file_path)

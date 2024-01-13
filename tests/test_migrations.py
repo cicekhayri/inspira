@@ -28,11 +28,13 @@ from inspira.migrations.utils import (
 )
 
 
-def test_get_or_create_migration_directory(setup_test_environment,teardown_src_directory):
+def test_get_or_create_migration_directory(
+    setup_test_environment, teardown_src_directory
+):
     controller_name = "module1"
     controller_directory = os.path.join(SRC_DIRECTORY, controller_name)
     migration_directory = os.path.join(controller_directory, "migrations")
-    with patch('inspira.logging.log.error') as log_error_mock:
+    with patch("inspira.logging.log.error") as log_error_mock:
         result = get_or_create_migration_directory(controller_name)
 
     assert result == migration_directory
@@ -42,15 +44,18 @@ def test_get_or_create_migration_directory(setup_test_environment,teardown_src_d
     log_error_mock.assert_not_called()
 
 
-def test_get_or_create_migration_directory_missing_module(setup_test_environment, teardown_src_directory):
+def test_get_or_create_migration_directory_missing_module(
+    setup_test_environment, teardown_src_directory
+):
     controller_name = "Module"
 
-    with patch('inspira.logging.log.error') as log_error_mock:
+    with patch("inspira.logging.log.error") as log_error_mock:
         result = get_or_create_migration_directory(controller_name)
 
     assert result is None
     assert not os.path.exists(result) if result else True
     assert log_error_mock.called
+
 
 @patch("inspira.migrations.utils.generate_migration_file")
 @patch("inspira.migrations.utils.generate_column_sql")
@@ -158,7 +163,9 @@ def test_load_model_file(
 
     result = load_model_file(entity_name)
 
-    mock_join.assert_any_call(SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name))
+    mock_join.assert_any_call(
+        SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name)
+    )
     mock_join.assert_any_call(
         mock_join.return_value, f"{mock_singularize.return_value}.py"
     )
@@ -232,7 +239,9 @@ def test_insert_migration(setup_teardown_db_session):
     assert result.migration_name == migration_name
 
 
-def test_get_existing_indexes(setup_test_environment, teardown_src_directory,add_index_users):
+def test_get_existing_indexes(
+    setup_test_environment, teardown_src_directory, add_index_users
+):
     execute_sql_file(add_index_users)
     indexes = get_existing_indexes("users")
 
@@ -240,7 +249,9 @@ def test_get_existing_indexes(setup_test_environment, teardown_src_directory,add
     assert "ix_users_name" in indexes
 
 
-def test_get_all_module_names_with_migration_folder(setup_test_environment, teardown_src_directory):
+def test_get_all_module_names_with_migration_folder(
+    setup_test_environment, teardown_src_directory
+):
     expected_module_names = ["module1", "module2", "module3"]
 
     module_names = get_all_module_names()
@@ -248,7 +259,9 @@ def test_get_all_module_names_with_migration_folder(setup_test_environment, tear
     assert set(module_names) == set(expected_module_names)
 
 
-def test_get_all_module_names_without_migrations(setup_test_environment, teardown_src_directory):
+def test_get_all_module_names_without_migrations(
+    setup_test_environment, teardown_src_directory
+):
     module3_migrations_dir = os.path.join(
         setup_test_environment, "module3", "migrations"
     )
