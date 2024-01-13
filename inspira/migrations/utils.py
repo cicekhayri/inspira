@@ -32,7 +32,12 @@ def load_model_file(entity_name):
     model_name = singularize(entity_name).capitalize()
     spec = importlib.util.spec_from_file_location(model_name, model_file_path)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+
+    try:
+        spec.loader.exec_module(module)
+    except FileNotFoundError:
+        return None
+
     return module
 
 

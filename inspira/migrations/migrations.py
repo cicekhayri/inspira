@@ -86,6 +86,11 @@ def create_migrations(entity_name, empty_migration_file):
         generate_empty_sql_file(entity_name, empty_migration_file)
 
     module = load_model_file(entity_name)
+
+    if module is None:
+        log.error(f"Module '{entity_name}' not found.")
+        return
+
     model = getattr(module, module.__name__)
 
     if not get_existing_columns(entity_name):
