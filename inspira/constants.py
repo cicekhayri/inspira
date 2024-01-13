@@ -12,3 +12,5 @@ WEBSOCKET_CLOSE_TYPE = "websocket.close"
 WEBSOCKET_RECEIVE_TYPE = "websocket.receive"
 WEBSOCKET_DISCONNECT_TYPE = "websocket.disconnect"
 WEBSOCKET_TYPE = "websocket"
+
+SRC_DIRECTORY = "src"

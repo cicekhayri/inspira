@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 
 from sqlalchemy import Column, Integer, String, inspect
 
+from inspira.constants import SRC_DIRECTORY
 from inspira.migrations.migrations import (
     execute_sql_file,
     engine,
@@ -30,7 +31,7 @@ from inspira.migrations.utils import (
 def test_get_or_create_migration_directory(teardown_src_directory):
     controller_name = "test_controller"
     result = get_or_create_migration_directory(controller_name)
-    expected_directory = os.path.join("src", controller_name, "migrations")
+    expected_directory = os.path.join(SRC_DIRECTORY, controller_name, "migrations")
     assert result == expected_directory
     assert os.path.exists(result)
     assert os.path.isdir(result)
@@ -143,7 +144,7 @@ def test_load_model_file(
 
     result = load_model_file(entity_name)
 
-    mock_join.assert_any_call("src", entity_name.replace(".", "/" + entity_name))
+    mock_join.assert_any_call(SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name))
     mock_join.assert_any_call(
         mock_join.return_value, f"{mock_singularize.return_value}.py"
     )

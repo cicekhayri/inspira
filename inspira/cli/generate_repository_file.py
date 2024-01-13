@@ -1,13 +1,12 @@
 import os
 import re
 
+from inspira.constants import SRC_DIRECTORY
 from inspira.utils import pluralize_word, singularize
 
 
 def generate_repository_file(module_name):
-    base_path = "src"
-    # Specify the directory path
-    model_directory = os.path.join(base_path, module_name.lower())
+    model_directory = os.path.join(SRC_DIRECTORY, module_name.lower())
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "repository_template.txt"
@@ -33,7 +32,7 @@ def generate_repository_file(module_name):
 
 def add_repository_dependency_to_service(module_name):
     controller_file_path = os.path.join(
-        "src", module_name.lower(), f"{singularize(module_name.lower())}_service.py"
+        SRC_DIRECTORY, module_name.lower(), f"{singularize(module_name.lower())}_service.py"
     )
     module_name_capitalized = singularize(module_name.lower()).capitalize()
     singularized_module_name = singularize(module_name.lower())

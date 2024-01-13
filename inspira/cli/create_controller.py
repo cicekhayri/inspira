@@ -4,18 +4,18 @@ import click
 
 from inspira.cli.create_app import generate_project
 from inspira.cli.init_file import create_init_file
+from inspira.constants import SRC_DIRECTORY
 from inspira.utils import singularize
 
 
 def create_src_directory():
-    src_directory = "src"
     app_file_path = "main.py"
 
     if not os.path.exists(app_file_path):
         generate_project()
-    if not os.path.exists(src_directory):
-        os.makedirs(src_directory)
-        create_init_file(src_directory)
+    if not os.path.exists(SRC_DIRECTORY):
+        os.makedirs(SRC_DIRECTORY)
+        create_init_file(SRC_DIRECTORY)
 
 
 def create_test_directory(controller_directory):
@@ -26,8 +26,7 @@ def create_test_directory(controller_directory):
 
 
 def create_controller_file(name, is_websocket):
-    src_directory = "src"
-    controller_directory = os.path.join(src_directory, name)
+    controller_directory = os.path.join(SRC_DIRECTORY, name)
     singularize_name = singularize(name.lower())
 
     os.makedirs(controller_directory)

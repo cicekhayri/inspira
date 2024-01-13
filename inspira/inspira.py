@@ -6,6 +6,7 @@ import sys
 from typing import Any, Callable, Dict, List
 
 from inspira.config import Config
+from inspira.constants import SRC_DIRECTORY
 from inspira.enums import HttpMethod
 from inspira.globals import set_global_app
 from inspira.helpers.error_handlers import (
@@ -52,7 +53,7 @@ class Inspira:
 
     def discover_controllers(self) -> None:
         current_dir = os.getcwd()
-        src_dir = os.path.join(current_dir, "src")
+        src_dir = os.path.join(current_dir, SRC_DIRECTORY)
 
         for root, _, files in os.walk(src_dir):
             for file_name in files:
