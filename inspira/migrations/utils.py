@@ -36,7 +36,7 @@ def generate_drop_column_sql(table_name, existing_columns, new_columns):
     for i, col in enumerate(existing_columns):
         if col not in new_columns:
             add_underscore = "_" if i < len(new_columns) - 1 else ""
-            sql_statements += f"ALTER TABLE {table_name} DROP COLUMN {col};"
+            sql_statements += f"ALTER TABLE {table_name} DROP COLUMN {col};\n"
             migration_name += col + add_underscore
 
     if sql_statements:
