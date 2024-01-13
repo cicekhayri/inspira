@@ -178,3 +178,18 @@ def get_columns_from_model(model_class):
 
 def get_indexes_from_model(model_class):
     return model_class.__table__.indexes
+
+
+def get_all_module_names():
+    src_directory = 'src/'
+    module_names = []
+
+    for dir_entry in os.listdir(src_directory):
+        full_path = os.path.join(src_directory, dir_entry)
+        if os.path.isdir(full_path):
+            migrations_dir = os.path.join(full_path, 'migrations')
+            if os.path.exists(migrations_dir):
+                module_names.append(dir_entry)
+
+    return module_names
+

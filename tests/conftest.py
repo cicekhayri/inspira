@@ -145,3 +145,20 @@ def setup_teardown_db_session():
     initialize_database(engine)
     yield db_session
     db_session.rollback()
+
+
+@pytest.fixture
+def setup_test_environment(teardown_src_directory):
+
+    src_directory = os.path.join('src')
+    os.makedirs(src_directory)
+
+    dirs_to_simulate = ['module1', 'module2', 'module3']
+
+    for module in dirs_to_simulate:
+        module_dir = os.path.join(src_directory, module)
+        os.makedirs(module_dir)
+        migrations_dir = os.path.join(module_dir, 'migrations')
+        os.makedirs(migrations_dir)
+
+    yield src_directory

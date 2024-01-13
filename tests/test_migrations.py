@@ -22,7 +22,7 @@ from inspira.migrations.utils import (
     generate_rename_column_sql,
     load_model_file,
     generate_column_sql,
-    get_latest_migration_number,
+    get_latest_migration_number, get_all_module_names,
 )
 
 
@@ -222,3 +222,21 @@ def test_get_existing_indexes(add_index_users):
 
     assert len(indexes) == 1
     assert "ix_users_name" in indexes
+
+
+def test_get_all_module_names_with_migration_folder(setup_test_environment):
+    expected_module_names = ['module1','module2', 'module3']
+
+    module_names = get_all_module_names()
+
+    assert set(module_names) == set(expected_module_names)
+
+
+def test_get_all_module_names_without_migrations(setup_test_environment):
+    module3_migrations_dir = os.path.join(setup_test_environment, 'module3', 'migrations')
+    os.rmdir(module3_migrations_dir)
+
+    expected_module_names = ['module1', 'module2']
+    module_names = get_all_module_names()
+
+    assert set(module_names) == set(expected_module_names)
