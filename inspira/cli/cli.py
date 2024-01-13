@@ -72,7 +72,7 @@ def createmigrations(module_name, empty):
 
 
 @cli.command()
-@click.argument('module_name', required=False)
+@click.argument("module_name", required=False)
 def migrate(module_name):
     if module_name:
         module_names = [module_name]
