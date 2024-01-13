@@ -45,7 +45,7 @@ def test_generate_drop_column_sql(
     existing_columns = ["email_dc"]
     new_columns = [Column("email_dc", String(255)), Column("name", String(50))]
 
-    expected_sql_statements = "ALTER TABLE customers DROP COLUMN email_dc;"
+    expected_sql_statements = "ALTER TABLE customers DROP COLUMN email_dc;\n"
     expected_migration_name = "drop_column_email_dc_"
 
     mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
