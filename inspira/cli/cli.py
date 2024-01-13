@@ -7,6 +7,7 @@ from inspira.cli.generate_model_file import database_file_exists, generate_model
 from inspira.cli.generate_repository_file import generate_repository_file
 from inspira.cli.generate_service_file import generate_service_file
 from inspira.migrations.migrations import create_migrations, run_migrations
+from inspira.migrations.utils import get_all_module_names
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 
@@ -71,9 +72,15 @@ def createmigrations(module_name, empty):
 
 
 @cli.command()
-@click.argument("module_name")
+@click.argument("module_name", required=False)
 def migrate(module_name):
-    run_migrations(module_name)
+    if module_name:
+        module_names = [module_name]
+    else:
+        module_names = get_all_module_names()
+
+    for module_name in module_names:
+        run_migrations(module_name)
 
 
 @cli.command()

@@ -6,6 +6,7 @@ import pytest
 
 from inspira import Inspira
 from inspira.config import Config
+from inspira.constants import SRC_DIRECTORY
 from inspira.requests import Request
 from inspira.testclient import TestClient
 
@@ -48,7 +49,7 @@ def teardown_app_file():
 @pytest.fixture
 def teardown_src_directory():
     yield
-    shutil.rmtree("src")
+    shutil.rmtree(SRC_DIRECTORY)
 
 
 @pytest.fixture
@@ -145,3 +146,18 @@ def setup_teardown_db_session():
     initialize_database(engine)
     yield db_session
     db_session.rollback()
+
+
+@pytest.fixture
+def setup_test_environment():
+    os.makedirs(SRC_DIRECTORY)
+
+    dirs_to_simulate = ["module1", "module2", "module3"]
+
+    for module in dirs_to_simulate:
+        module_dir = os.path.join(SRC_DIRECTORY, module)
+        os.makedirs(module_dir)
+        migrations_dir = os.path.join(module_dir, "migrations")
+        os.makedirs(migrations_dir)
+
+    yield SRC_DIRECTORY

@@ -4,14 +4,19 @@ import os
 from sqlalchemy import String, Integer
 
 from inspira.cli.create_controller import create_init_file
+from inspira.constants import SRC_DIRECTORY
 from inspira.logging import log
 from inspira.utils import singularize
 
 
 def get_or_create_migration_directory(name: str):
-    src_directory = "src"
-    controller_directory = os.path.join(src_directory, name)
+    controller_directory = os.path.join(SRC_DIRECTORY, name)
     migration_directory = os.path.join(controller_directory, "migrations")
+
+    if not os.path.exists(migration_directory):
+        log.error(f"Module '{name}' doesn't exists.")
+        return
+
     os.makedirs(migration_directory, exist_ok=True)
 
     create_init_file(migration_directory)
@@ -20,12 +25,19 @@ def get_or_create_migration_directory(name: str):
 
 
 def load_model_file(entity_name):
-    module_path = os.path.join("src", entity_name.replace(".", "/" + entity_name))
+    module_path = os.path.join(
+        SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name)
+    )
     model_file_path = os.path.join(module_path, f"{singularize(entity_name)}.py")
     model_name = singularize(entity_name).capitalize()
     spec = importlib.util.spec_from_file_location(model_name, model_file_path)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+
+    try:
+        spec.loader.exec_module(module)
+    except FileNotFoundError:
+        return None
+
     return module
 
 
@@ -178,3 +190,16 @@ def get_columns_from_model(model_class):
 
 def get_indexes_from_model(model_class):
     return model_class.__table__.indexes
+
+
+def get_all_module_names():
+    module_names = []
+
+    for dir_entry in os.listdir(SRC_DIRECTORY):
+        full_path = os.path.join(SRC_DIRECTORY, dir_entry)
+        if os.path.isdir(full_path):
+            migrations_dir = os.path.join(full_path, "migrations")
+            if os.path.exists(migrations_dir):
+                module_names.append(dir_entry)
+
+    return module_names

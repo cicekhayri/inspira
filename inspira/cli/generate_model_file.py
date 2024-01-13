@@ -2,13 +2,12 @@ import os
 
 import click
 
+from inspira.constants import SRC_DIRECTORY
 from inspira.utils import pluralize_word, singularize
 
 
 def generate_model_file(module_name):
-    base_path = "src"
-    # Specify the directory path
-    model_directory = os.path.join(base_path, module_name.lower())
+    model_directory = os.path.join(SRC_DIRECTORY, module_name.lower())
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "model_template.txt"
