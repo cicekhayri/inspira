@@ -13,7 +13,7 @@ from inspira.migrations.migrations import (
     insert_migration,
     db_session,
     Migration,
-    get_existing_indexes,
+    get_existing_indexes, create_migrations,
 )
 from inspira.migrations.utils import (
     get_or_create_migration_directory,
@@ -271,3 +271,11 @@ def test_get_all_module_names_without_migrations(
     module_names = get_all_module_names()
 
     assert set(module_names) == set(expected_module_names)
+
+
+def test_empty_migration_file(setup_test_environment, teardown_src_directory):
+    entity_name = "module1"
+    empty_migration_file = "0001_empty_migration"
+    create_migrations(entity_name, "empty_migration")
+    expected_migration_file = f"{setup_test_environment}/{entity_name}/migrations/{empty_migration_file}.sql"
+    assert os.path.exists(expected_migration_file), f"Migration file {expected_migration_file} not found."
