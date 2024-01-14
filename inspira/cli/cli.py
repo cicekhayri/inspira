@@ -27,6 +27,26 @@ def new():
 @click.option("--only-controller", "only_controller", is_flag=True, required=False)
 @click.option("--websocket", "is_websocket", is_flag=True, required=False)
 def module(name, only_controller, is_websocket):
+    """
+    Generate files for a new module.
+
+    This command takes a required argument 'name' for the module name, and two optional flags:
+
+    :param str name: Name of the module.
+
+    Optional Flags:
+    :param bool only_controller: If provided, generates only the controller file.
+
+    :param bool is_websocket: If provided, includes WebSocket support in the module.
+
+    Example usage:
+
+    ```\n
+    inspira new module orders --only-controller --websocket\n
+    ```
+
+    This command will generate files for a module named 'orders' with the specified options.
+    """
     if not name:
         click.echo("Please provide a name for the module")
         return
@@ -54,6 +74,22 @@ def create_module_files(name, only_controller, is_websocket):
 @click.option("--name", required=True, help="Name of the database.")
 @click.option("--type", required=True, help="Database type")
 def database(name, type):
+    """
+    Create a new database file with the given name and type.
+
+    This command takes two required parameters:
+
+    :param str name: Name of the database.
+
+    :param str type: Type of the database.
+
+    Example usage:
+    ```
+    inspira new database --name my_database --type sqlite
+    ```
+
+    This command will create a new database file named 'my_database' of type 'sqlite'.
+    """
     create_database_file(name, type)
 
 
