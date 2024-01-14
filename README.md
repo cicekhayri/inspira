@@ -14,21 +14,21 @@ Make sure you have Python and `pip` installed on your system.
 
 ```bash
 # Create a new directory for your project
-mkdir myproject
-cd myproject
+$ mkdir myproject
+$ cd myproject
 ```
 
 **Create and activate a virtual environment**
 
 ```bash
-python -m venv venv
-source venv/bin/activate   # On Windows, use `venv\Scripts\activate`
+$ python -m venv venv
+$ source venv/bin/activate
 ```
 
 **Install Inspira**
 
 ```bash
-pip install inspira
+$ pip install inspira
 ```
 
 ## Generating an App
@@ -36,7 +36,7 @@ pip install inspira
 To generate a new app for your project, run the following command:
 
 ```bash
-inspira init
+$ inspira init
 ```
 
 ## Generate Database file
@@ -44,7 +44,7 @@ inspira init
 Use the following command to generate a database file:
 
 ```bash
-inspira new database --name mydb --type sqlite
+$ inspira new database --name mydb --type sqlite
 ```
 
 This command will create a new database file named `mydb` with `SQLite` as the database type.
@@ -61,10 +61,6 @@ db_session = scoped_session(
 )
 Base = declarative_base()
 Base.query = db_session.query_property()
-
-
-def init_db():
-    Base.metadata.create_all(bind=engine)
 ```
 
 ## Generating Modules
@@ -72,7 +68,7 @@ def init_db():
 To generate necessary resources for your project, run the following command:
 
 ```bash
-inspira new module orders
+$ inspira new module orders
 ```
 
 ## Generated Directory Structure
@@ -96,7 +92,7 @@ After running the command to generate a new module (`inspira new module orders`)
 After generating your app and setting up the necessary resources, start the server with the following command:
 
 ```bash
-uvicorn main:app --reload
+$ uvicorn main:app --reload
 ```
 
 ## Links
