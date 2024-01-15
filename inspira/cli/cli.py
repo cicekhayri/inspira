@@ -56,8 +56,13 @@ def module(name, only_controller, is_websocket):
             "Database file doesn't exist. Please generate one before generating modules"
         )
         return
+    try:
 
-    create_module_files(name, only_controller, is_websocket)
+        create_module_files(name, only_controller, is_websocket)
+        return click.echo(f"Module '{name}' created successfully.")
+    except FileExistsError:
+        click.echo(f"Module '{name}' already exists.")
+
 
 
 def create_module_files(name, only_controller, is_websocket):
