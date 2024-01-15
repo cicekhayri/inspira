@@ -60,9 +60,6 @@ def module(name, only_controller, is_websocket):
         click.echo(f"Module '{name}' already exists.")
 
 
-
-
-
 @new.command()
 @click.option("--name", required=True, help="Name of the database.")
 @click.option("--type", required=True, help="Database type")
