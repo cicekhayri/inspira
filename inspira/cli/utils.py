@@ -1,4 +1,4 @@
-from inspira.cli.create_controller import create_src_directory, create_controller_file
+from inspira.cli.create_controller import create_controller_file, create_src_directory
 from inspira.cli.generate_model_file import generate_model_file
 from inspira.cli.generate_repository_file import generate_repository_file
 from inspira.cli.generate_service_file import generate_service_file

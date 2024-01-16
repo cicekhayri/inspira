@@ -1,14 +1,14 @@
 import datetime
 import uuid
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
 from inspira.globals import get_global_app
 from inspira.helpers.error_handlers import handle_forbidden
 from inspira.inspira import RequestContext
 from inspira.logging import log
 from inspira.utils.session_utils import (
-    encode_session_data,
     decode_session_data,
+    encode_session_data,
     get_session_token_from_request,
 )
 

@@ -1,31 +1,31 @@
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from sqlalchemy import Column, Integer, String, inspect
 
 from inspira.constants import SRC_DIRECTORY
 from inspira.migrations.migrations import (
-    execute_sql_file,
-    engine,
     Base,
+    Migration,
+    create_migrations,
+    db_session,
+    engine,
+    execute_sql_file,
     generate_create_table_sql,
     get_existing_columns,
-    insert_migration,
-    db_session,
-    Migration,
     get_existing_indexes,
-    create_migrations,
+    insert_migration,
 )
 from inspira.migrations.utils import (
-    get_or_create_migration_directory,
-    generate_drop_column_sql,
     generate_add_column_sql,
-    get_migration_files,
-    generate_rename_column_sql,
-    load_model_file,
     generate_column_sql,
-    get_latest_migration_number,
+    generate_drop_column_sql,
+    generate_rename_column_sql,
     get_all_module_names,
+    get_latest_migration_number,
+    get_migration_files,
+    get_or_create_migration_directory,
+    load_model_file,
 )
 
 

@@ -3,7 +3,7 @@ from http.cookies import SimpleCookie
 
 import pytest
 
-from inspira.auth.auth_utils import login_user, decode_auth_token
+from inspira.auth.auth_utils import decode_auth_token, login_user
 from inspira.auth.decorators import login_required
 from inspira.auth.mixins.user_mixin import AnonymousUserMixin
 from inspira.decorators.http_methods import get
@@ -13,7 +13,7 @@ from inspira.middlewares.cors import CORSMiddleware
 from inspira.middlewares.sessions import SessionMiddleware
 from inspira.middlewares.user_loader import UserLoaderMiddleware
 from inspira.requests import Request, RequestContext
-from inspira.responses import JsonResponse, HttpResponse
+from inspira.responses import HttpResponse, JsonResponse
 from inspira.utils.session_utils import decode_session_data
 
 

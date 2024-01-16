@@ -1,27 +1,36 @@
+import os
 import sys
 
 import click
-from sqlalchemy import select, create_engine, inspect, Index
+from sqlalchemy import (
+    Column,
+    Index,
+    Integer,
+    MetaData,
+    String,
+    create_engine,
+    inspect,
+    select,
+    text,
+)
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
-from sqlalchemy.sql.ddl import CreateTable, CreateIndex, DropIndex
+from sqlalchemy.sql.ddl import CreateIndex, CreateTable, DropIndex
 from sqlalchemy.sql.expression import func
-import os
-from sqlalchemy import MetaData, Column, Integer, String, text
 
 from inspira.logging import log
 from inspira.migrations.utils import (
-    get_or_create_migration_directory,
-    get_migration_files,
-    load_model_file,
-    get_columns_from_model,
     generate_add_column_sql,
     generate_drop_column_sql,
+    generate_empty_sql_file,
+    generate_migration_file,
     generate_migration_file_for_create_table,
     generate_rename_column_sql,
-    generate_empty_sql_file,
+    get_columns_from_model,
     get_indexes_from_model,
-    generate_migration_file,
+    get_migration_files,
+    get_or_create_migration_directory,
+    load_model_file,
     migration_file_exist,
 )
 
@@ -29,7 +38,7 @@ PROJECT_ROOT = os.path.abspath(".")
 sys.path.append(PROJECT_ROOT)
 
 try:
-    from database import Base, engine, db_session
+    from database import Base, db_session, engine
 except ImportError:
     Base = declarative_base()
     engine = create_engine("sqlite:///:memory:")

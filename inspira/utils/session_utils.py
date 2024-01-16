@@ -1,6 +1,5 @@
 import datetime
 import json
-
 from http.cookies import SimpleCookie
 
 from itsdangerous import URLSafeTimedSerializer

@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Callable
+from typing import Any, Callable, Dict, List
 
 from inspira.helpers.error_handlers import handle_forbidden
 from inspira.requests import Request

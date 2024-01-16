@@ -1,7 +1,6 @@
 import logging
 
-
-from inspira.logging import log, handler
+from inspira.logging import handler, log
 
 
 def test_logging():
