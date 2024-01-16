@@ -1,7 +1,7 @@
 import importlib
 import os
 
-from sqlalchemy import String, Integer
+from sqlalchemy import Integer, String
 
 from inspira.cli.create_controller import create_init_file
 from inspira.constants import SRC_DIRECTORY

@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
 from inspira.auth.auth_utils import decode_auth_token
 from inspira.auth.mixins.user_mixin import AnonymousUserMixin

@@ -2,13 +2,13 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from inspira.auth.decorators import login_required
 from inspira.auth.auth_utils import (
+    decode_auth_token,
+    encode_auth_token,
     login_user,
     logout_user,
-    encode_auth_token,
-    decode_auth_token,
 )
+from inspira.auth.decorators import login_required
 from inspira.requests import Request, RequestContext
 from inspira.responses import HttpResponse
 

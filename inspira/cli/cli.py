@@ -3,8 +3,7 @@ import click
 from inspira.cli.create_app import generate_project
 from inspira.cli.generate_database_file import create_database_file
 from inspira.cli.generate_model_file import database_file_exists
-from inspira.cli.utils import handle_creations, handle_migrations, create_module_files
-
+from inspira.cli.utils import create_module_files, handle_creations, handle_migrations
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 

@@ -137,11 +137,7 @@ def add_index_users(tmp_path, teardown_src_directory):
 
 @pytest.fixture
 def setup_teardown_db_session():
-    from inspira.migrations.migrations import (
-        engine,
-        db_session,
-        initialize_database,
-    )
+    from inspira.migrations.migrations import db_session, engine, initialize_database
 
     initialize_database(engine)
     yield db_session

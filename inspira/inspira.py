@@ -17,10 +17,10 @@ from inspira.helpers.error_handlers import (
 from inspira.helpers.static_file_handler import handle_static_files
 from inspira.logging import log
 from inspira.requests import Request, RequestContext
-from inspira.utils.session_utils import get_or_create_session
 from inspira.utils.controller_parser import parse_controller_decorators
 from inspira.utils.dependency_resolver import resolve_dependencies_automatic
 from inspira.utils.handler_invoker import invoke_handler
+from inspira.utils.session_utils import get_or_create_session
 from inspira.websockets import handle_websocket
 
 

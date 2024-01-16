@@ -2,9 +2,8 @@ from datetime import datetime, timedelta
 
 import jwt
 
-from inspira.requests import RequestContext
 from inspira.globals import get_global_app
-
+from inspira.requests import RequestContext
 
 app = get_global_app()
 

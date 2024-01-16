@@ -6,15 +6,15 @@ import pytest
 
 from inspira import Inspira
 from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
-from inspira.decorators.http_methods import delete, get, post, put, patch
+from inspira.decorators.http_methods import delete, get, patch, post, put
 from inspira.enums import HttpMethod
 from inspira.requests import Request
 from inspira.responses import (
+    ForbiddenResponse,
     HttpResponse,
     HttpResponseRedirect,
     JsonResponse,
     TemplateResponse,
-    ForbiddenResponse,
 )
 
 
