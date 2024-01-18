@@ -14,3 +14,4 @@ WEBSOCKET_DISCONNECT_TYPE = "websocket.disconnect"
 WEBSOCKET_TYPE = "websocket"
 
 SRC_DIRECTORY = "src"
+MIGRATION_DIRECTORY = "migrations"

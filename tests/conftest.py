@@ -6,7 +6,7 @@ import pytest
 
 from inspira import Inspira
 from inspira.config import Config
-from inspira.constants import SRC_DIRECTORY
+from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
 from inspira.requests import Request
 from inspira.testclient import TestClient
 
@@ -153,7 +153,7 @@ def setup_test_environment():
     for module in dirs_to_simulate:
         module_dir = os.path.join(SRC_DIRECTORY, module)
         os.makedirs(module_dir)
-        migrations_dir = os.path.join(module_dir, "migrations")
+        migrations_dir = os.path.join(module_dir, MIGRATION_DIRECTORY)
         os.makedirs(migrations_dir)
 
     yield SRC_DIRECTORY

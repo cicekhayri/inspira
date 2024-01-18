@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from sqlalchemy import Column, Integer, String, inspect
 
-from inspira.constants import SRC_DIRECTORY
+from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
     Base,
     Migration,
@@ -34,7 +34,7 @@ def test_get_or_create_migration_directory(
 ):
     controller_name = "module1"
     controller_directory = os.path.join(SRC_DIRECTORY, controller_name)
-    migration_directory = os.path.join(controller_directory, "migrations")
+    migration_directory = os.path.join(controller_directory, MIGRATION_DIRECTORY)
     with patch("inspira.logging.log.error") as log_error_mock:
         result = get_or_create_migration_directory(controller_name)
 
@@ -264,7 +264,7 @@ def test_get_all_module_names_without_migrations(
     setup_test_environment, teardown_src_directory
 ):
     module3_migrations_dir = os.path.join(
-        setup_test_environment, "module3", "migrations"
+        setup_test_environment, "module3", MIGRATION_DIRECTORY
     )
     os.rmdir(module3_migrations_dir)
 

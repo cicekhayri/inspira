@@ -18,6 +18,7 @@ from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
 from sqlalchemy.sql.ddl import CreateIndex, CreateTable, DropIndex
 from sqlalchemy.sql.expression import func
 
+from inspira.constants import MIGRATION_DIRECTORY
 from inspira.logging import log
 from inspira.migrations.utils import (
     generate_add_column_sql,
@@ -45,7 +46,7 @@ except ImportError:
 
 
 class Migration(Base):
-    __tablename__ = "migrations"
+    __tablename__ = MIGRATION_DIRECTORY
     id = Column(Integer, primary_key=True)
     migration_name = Column(String(255))
     version = Column(Integer)
@@ -125,7 +126,7 @@ def handle_indexes(entity_name, model):
 
 def run_migrations():
     with engine.connect() as connection:
-        if not engine.dialect.has_table(connection, "migrations"):
+        if not engine.dialect.has_table(connection, MIGRATION_DIRECTORY):
             initialize_database(engine)
 
         migration_dir = get_or_create_migration_directory()

@@ -4,13 +4,13 @@ import os
 from sqlalchemy import Integer, String
 
 from inspira.cli.create_controller import create_init_file
-from inspira.constants import SRC_DIRECTORY
+from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
 from inspira.logging import log
 from inspira.utils import singularize
 
 
 def get_or_create_migration_directory():
-    migration_directory = os.path.join("migrations")
+    migration_directory = os.path.join(MIGRATION_DIRECTORY)
 
     os.makedirs(migration_directory, exist_ok=True)
 
