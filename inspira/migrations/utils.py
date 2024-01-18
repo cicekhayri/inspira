@@ -36,8 +36,8 @@ def load_model_file(entity_name):
     return module
 
 
-def migration_file_exist(table_name: str, migration_file_name: str) -> bool:
-    migration_dir = get_or_create_migration_directory(table_name)
+def migration_file_exist(migration_file_name: str) -> bool:
+    migration_dir = get_or_create_migration_directory()
     migration_files = get_migration_files(migration_dir)
 
     migration_exists = any(

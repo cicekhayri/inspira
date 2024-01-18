@@ -86,39 +86,11 @@ def generate_create_table_sql(model_name):
 
 
 def create_migrations(migration_name):
+
+    if migration_file_exist(migration_name):
+        return
+
     generate_migration_file(migration_name)
-
-
-def handle_columns(entity_name, model):
-    existing_columns = get_existing_columns(entity_name)
-    new_columns = get_columns_from_model(model)
-
-    renamed_columns = [
-        (old_col, new_col.key)
-        for old_col, new_col in zip(existing_columns, new_columns)
-        if old_col != new_col.key
-    ]
-
-    if renamed_columns:
-        generate_rename_column_sql(entity_name, existing_columns, new_columns)
-        return
-
-    added_columns = [col for col in new_columns if col.key not in existing_columns]
-    if added_columns:
-        generate_add_column_sql(entity_name, existing_columns, added_columns)
-        return
-
-    removed_columns = [col for col in existing_columns if col not in new_columns]
-    if removed_columns:
-        generate_drop_column_sql(entity_name, existing_columns, new_columns)
-
-
-def handle_indexes(entity_name, model):
-    existing_indexes = get_existing_indexes(entity_name)
-    new_indexes = get_indexes_from_model(model)
-
-    generate_add_index_sql(entity_name, existing_indexes, new_indexes)
-    generate_drop_index_sql(entity_name, existing_indexes, new_indexes)
 
 
 def run_migrations():
@@ -173,31 +145,3 @@ def get_existing_indexes(table_name):
     inspector = inspect(engine)
     indexes = inspector.get_indexes(table_name)
     return [index["name"] for index in indexes]
-
-
-def generate_add_index_sql(table_name, existing_indexes, new_indexes):
-    for new_index in new_indexes:
-        if new_index.name not in existing_indexes:
-            index_sql = str(CreateIndex(new_index).compile(engine)) + ";"
-
-            migration_file_name = f"add_index_{new_index.name}"
-
-            if migration_file_exist(table_name, migration_file_name):
-                return
-
-            generate_migration_file(table_name, index_sql, migration_file_name)
-
-
-def generate_drop_index_sql(table_name, existing_indexes, new_indexes):
-    new_index_names = set(index.name for index in new_indexes)
-
-    for removed_index_name in set(existing_indexes) - new_index_names:
-        removed_index = Index(removed_index_name, text("dummy"))
-        drop_index_sql = str(DropIndex(removed_index).compile(engine)) + ";"
-
-        migration_file_name = f"drop_index_{removed_index_name}"
-
-        if migration_file_exist(table_name, migration_file_name):
-            return
-
-        generate_migration_file(table_name, drop_index_sql, migration_file_name)
