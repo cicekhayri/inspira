@@ -18,6 +18,7 @@ def cli():
 def new():
     pass
 
+
 @new.command()
 @click.argument("name")
 @click.option("--websocket", "is_websocket", is_flag=True, required=False)

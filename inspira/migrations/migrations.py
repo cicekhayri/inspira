@@ -21,10 +21,7 @@ from sqlalchemy.sql.expression import func
 from inspira.constants import MIGRATION_DIRECTORY
 from inspira.logging import log
 from inspira.migrations.utils import (
-    generate_add_column_sql,
-    generate_drop_column_sql,
     generate_migration_file,
-    generate_rename_column_sql,
     get_columns_from_model,
     get_indexes_from_model,
     get_migration_files,

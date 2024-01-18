@@ -53,6 +53,12 @@ def teardown_src_directory():
 
 
 @pytest.fixture
+def teardown_migration_directory():
+    yield
+    shutil.rmtree(MIGRATION_DIRECTORY)
+
+
+@pytest.fixture
 def teardown_database_file():
     yield
     os.remove("database.py")
@@ -146,7 +152,7 @@ def setup_teardown_db_session():
 
 @pytest.fixture
 def setup_test_environment():
-    os.makedirs(SRC_DIRECTORY)
+    # os.makedirs(SRC_DIRECTORY)
 
     dirs_to_simulate = ["module1", "module2", "module3"]
 

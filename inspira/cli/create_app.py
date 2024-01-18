@@ -37,7 +37,7 @@ def create_directory_structure():
                 if module_name != base_dir:
                     import_statement = f"from src import {module_name}\n"
 
-                with open(dir_path, 'a') as init_file:
+                with open(dir_path, "a") as init_file:
                     init_file.write(import_statement)
             else:
                 os.makedirs(dir_path)
