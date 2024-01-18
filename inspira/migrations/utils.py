@@ -9,13 +9,8 @@ from inspira.logging import log
 from inspira.utils import singularize
 
 
-def get_or_create_migration_directory(name: str):
-    controller_directory = os.path.join(SRC_DIRECTORY, name)
-    migration_directory = os.path.join(controller_directory, "migrations")
-
-    if not os.path.exists(controller_directory):
-        log.error(f"Module '{name}' doesn't exists.")
-        return
+def get_or_create_migration_directory():
+    migration_directory = os.path.join("migrations")
 
     os.makedirs(migration_directory, exist_ok=True)
 
@@ -194,5 +189,5 @@ def get_all_module_names():
     for module_name in os.listdir(SRC_DIRECTORY + "/model"):
         if module_name != "__init__.py":
             module_names.append(module_name)
-    print(module_names)
+
     return module_names

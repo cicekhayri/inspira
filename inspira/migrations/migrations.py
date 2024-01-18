@@ -22,15 +22,12 @@ from inspira.logging import log
 from inspira.migrations.utils import (
     generate_add_column_sql,
     generate_drop_column_sql,
-    generate_empty_sql_file,
     generate_migration_file,
-    generate_migration_file_for_create_table,
     generate_rename_column_sql,
     get_columns_from_model,
     get_indexes_from_model,
     get_migration_files,
     get_or_create_migration_directory,
-    load_model_file,
     migration_file_exist,
 )
 
