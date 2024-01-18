@@ -117,10 +117,6 @@ def migration_file_exist(table_name: str, migration_file_name: str) -> bool:
     return migration_exists
 
 
-def generate_empty_sql_file(module, migration_name):
-    generate_migration_file(module, "", migration_name)
-
-
 def get_migration_files(migration_dir):
     migration_files = [
         os.path.join(migration_dir, f)
@@ -142,8 +138,8 @@ def get_latest_migration_number(migration_dir):
     return latest_migration
 
 
-def generate_migration_file(module_name, migration_sql, migration_name):
-    migration_dir = get_or_create_migration_directory(module_name)
+def generate_migration_file(migration_name):
+    migration_dir = get_or_create_migration_directory()
     latest_migration_number = get_latest_migration_number(migration_dir)
     new_migration_number = latest_migration_number + 1
     migration_file_path = os.path.join(
@@ -151,7 +147,7 @@ def generate_migration_file(module_name, migration_sql, migration_name):
     )
 
     with open(migration_file_path, "w") as migration_file:
-        migration_file.write(migration_sql)
+        pass
 
     log.info(
         f"Migration file '{str(new_migration_number).zfill(4)}_{migration_name}.sql' created."
@@ -195,11 +191,8 @@ def get_indexes_from_model(model_class):
 def get_all_module_names():
     module_names = []
 
-    for dir_entry in os.listdir(SRC_DIRECTORY):
-        full_path = os.path.join(SRC_DIRECTORY, dir_entry)
-        if os.path.isdir(full_path):
-            migrations_dir = os.path.join(full_path, "migrations")
-            if os.path.exists(migrations_dir):
-                module_names.append(dir_entry)
-
+    for module_name in os.listdir(SRC_DIRECTORY + "/model"):
+        if module_name != "__init__.py":
+            module_names.append(module_name)
+    print(module_names)
     return module_names

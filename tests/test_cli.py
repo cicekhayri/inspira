@@ -1,6 +1,10 @@
+import os
+
+import pytest
 from click.testing import CliRunner
 
 from inspira.cli import cli
+from inspira.cli.create_app import create_directory_structure
 
 
 def test_init_command(teardown_app_file):

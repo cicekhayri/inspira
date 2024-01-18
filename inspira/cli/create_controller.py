@@ -5,7 +5,7 @@ import click
 from inspira.cli.create_app import generate_project
 from inspira.cli.init_file import create_init_file
 from inspira.constants import SRC_DIRECTORY
-from inspira.utils import singularize
+from inspira.utils import singularize, pluralize_word
 
 
 def create_src_directory():
@@ -26,15 +26,10 @@ def create_test_directory(controller_directory):
 
 
 def create_controller_file(name, is_websocket):
-    controller_directory = os.path.join(SRC_DIRECTORY, name)
+    controller_directory = os.path.join(SRC_DIRECTORY, "controller")
     singularize_name = singularize(name.lower())
 
-    os.makedirs(controller_directory)
-
-    create_test_directory(controller_directory)
-
     controller_template_file = "controller_template.txt"
-    create_init_file(controller_directory)
 
     controller_file = os.path.join(
         controller_directory, f"{singularize_name}_controller.py"
@@ -53,7 +48,7 @@ def create_controller_file(name, is_websocket):
         content = (
             template_file.read()
             .replace("{{controller_name}}", singularize_name.capitalize())
-            .replace("{{root_path}}", name.lower())
+            .replace("{{root_path}}", pluralize_word(name.lower()))
         )
         output_file.write(content)
 

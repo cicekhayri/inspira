@@ -90,26 +90,8 @@ def generate_create_table_sql(model_name):
     return sql
 
 
-def create_migrations(entity_name, empty_migration_file):
-    if empty_migration_file:
-        generate_empty_sql_file(entity_name, empty_migration_file)
-
-    module = load_model_file(entity_name)
-
-    if module is None:
-        log.error(f"Module '{entity_name}' not found.")
-        return
-
-    model = getattr(module, module.__name__)
-
-    if not get_existing_columns(entity_name):
-        generate_migration_file_for_create_table(
-            generate_create_table_sql(entity_name), entity_name
-        )
-        return
-
-    handle_columns(entity_name, model)
-    handle_indexes(entity_name, model)
+def create_migrations(migration_name):
+    generate_migration_file(migration_name)
 
 
 def handle_columns(entity_name, model):
@@ -144,15 +126,12 @@ def handle_indexes(entity_name, model):
     generate_drop_index_sql(entity_name, existing_indexes, new_indexes)
 
 
-def run_migrations(module_name):
+def run_migrations():
     with engine.connect() as connection:
         if not engine.dialect.has_table(connection, "migrations"):
             initialize_database(engine)
 
-        if not engine.dialect.has_table(connection, module_name):
-            initialize_database(engine)
-
-        migration_dir = get_or_create_migration_directory(module_name)
+        migration_dir = get_or_create_migration_directory()
         migration_files = get_migration_files(migration_dir)
 
         for file in migration_files:
