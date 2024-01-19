@@ -14,9 +14,7 @@ def generate_service_file(module_name):
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "service_template.txt"
     )
-    service_file_path = os.path.join(
-        model_directory, service_file_name
-    )
+    service_file_path = os.path.join(model_directory, service_file_name)
 
     if service_file_path:
         click.echo(f"Service '{service_file_name}' already exists.")

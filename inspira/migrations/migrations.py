@@ -86,7 +86,6 @@ def generate_create_table_sql(model_name):
 
 
 def create_migrations(migration_name):
-
     if migration_file_exist(migration_name):
         return
 

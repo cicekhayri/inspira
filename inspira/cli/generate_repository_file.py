@@ -14,9 +14,7 @@ def generate_repository_file(module_name):
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "repository_template.txt"
     )
-    repository_file_path = os.path.join(
-        model_directory, repository_file_name
-    )
+    repository_file_path = os.path.join(model_directory, repository_file_name)
 
     if repository_file_path:
         click.echo(f"Repository '{repository_file_name}' already exists.")

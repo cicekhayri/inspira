@@ -38,7 +38,6 @@ def controller(name, is_websocket):
 @new.command()
 @click.argument("name")
 def repository(name):
-
     if not name:
         click.echo("Please provide a name of the repository")
         return
@@ -52,7 +51,6 @@ def repository(name):
 @new.command()
 @click.argument("name")
 def service(name):
-
     if not name:
         click.echo("Please provide a name of the service")
         return
@@ -61,7 +59,6 @@ def service(name):
         generate_service_file(name)
     except FileExistsError:
         click.echo(f"Service '{name}' already exists.")
-
 
 
 @new.command()
