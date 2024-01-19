@@ -31,9 +31,9 @@ def create_controller_file(name, is_websocket):
     controller_file_name = f"{singularize_name}_controller.py"
     controller_template_file = "controller_template.txt"
 
-    controller_file = os.path.join(controller_directory, controller_file_name)
+    controller_file_path = os.path.join(controller_directory, controller_file_name)
 
-    if controller_file:
+    if os.path.exists(controller_file_path):
         click.echo(f"Controller '{controller_file_name}' already exists.")
         return
 
@@ -45,7 +45,7 @@ def create_controller_file(name, is_websocket):
     )
 
     with open(template_path, "r") as template_file, open(
-        controller_file, "w"
+        controller_file_path, "w"
     ) as output_file:
         content = (
             template_file.read()

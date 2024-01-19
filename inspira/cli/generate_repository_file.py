@@ -16,7 +16,7 @@ def generate_repository_file(module_name):
     )
     repository_file_path = os.path.join(model_directory, repository_file_name)
 
-    if repository_file_path:
+    if os.path.exists(repository_file_path):
         click.echo(f"Repository '{repository_file_name}' already exists.")
         return
 

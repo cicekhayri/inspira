@@ -16,7 +16,7 @@ def generate_service_file(module_name):
     )
     service_file_path = os.path.join(model_directory, service_file_name)
 
-    if service_file_path:
+    if os.path.exists(service_file_path):
         click.echo(f"Service '{service_file_name}' already exists.")
         return
 

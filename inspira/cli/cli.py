@@ -3,6 +3,7 @@ import click
 from inspira.cli.create_app import generate_project
 from inspira.cli.create_controller import create_controller_file
 from inspira.cli.generate_database_file import create_database_file
+from inspira.cli.generate_model_file import generate_model_file
 from inspira.cli.generate_repository_file import generate_repository_file
 from inspira.cli.generate_service_file import generate_service_file
 
@@ -60,6 +61,18 @@ def service(name):
     except FileExistsError:
         click.echo(f"Service '{name}' already exists.")
 
+
+@new.command()
+@click.argument("name")
+def model(name):
+    if not name:
+        click.echo("Please provide a name for the model.")
+        return
+
+    try:
+        generate_model_file(name)
+    except FileExistsError:
+        click.echo(f"Model '{name}' already exists.")
 
 @new.command()
 @click.option("--name", required=True, help="Name of the database.")
