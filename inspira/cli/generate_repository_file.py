@@ -22,9 +22,8 @@ def generate_repository_file(module_name):
     with open(template_path, "r") as template_file, open(
         repository_file_path, "w"
     ) as output_file:
-        content = (
-            template_file.read()
-            .replace("{{model_name_upper}}", singularize(module_name.capitalize()))
+        content = template_file.read().replace(
+            "{{model_name_upper}}", singularize(module_name.capitalize())
         )
         output_file.write(content)
 

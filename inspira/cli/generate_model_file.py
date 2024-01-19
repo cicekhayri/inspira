@@ -12,9 +12,7 @@ def generate_model_file(module_name):
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "model_template.txt"
     )
-    model_file_path = os.path.join(
-        model_directory, model_file_name
-    )
+    model_file_path = os.path.join(model_directory, model_file_name)
 
     if os.path.exists(model_file_path):
         click.echo(f"Model '{model_file_name}' already exists.")

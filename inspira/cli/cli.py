@@ -74,6 +74,7 @@ def model(name):
     except FileExistsError:
         click.echo(f"Model '{name}' already exists.")
 
+
 @new.command()
 @click.option("--name", required=True, help="Name of the database.")
 @click.option("--type", required=True, help="Database type")
