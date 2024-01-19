@@ -39,6 +39,26 @@ To generate a new app for your project, run the following command:
 $ inspira init
 ```
 
+## Generated Directory Structure
+
+After running the `init` command, the directory structure of your project should look like the following:
+
+```bash
+├── main.py
+├── src
+│   ├── __init__.py
+│   ├── controller
+│   │   └── __init__.py
+│   ├── model
+│   │   └── __init__.py
+│   ├── repository
+│   │   └── __init__.py
+│   └── service
+│       └── __init__.py
+└── tests
+    └── __init__.py
+```
+
 ## Generate Database file
 
 Use the following command to generate a database file:
@@ -63,28 +83,36 @@ Base = declarative_base()
 Base.query = db_session.query_property()
 ```
 
-## Generating Modules
+## Generating Controller
 
-To generate necessary resources for your project, run the following command:
+To generate necessary controller for your project, run the following command:
 
 ```bash
-$ inspira new module orders
+$ inspira new controller orders
 ```
 
-## Generated Directory Structure
+## Generating Repository
 
-After running the command to generate a new module (`inspira new module orders`), the directory structure of your project should look like the following:
+To generate repository file, run the following command:
 
 ```bash
-├── main.py
-├── database.py
-└── src
-    └── orders
-        ├── __init__.py
-        ├── order.py
-        ├── order_controller.py
-        └── order_repository.py
-        └── order_service.py
+$ inspira new repository orders
+```
+
+## Generating Service
+
+To generate service file, run the following command:
+
+```bash
+$ inspira new service orders
+```
+
+## Generating Model
+
+To generate model file, run the following command:
+
+```bash
+$ inspira new model order
 ```
 
 ## Starting the Server

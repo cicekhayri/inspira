@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from sqlalchemy import Column, Integer, String, inspect
 
-from inspira.constants import SRC_DIRECTORY
+from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
     Base,
     Migration,
@@ -17,11 +17,7 @@ from inspira.migrations.migrations import (
     insert_migration,
 )
 from inspira.migrations.utils import (
-    generate_add_column_sql,
     generate_column_sql,
-    generate_drop_column_sql,
-    generate_rename_column_sql,
-    get_all_module_names,
     get_latest_migration_number,
     get_migration_files,
     get_or_create_migration_directory,
@@ -34,9 +30,9 @@ def test_get_or_create_migration_directory(
 ):
     controller_name = "module1"
     controller_directory = os.path.join(SRC_DIRECTORY, controller_name)
-    migration_directory = os.path.join(controller_directory, "migrations")
+    migration_directory = os.path.join(MIGRATION_DIRECTORY)
     with patch("inspira.logging.log.error") as log_error_mock:
-        result = get_or_create_migration_directory(controller_name)
+        result = get_or_create_migration_directory()
 
     assert result == migration_directory
     assert os.path.exists(result)
@@ -45,80 +41,7 @@ def test_get_or_create_migration_directory(
     log_error_mock.assert_not_called()
 
 
-def test_get_or_create_migration_directory_missing_module(
-    setup_test_environment, teardown_src_directory
-):
-    controller_name = "Module"
-
-    with patch("inspira.logging.log.error") as log_error_mock:
-        result = get_or_create_migration_directory(controller_name)
-
-    assert result is None
-    assert not os.path.exists(result) if result else True
-    assert log_error_mock.called
-
-
-@patch("inspira.migrations.utils.generate_migration_file")
-@patch("inspira.migrations.utils.generate_column_sql")
-def test_generate_drop_column_sql(
-    mock_generate_column_sql, mock_generate_migration_file
-):
-    entity_name = "customers"
-    existing_columns = ["email_dc"]
-    new_columns = [Column("email_dc", String(255)), Column("name", String(50))]
-
-    expected_sql_statements = "ALTER TABLE customers DROP COLUMN email_dc;\n"
-    expected_migration_name = "drop_column_email_dc_"
-
-    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
-    generate_drop_column_sql(entity_name, existing_columns, new_columns)
-
-    mock_generate_migration_file.assert_called_once_with(
-        entity_name, expected_sql_statements, expected_migration_name
-    )
-
-
-@patch("inspira.migrations.utils.generate_migration_file")
-@patch("inspira.migrations.utils.generate_column_sql")
-def test_generate_add_column_sql(
-    mock_generate_column_sql, mock_generate_migration_file
-):
-    entity_name = "customers"
-    existing_columns = ["email_dc"]
-    new_columns = [Column("email_dc", String(255)), Column("name", String(50))]
-
-    expected_sql_statements = "ALTER TABLE customers ADD COLUMN name VARCHAR(50);\n"
-    expected_migration_name = "add_column_name"
-
-    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
-    generate_add_column_sql(entity_name, existing_columns, new_columns)
-
-    mock_generate_migration_file.assert_called_once_with(
-        entity_name, expected_sql_statements, expected_migration_name
-    )
-
-
-@patch("inspira.migrations.utils.generate_migration_file")
-@patch("inspira.migrations.utils.generate_column_sql")
-def test_generate_rename_column_sql(
-    mock_generate_column_sql, mock_generate_migration_file
-):
-    entity_name = "customers"
-    existing_columns = ["email_dc", "name"]
-    new_columns = [Column("email", String(255)), Column("name", String(50))]
-
-    expected_sql_statements = "ALTER TABLE customers RENAME COLUMN email_dc TO email;"
-    expected_migration_name = "rename_column_email_dc_to_email"
-
-    mock_generate_column_sql.side_effect = lambda col: f"{col.key} VARCHAR(50)"
-    generate_rename_column_sql(entity_name, existing_columns, new_columns)
-
-    mock_generate_migration_file.assert_called_once_with(
-        entity_name, expected_sql_statements, expected_migration_name
-    )
-
-
-def test_get_migration_files(create_migration_files):
+def test_get_migration_files(create_migration_files, teardown_migration_directory):
     migration_files, migration_dir = create_migration_files
 
     with patch("inspira.migrations.utils.os.listdir", return_value=migration_files):
@@ -250,37 +173,12 @@ def test_get_existing_indexes(
     assert "ix_users_name" in indexes
 
 
-def test_get_all_module_names_with_migration_folder(
-    setup_test_environment, teardown_src_directory
+def test_empty_migration_file(
+    setup_test_environment, teardown_src_directory, teardown_migration_directory
 ):
-    expected_module_names = ["module1", "module2", "module3"]
-
-    module_names = get_all_module_names()
-
-    assert set(module_names) == set(expected_module_names)
-
-
-def test_get_all_module_names_without_migrations(
-    setup_test_environment, teardown_src_directory
-):
-    module3_migrations_dir = os.path.join(
-        setup_test_environment, "module3", "migrations"
-    )
-    os.rmdir(module3_migrations_dir)
-
-    expected_module_names = ["module1", "module2"]
-    module_names = get_all_module_names()
-
-    assert set(module_names) == set(expected_module_names)
-
-
-def test_empty_migration_file(setup_test_environment, teardown_src_directory):
-    entity_name = "module1"
     empty_migration_file = "0001_empty_migration"
-    create_migrations(entity_name, "empty_migration")
-    expected_migration_file = (
-        f"{setup_test_environment}/{entity_name}/migrations/{empty_migration_file}.sql"
-    )
+    create_migrations("empty_migration")
+    expected_migration_file = f"migrations/{empty_migration_file}.sql"
     assert os.path.exists(
         expected_migration_file
     ), f"Migration file {expected_migration_file} not found."
