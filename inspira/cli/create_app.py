@@ -2,6 +2,7 @@ import os
 
 import click
 
+from inspira.cli.init_file import create_init_file
 from inspira.constants import SRC_DIRECTORY
 from inspira.utils import get_random_secret_key
 
@@ -9,8 +10,15 @@ from inspira.utils import get_random_secret_key
 def generate_project():
     create_app_file()
     create_directory_structure()
-
+    create_test_directory()
     click.echo("Project created successfully")
+
+
+def create_test_directory():
+    test_directory = os.path.join("tests")
+    os.makedirs(test_directory)
+
+    create_init_file(test_directory)
 
 
 def create_directory_structure():

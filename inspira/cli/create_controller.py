@@ -18,13 +18,6 @@ def create_src_directory():
         create_init_file(SRC_DIRECTORY)
 
 
-def create_test_directory(controller_directory):
-    test_directory = os.path.join(controller_directory, "tests")
-    os.makedirs(test_directory)
-
-    create_init_file(test_directory)
-
-
 def create_controller_file(name, is_websocket):
     controller_directory = os.path.join(SRC_DIRECTORY, "controller")
     singularize_name = singularize(name.lower())
