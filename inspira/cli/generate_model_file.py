@@ -38,7 +38,6 @@ def generate_model_file(module_name):
 def database_file_exists() -> bool:
     main_script_path = "database.py"
 
-    # Check if the main script exists
     if not os.path.isfile(main_script_path):
         click.echo("Main script (database.py) not found.")
         return False

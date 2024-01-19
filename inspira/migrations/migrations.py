@@ -4,7 +4,6 @@ import sys
 import click
 from sqlalchemy import (
     Column,
-    Index,
     Integer,
     MetaData,
     String,
@@ -15,15 +14,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
-from sqlalchemy.sql.ddl import CreateIndex, CreateTable, DropIndex
+from sqlalchemy.sql.ddl import CreateIndex, CreateTable
 from sqlalchemy.sql.expression import func
 
 from inspira.constants import MIGRATION_DIRECTORY
 from inspira.logging import log
 from inspira.migrations.utils import (
     generate_migration_file,
-    get_columns_from_model,
-    get_indexes_from_model,
     get_migration_files,
     get_or_create_migration_directory,
     migration_file_exist,

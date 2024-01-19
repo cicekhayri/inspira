@@ -1,6 +1,4 @@
 import os
-import re
-
 import click
 
 from inspira.constants import SRC_DIRECTORY
@@ -33,47 +31,3 @@ def generate_service_file(module_name):
         output_file.write(content)
 
     click.echo(f"Service '{service_file_name}' created successfully.")
-    # add_service_dependency_to_controller(module_name)
-
-
-def add_service_dependency_to_controller(module_name):
-    controller_file_path = os.path.join(
-        SRC_DIRECTORY,
-        module_name.lower(),
-        f"{singularize(module_name.lower())}_controller.py",
-    )
-    module_name_capitalized = singularize(module_name.lower()).capitalize()
-    singularized_module_name = singularize(module_name.lower())
-
-    with open(controller_file_path, "r") as controller_file:
-        existing_content = controller_file.read()
-
-    # Define the __init__ method
-    init_method = f"""\n
-    def __init__(self, {singularized_module_name}_service: {module_name_capitalized}Service):
-        self._{singularized_module_name}_service = {singularized_module_name}_service"""
-
-    import_statement = (
-        f""
-        f"\n\nfrom src.{module_name.lower()}.{singularize(module_name.lower())}_service"
-        f" import {module_name_capitalized}Service\n\n\n"
-    )
-
-    # Update the regular expression to match @path or @websocket
-    class_pattern = re.compile(
-        r"@(path|websocket)\(.+\)\nclass\s+[A-Za-z_][A-Za-z0-9_]*:"
-    )
-    match = class_pattern.search(existing_content)
-
-    if match:
-        start, end = match.span()
-        updated_content = (
-            existing_content[:start].rstrip()
-            + import_statement
-            + existing_content[start:end]
-            + init_method
-            + existing_content[end:]
-        )
-
-        with open(controller_file_path, "w") as controller_file:
-            controller_file.write(updated_content)

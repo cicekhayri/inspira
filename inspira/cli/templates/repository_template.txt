@@ -1,11 +1,6 @@
 from database import db_session
-from src.model.{{model_name_singular}} import {{model_name_upper}}
 
 
 class {{model_name_upper}}Repository:
 
-    def get_all_{{model_name}}(self):
-        return db_session.query({{model_name_upper}}).all()
-
-    def get_{{model_name_singular}}_by_id(self, id: int):
-        return db_session.query({{model_name_upper}}).filter_by(id=id).first()
+    pass
