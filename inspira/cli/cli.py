@@ -97,11 +97,11 @@ def database(name, type):
     create_database_file(name, type)
 
 
-@cli.command()
+@new.command()
 @click.argument("migration_name", required=True)
-def createmigrations(migration_name):
+def migration(migration_name):
     """
-    Create migrations
+    Create migration
 
     :param migration_name: Name of the migration e.g. add_column_name_to_order.\n
     """
@@ -110,7 +110,7 @@ def createmigrations(migration_name):
         create_migrations(migration_name)
     except click.UsageError as e:
         click.echo(f"Error: {e}")
-        click.echo("Use 'createmigrations --help' for usage information.")
+        click.echo("Use 'migration --help' for usage information.")
 
 
 @cli.command()
