@@ -28,12 +28,16 @@ def create_test_directory(controller_directory):
 def create_controller_file(name, is_websocket):
     controller_directory = os.path.join(SRC_DIRECTORY, "controller")
     singularize_name = singularize(name.lower())
-
+    controller_file_name =f"{singularize_name}_controller.py"
     controller_template_file = "controller_template.txt"
 
     controller_file = os.path.join(
-        controller_directory, f"{singularize_name}_controller.py"
+        controller_directory, controller_file_name
     )
+
+    if controller_file:
+        click.echo(f"Controller '{controller_file_name}' already exists.")
+        return
 
     if is_websocket:
         controller_template_file = "websocket_controller_template.txt"
@@ -52,4 +56,4 @@ def create_controller_file(name, is_websocket):
         )
         output_file.write(content)
 
-    click.echo(f"Module '{singularize_name}' created successfully.")
+    click.echo(f"Controller '{singularize_name}' created successfully.")

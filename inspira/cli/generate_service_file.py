@@ -1,22 +1,29 @@
 import os
 import re
 
+import click
+
 from inspira.constants import SRC_DIRECTORY
 from inspira.utils import pluralize_word, singularize
 
 
 def generate_service_file(module_name):
-    model_directory = os.path.join(SRC_DIRECTORY, module_name.lower())
+    model_directory = os.path.join(SRC_DIRECTORY, "service")
+    service_file_name = f"{singularize(module_name.lower())}_service.py"
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "service_template.txt"
     )
-    repository_file_path = os.path.join(
-        model_directory, f"{singularize(module_name.lower())}_service.py"
+    service_file_path = os.path.join(
+        model_directory, service_file_name
     )
 
+    if service_file_path:
+        click.echo(f"Service '{service_file_name}' already exists.")
+        return
+
     with open(template_path, "r") as template_file, open(
-        repository_file_path, "w"
+        service_file_path, "w"
     ) as output_file:
         content = (
             template_file.read()
@@ -27,7 +34,8 @@ def generate_service_file(module_name):
         )
         output_file.write(content)
 
-    add_service_dependency_to_controller(module_name)
+    click.echo(f"Service '{service_file_name}' created successfully.")
+    # add_service_dependency_to_controller(module_name)
 
 
 def add_service_dependency_to_controller(module_name):

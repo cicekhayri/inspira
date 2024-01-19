@@ -1,5 +1,5 @@
 from database import db_session
-from src.{{module_name}}.{{model_name_singular}} import {{model_name_upper}}
+from src.model.{{model_name_singular}} import {{model_name_upper}}
 
 
 class {{model_name_upper}}Repository:

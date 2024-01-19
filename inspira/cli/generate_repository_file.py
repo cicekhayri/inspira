@@ -1,19 +1,26 @@
 import os
 import re
 
+import click
+
 from inspira.constants import SRC_DIRECTORY
 from inspira.utils import pluralize_word, singularize
 
 
 def generate_repository_file(module_name):
-    model_directory = os.path.join(SRC_DIRECTORY, module_name.lower())
+    model_directory = os.path.join(SRC_DIRECTORY, "repository")
+    repository_file_name = f"{singularize(module_name.lower())}_repository.py"
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "repository_template.txt"
     )
     repository_file_path = os.path.join(
-        model_directory, f"{singularize(module_name.lower())}_repository.py"
+        model_directory, repository_file_name
     )
+
+    if repository_file_path:
+        click.echo(f"Repository '{repository_file_name}' already exists.")
+        return
 
     with open(template_path, "r") as template_file, open(
         repository_file_path, "w"
@@ -27,7 +34,9 @@ def generate_repository_file(module_name):
         )
         output_file.write(content)
 
-    add_repository_dependency_to_service(module_name)
+    click.echo(f"Repository '{repository_file_name}' created successfully.")
+
+    # add_repository_dependency_to_service(module_name)
 
 
 def add_repository_dependency_to_service(module_name):

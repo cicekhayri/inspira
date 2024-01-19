@@ -3,6 +3,8 @@ import click
 from inspira.cli.create_app import generate_project
 from inspira.cli.create_controller import create_controller_file
 from inspira.cli.generate_database_file import create_database_file
+from inspira.cli.generate_repository_file import generate_repository_file
+from inspira.cli.generate_service_file import generate_service_file
 
 from inspira.migrations.migrations import run_migrations, create_migrations
 
@@ -24,14 +26,42 @@ def new():
 @click.option("--websocket", "is_websocket", is_flag=True, required=False)
 def controller(name, is_websocket):
     if not name:
-        click.echo("Please provide a name for the module")
+        click.echo("Please provide a name for the controller")
         return
 
     try:
         create_controller_file(name, is_websocket)
-        return click.echo(f"Module '{name}' created successfully.")
     except FileExistsError:
-        click.echo(f"Module '{name}' already exists.")
+        click.echo(f"Controller '{name}' already exists.")
+
+
+@new.command()
+@click.argument("name")
+def repository(name):
+
+    if not name:
+        click.echo("Please provide a name of the repository")
+        return
+
+    try:
+        generate_repository_file(name)
+    except FileExistsError:
+        click.echo(f"Repository '{name}' already exists.")
+
+
+@new.command()
+@click.argument("name")
+def service(name):
+
+    if not name:
+        click.echo("Please provide a name of the service")
+        return
+
+    try:
+        generate_service_file(name)
+    except FileExistsError:
+        click.echo(f"Service '{name}' already exists.")
+
 
 
 @new.command()
