@@ -1,7 +1,5 @@
 import os
-from unittest.mock import patch, MagicMock
-
-import pytest
+from unittest.mock import patch
 
 from inspira.cli.cli import migrate
 from inspira.constants import MIGRATION_DIRECTORY
