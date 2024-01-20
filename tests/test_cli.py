@@ -13,6 +13,6 @@ def test_database_command(teardown_database_file):
     assert "Database file created successfully." in result.output
 
 
-def test_run_migrations_down(runner, monkeypatch, tmpdir):
+def test_run_migrations_down(runner):
     result = runner.invoke(migrate, ["--down"])
     assert result.exit_code == 0

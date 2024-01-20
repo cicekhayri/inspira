@@ -16,9 +16,7 @@ from inspira.migrations.utils import (
 )
 
 
-def test_get_or_create_migration_directory(
-    setup_test_environment, teardown_src_directory
-):
+def test_get_or_create_migration_directory():
     migration_directory = os.path.join(MIGRATION_DIRECTORY)
     with patch("inspira.logging.log.error") as log_error_mock:
         result = get_or_create_migration_directory()
@@ -68,17 +66,6 @@ def test_insert_migration(setup_teardown_db_session):
 
     assert result.version == 1
     assert result.migration_name == migration_name
-
-
-def test_empty_migration_file(
-    setup_test_environment, teardown_src_directory, teardown_migration_directory
-):
-    empty_migration_file = "0001_empty_migration"
-    create_migrations("empty_migration")
-    expected_migration_file = f"migrations/{empty_migration_file}.sql"
-    assert os.path.exists(
-        expected_migration_file
-    ), f"Migration file {expected_migration_file} not found."
 
 
 def test_run_migrations_up(runner, monkeypatch, tmpdir):

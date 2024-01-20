@@ -110,18 +110,5 @@ def setup_teardown_db_session():
 
 
 @pytest.fixture
-def setup_test_environment():
-    dirs_to_simulate = ["module1", "module2", "module3"]
-
-    for module in dirs_to_simulate:
-        module_dir = os.path.join(SRC_DIRECTORY, module)
-        os.makedirs(module_dir)
-        migrations_dir = os.path.join(module_dir, MIGRATION_DIRECTORY)
-        os.makedirs(migrations_dir)
-
-    yield SRC_DIRECTORY
-
-
-@pytest.fixture
-def runner():
+def runner(teardown_migration_directory):
     return CliRunner()
