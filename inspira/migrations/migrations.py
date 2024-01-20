@@ -14,7 +14,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
-from sqlalchemy.sql.ddl import CreateIndex, CreateTable
 from sqlalchemy.sql.expression import func
 
 from inspira.constants import MIGRATION_DIRECTORY
@@ -68,18 +67,6 @@ def execute_sql_file(file_path):
             log.error("Error:", e)
             connection.rollback()
             log.info("Transaction rolled back.")
-
-
-def generate_create_table_sql(model_name):
-    metadata = Base.metadata
-    table = metadata.tables[model_name]
-    sql = str(CreateTable(table).compile(engine))[:-2] + ";" + "\n"
-    index_sqls = [CreateIndex(index).compile(engine) for index in table.indexes]
-
-    for index_sql in index_sqls:
-        sql += "\n" + str(index_sql) + ";"
-
-    return sql
 
 
 def create_migrations(migration_name):
