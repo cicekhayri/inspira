@@ -1,18 +1,12 @@
 import os
 from unittest.mock import patch
 
-from sqlalchemy import inspect
-
 from inspira.cli.cli import migrate
 from inspira.constants import MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
     Migration,
     create_migrations,
     db_session,
-    engine,
-    execute_sql_file,
-    get_existing_columns,
-    get_existing_indexes,
     insert_migration,
 )
 from inspira.migrations.utils import (
@@ -61,26 +55,6 @@ def test_get_latest_migration_number(mock_listdir):
     assert result == 3
 
 
-def test_execute_sql_file(sample_sql_file):
-    execute_sql_file(sample_sql_file)
-
-    inspector = inspect(engine)
-
-    assert "users" in inspector.get_table_names()
-
-
-def test_get_existing_columns_table_exists(sample_sql_file):
-    execute_sql_file(sample_sql_file)
-    result = get_existing_columns("users")
-    assert result == ["id", "name", "email"]
-
-
-def test_get_existing_columns_table_does_not_exist():
-    table_name = "non_existent_table"
-    result = get_existing_columns(table_name)
-    assert result is None
-
-
 def test_insert_migration(setup_teardown_db_session):
     current_version = 0
     migration_name = "example_migration"
@@ -94,16 +68,6 @@ def test_insert_migration(setup_teardown_db_session):
 
     assert result.version == 1
     assert result.migration_name == migration_name
-
-
-def test_get_existing_indexes(
-    setup_test_environment, teardown_src_directory, add_index_users
-):
-    execute_sql_file(add_index_users)
-    indexes = get_existing_indexes("users")
-
-    assert len(indexes) == 1
-    assert "ix_users_name" in indexes
 
 
 def test_empty_migration_file(

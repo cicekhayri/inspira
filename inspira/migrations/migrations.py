@@ -49,26 +49,6 @@ def initialize_database(engine):
     Base.metadata.create_all(engine)
 
 
-def execute_sql_file(file_path):
-    with open(file_path, "r") as file:
-        sql_content = file.read()
-
-    sql_statements = [
-        statement.strip() for statement in sql_content.split(";") if statement.strip()
-    ]
-
-    with engine.connect() as connection:
-        try:
-            for statement in sql_statements:
-                connection.execute(text(statement))
-            connection.commit()
-            log.info("Migration run successfully.")
-        except SQLAlchemyError as e:
-            log.error("Error:", e)
-            connection.rollback()
-            log.info("Transaction rolled back.")
-
-
 def create_migrations(migration_name):
     if migration_file_exist(migration_name):
         return
@@ -157,17 +137,6 @@ def execute_sql_file_contents(connection, sql_content):
         log.info("Transaction rolled back.")
 
 
-def get_existing_columns(table_name):
-    metadata = MetaData()
-    metadata.reflect(bind=engine)
-
-    if table_name in metadata.tables:
-        table = metadata.tables[table_name]
-        return [column.name for column in table.columns]
-    else:
-        return None
-
-
 def insert_migration(current_version, migration_name):
     migration = Migration()
     migration.version = current_version + 1
@@ -182,9 +151,3 @@ def remove_migration(migration_name):
     )
     db_session.delete(migration)
     db_session.commit()
-
-
-def get_existing_indexes(table_name):
-    inspector = inspect(engine)
-    indexes = inspector.get_indexes(table_name)
-    return [index["name"] for index in indexes]
