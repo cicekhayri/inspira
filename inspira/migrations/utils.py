@@ -1,12 +1,8 @@
-import importlib
 import os
 
-from sqlalchemy import Integer, String
-
 from inspira.cli.create_controller import create_init_file
-from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
+from inspira.constants import MIGRATION_DIRECTORY
 from inspira.logging import log
-from inspira.utils import singularize
 
 
 def get_or_create_migration_directory():
@@ -17,23 +13,6 @@ def get_or_create_migration_directory():
     create_init_file(migration_directory)
 
     return migration_directory
-
-
-def load_model_file(entity_name):
-    module_path = os.path.join(
-        SRC_DIRECTORY, entity_name.replace(".", "/" + entity_name)
-    )
-    model_file_path = os.path.join(module_path, f"{singularize(entity_name)}.py")
-    model_name = singularize(entity_name).capitalize()
-    spec = importlib.util.spec_from_file_location(model_name, model_file_path)
-    module = importlib.util.module_from_spec(spec)
-
-    try:
-        spec.loader.exec_module(module)
-    except FileNotFoundError:
-        return None
-
-    return module
 
 
 def migration_file_exist(migration_file_name: str) -> bool:
@@ -85,36 +64,3 @@ def generate_migration_file(migration_name):
         f"Migration file '{str(new_migration_number).zfill(4)}_{migration_name}.sql' created."
     )
     return migration_file
-
-
-def generate_column_sql(column):
-    column_name = column.key
-    constraints = []
-
-    if isinstance(column.type, String):
-        column_type = f"VARCHAR({column.type.length})"
-    elif isinstance(column.type, Integer):
-        column_type = "INTEGER"
-    else:
-        column_type = str(column.type)
-
-    if column.primary_key:
-        column_type += " PRIMARY KEY"
-
-    if column.nullable:
-        column_type += " NULL"
-    else:
-        column_type += " NOT NULL"
-
-    if column.unique:
-        constraints.append("UNIQUE")
-
-    return f"{column_name} {column_type} {''.join(constraints)}"
-
-
-def get_columns_from_model(model_class):
-    return model_class.__table__.columns
-
-
-def get_indexes_from_model(model_class):
-    return model_class.__table__.indexes
