@@ -165,6 +165,7 @@ def setup_test_environment():
 
     yield SRC_DIRECTORY
 
+
 @pytest.fixture
 def runner():
     return CliRunner()

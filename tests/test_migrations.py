@@ -3,11 +3,9 @@ from unittest.mock import patch
 
 from sqlalchemy import inspect
 
-from inspira.constants import MIGRATION_DIRECTORY
 from inspira.cli.cli import migrate
-from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
+from inspira.constants import MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
-    Base,
     Migration,
     create_migrations,
     db_session,
@@ -121,7 +119,8 @@ def test_empty_migration_file(
 
 def test_run_migrations_up(runner, monkeypatch, tmpdir):
     migration_file_path = tmpdir / "0001_create_table_customers.sql"
-    migration_file_path.write_text("""
+    migration_file_path.write_text(
+        """
 -- Up
 CREATE TABLE customers (
     id INTEGER NOT NULL, 
@@ -130,10 +129,17 @@ CREATE TABLE customers (
 );
 -- Down
 DROP TABLE customers;
-""", encoding='utf-8')
+""",
+        encoding="utf-8",
+    )
 
-    monkeypatch.setattr("inspira.migrations.migrations.initialize_database", lambda engine: None)
-    monkeypatch.setattr("inspira.migrations.utils.get_or_create_migration_directory", lambda: str(tmpdir))
+    monkeypatch.setattr(
+        "inspira.migrations.migrations.initialize_database", lambda engine: None
+    )
+    monkeypatch.setattr(
+        "inspira.migrations.utils.get_or_create_migration_directory",
+        lambda: str(tmpdir),
+    )
 
     result = runner.invoke(migrate)
 

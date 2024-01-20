@@ -108,7 +108,7 @@ def run_migrations(down=False):
 
 
 def execute_up_migration(connection, file, migration_name):
-    with open(file, 'r') as migration_file:
+    with open(file, "r") as migration_file:
         sql = migration_file.read()
 
         up_sql_start = sql.find("-- Up")
@@ -123,8 +123,9 @@ def execute_up_migration(connection, file, migration_name):
         else:
             click.echo(f"No 'Up' migration found in {migration_name}")
 
+
 def execute_down_migration(connection, file, migration_name):
-    with open(file, 'r') as migration_file:
+    with open(file, "r") as migration_file:
         sql = migration_file.read()
 
         down_sql_start = sql.find("-- Down")
@@ -174,8 +175,11 @@ def insert_migration(current_version, migration_name):
     db_session.add(migration)
     db_session.commit()
 
+
 def remove_migration(migration_name):
-    migration = db_session.query(Migration).filter_by(migration_name=migration_name).first()
+    migration = (
+        db_session.query(Migration).filter_by(migration_name=migration_name).first()
+    )
     db_session.delete(migration)
     db_session.commit()
 

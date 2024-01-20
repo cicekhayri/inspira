@@ -115,7 +115,7 @@ def migration(migration_name):
 
 
 @cli.command()
-@click.option('--down', is_flag=True, help='Run Down migrations.')
+@click.option("--down", is_flag=True, help="Run Down migrations.")
 def migrate(down):
     """
     Run migrations from the migrations folder.
