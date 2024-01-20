@@ -49,26 +49,6 @@ def initialize_database(engine):
     Base.metadata.create_all(engine)
 
 
-def execute_sql_file(file_path):
-    with open(file_path, "r") as file:
-        sql_content = file.read()
-
-    sql_statements = [
-        statement.strip() for statement in sql_content.split(";") if statement.strip()
-    ]
-
-    with engine.connect() as connection:
-        try:
-            for statement in sql_statements:
-                connection.execute(text(statement))
-            connection.commit()
-            log.info("Migration run successfully.")
-        except SQLAlchemyError as e:
-            log.error("Error:", e)
-            connection.rollback()
-            log.info("Transaction rolled back.")
-
-
 def create_migrations(migration_name):
     if migration_file_exist(migration_name):
         return
@@ -76,7 +56,7 @@ def create_migrations(migration_name):
     generate_migration_file(migration_name)
 
 
-def run_migrations():
+def run_migrations(down=False):
     with engine.connect() as connection:
         if not engine.dialect.has_table(connection, MIGRATION_DIRECTORY):
             initialize_database(engine)
@@ -96,24 +76,65 @@ def run_migrations():
                 or 0
             )
 
-            if not current_version:
-                execute_sql_file(file)
-                click.echo(
-                    f"Applying migration for {migration_name} version {current_version}"
-                )
+            if not current_version and not down:
+                execute_up_migration(connection, file, migration_name)
 
                 insert_migration(current_version, migration_name)
+                continue
+
+            if down:
+                execute_down_migration(connection, file, migration_name)
+                remove_migration(migration_name)
 
 
-def get_existing_columns(table_name):
-    metadata = MetaData()
-    metadata.reflect(bind=engine)
+def execute_up_migration(connection, file, migration_name):
+    with open(file, "r") as migration_file:
+        sql = migration_file.read()
 
-    if table_name in metadata.tables:
-        table = metadata.tables[table_name]
-        return [column.name for column in table.columns]
-    else:
-        return None
+        up_sql_start = sql.find("-- Up")
+        if up_sql_start != -1:
+            up_sql_start += len("-- Up")
+            up_sql_end = sql.find("-- Down") if "-- Down" in sql else None
+            up_sql = sql[up_sql_start:up_sql_end].strip()
+
+            execute_sql_file_contents(connection, up_sql)
+
+            click.echo(f"Applying 'Up' migration for {migration_name}")
+        else:
+            click.echo(f"No 'Up' migration found in {migration_name}")
+
+
+def execute_down_migration(connection, file, migration_name):
+    with open(file, "r") as migration_file:
+        sql = migration_file.read()
+
+        down_sql_start = sql.find("-- Down")
+        if down_sql_start != -1:
+            down_sql_start += len("-- Down")
+            down_sql_end = sql.find("-- End Down") if "-- End Down" in sql else None
+            down_sql = sql[down_sql_start:down_sql_end].strip()
+
+            execute_sql_file_contents(connection, down_sql)
+
+            click.echo(f"Applying 'Down' migration for {migration_name}")
+        else:
+            click.echo(f"No 'Down' migration found in {migration_name}")
+
+
+def execute_sql_file_contents(connection, sql_content):
+    sql_statements = [
+        statement.strip() for statement in sql_content.split(";") if statement.strip()
+    ]
+
+    try:
+        for statement in sql_statements:
+            connection.execute(text(statement))
+        connection.commit()
+        log.info("Migration run successfully.")
+    except SQLAlchemyError as e:
+        log.error("Error:", e)
+        connection.rollback()
+        log.info("Transaction rolled back.")
 
 
 def insert_migration(current_version, migration_name):
@@ -124,7 +145,17 @@ def insert_migration(current_version, migration_name):
     db_session.commit()
 
 
-def get_existing_indexes(table_name):
-    inspector = inspect(engine)
-    indexes = inspector.get_indexes(table_name)
-    return [index["name"] for index in indexes]
+def remove_migration(migration_name):
+    migration = (
+        db_session.query(Migration).filter_by(migration_name=migration_name).first()
+    )
+
+    if migration:
+        try:
+            db_session.delete(migration)
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            log.error(f"Error deleting migration {migration_name}: {e}")
+    else:
+        log.error(f"Migration {migration_name} not found.")

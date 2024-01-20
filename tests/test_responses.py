@@ -4,7 +4,6 @@ from http import HTTPStatus
 
 import pytest
 
-from inspira import Inspira
 from inspira.constants import APPLICATION_JSON, TEXT_PLAIN, UTF8
 from inspira.decorators.http_methods import delete, get, patch, post, put
 from inspira.enums import HttpMethod

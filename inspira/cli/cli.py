@@ -6,8 +6,7 @@ from inspira.cli.generate_database_file import create_database_file
 from inspira.cli.generate_model_file import generate_model_file
 from inspira.cli.generate_repository_file import generate_repository_file
 from inspira.cli.generate_service_file import generate_service_file
-
-from inspira.migrations.migrations import run_migrations, create_migrations
+from inspira.migrations.migrations import create_migrations, run_migrations
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 
@@ -115,12 +114,13 @@ def migration(migration_name):
 
 
 @cli.command()
-def migrate():
+@click.option("--down", is_flag=True, help="Run Down migrations.")
+def migrate(down):
     """
     Run migrations from the migrations folder.
     """
     try:
-        run_migrations()
+        run_migrations(down=down)
     except Exception as e:
         click.echo(f"Error: {e}")
         click.echo("Migration failed. Check logs for more details.")

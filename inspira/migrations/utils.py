@@ -58,7 +58,9 @@ def generate_migration_file(migration_name):
     )
 
     with open(migration_file_path, "w") as migration_file:
-        pass
+        migration_file.write(f"-- Up\n")
+        migration_file.write("\n")
+        migration_file.write("\n-- Down\n")
 
     log.info(
         f"Migration file '{str(new_migration_number).zfill(4)}_{migration_name}.sql' created."

@@ -1,12 +1,13 @@
 import os
 import shutil
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from click.testing import CliRunner
 
 from inspira import Inspira
 from inspira.config import Config
-from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
+from inspira.constants import MIGRATION_DIRECTORY, SRC_DIRECTORY
 from inspira.requests import Request
 from inspira.testclient import TestClient
 
@@ -32,18 +33,17 @@ def client_session(app):
 
 
 @pytest.fixture
+def mock_connection():
+    return MagicMock()
+
+
+@pytest.fixture
 def request_with_session(mock_scope):
     receive = AsyncMock()
     send = AsyncMock()
     request = Request(mock_scope, receive, send)
     request.session = {"user_id": 123, "username": "john_doe"}
     return request
-
-
-@pytest.fixture
-def teardown_app_file():
-    yield
-    os.remove("main.py")
 
 
 @pytest.fixture
@@ -59,18 +59,15 @@ def teardown_migration_directory():
 
 
 @pytest.fixture
-def teardown_database_file():
+def teardown_main_file():
     yield
-    os.remove("database.py")
+    os.remove("main.py")
 
 
 @pytest.fixture
-def setup_database_file(teardown_database_file):
-    file_name = "database.py"
-    with open(file_name, "w") as file:
-        # You can write content to the file if needed
-        file.write("Hello, this is a new file!")
+def teardown_database_file():
     yield
+    os.remove("database.py")
 
 
 @pytest.fixture
@@ -115,33 +112,6 @@ def user_mock():
 
 
 @pytest.fixture
-def sample_sql_file(tmp_path):
-    sql_content = """
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY NOT NULL,
-        name VARCHAR(50) NULL,
-        email VARCHAR(120) NULL
-    );
-    """
-    sql_file = tmp_path / "test.sql"
-    with open(sql_file, "w") as file:
-        file.write(sql_content)
-    return str(sql_file)
-
-
-@pytest.fixture
-def add_index_users(tmp_path, teardown_src_directory):
-    sql_content = """
-    CREATE INDEX ix_users_name ON users (name);
-    """
-
-    sql_file = tmp_path / "test.sql"
-    with open(sql_file, "w") as file:
-        file.write(sql_content)
-    return str(sql_file)
-
-
-@pytest.fixture
 def setup_teardown_db_session():
     from inspira.migrations.migrations import db_session, engine, initialize_database
 
@@ -151,15 +121,5 @@ def setup_teardown_db_session():
 
 
 @pytest.fixture
-def setup_test_environment():
-    # os.makedirs(SRC_DIRECTORY)
-
-    dirs_to_simulate = ["module1", "module2", "module3"]
-
-    for module in dirs_to_simulate:
-        module_dir = os.path.join(SRC_DIRECTORY, module)
-        os.makedirs(module_dir)
-        migrations_dir = os.path.join(module_dir, MIGRATION_DIRECTORY)
-        os.makedirs(migrations_dir)
-
-    yield SRC_DIRECTORY
+def runner():
+    return CliRunner()

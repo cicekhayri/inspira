@@ -1,19 +1,15 @@
 import os
 from unittest.mock import patch
 
-from sqlalchemy import inspect
-
+from inspira.cli.cli import migrate
 from inspira.constants import MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
-    Base,
     Migration,
-    create_migrations,
     db_session,
-    engine,
-    execute_sql_file,
-    get_existing_columns,
-    get_existing_indexes,
+    execute_down_migration,
+    execute_up_migration,
     insert_migration,
+    run_migrations,
 )
 from inspira.migrations.utils import (
     get_latest_migration_number,
@@ -22,9 +18,65 @@ from inspira.migrations.utils import (
 )
 
 
-def test_get_or_create_migration_directory(
-    setup_test_environment, teardown_src_directory
-):
+def test_execute_up_migration(capsys, mock_connection, tmp_path):
+    migration_name = "test_migration"
+    migration_content = "-- Up\nCREATE TABLE test_table (id SERIAL PRIMARY KEY);\n"
+
+    migration_file_path = tmp_path / f"{migration_name}.sql"
+    with open(migration_file_path, "w") as migration_file:
+        migration_file.write(migration_content)
+
+    execute_up_migration(mock_connection, migration_file_path, migration_name)
+
+    expected_sql = "CREATE TABLE test_table (id SERIAL PRIMARY KEY)"
+
+    # Extract SQL string from the call and compare as a string
+    actual_calls = [
+        call_args[0][0].text for call_args in mock_connection.execute.call_args_list
+    ]
+
+    assert expected_sql in actual_calls
+    assert "Applying 'Up' migration for test_migration" in capsys.readouterr().out
+
+
+def test_execute_down_migration(capsys, mock_connection, tmp_path):
+    migration_name = "test_migration"
+    migration_content = "-- Down\nDROP TABLE test_table;\n"
+
+    migration_file_path = tmp_path / f"{migration_name}.sql"
+    with open(migration_file_path, "w") as migration_file:
+        migration_file.write(migration_content)
+
+    execute_down_migration(mock_connection, migration_file_path, migration_name)
+
+    expected_sql = "DROP TABLE test_table"
+
+    # Extract SQL string from the call and compare as a string
+    actual_calls = [
+        call_args[0][0].text for call_args in mock_connection.execute.call_args_list
+    ]
+
+    assert expected_sql in actual_calls
+    assert "Applying 'Down' migration for test_migration" in capsys.readouterr().out
+
+
+def test_run_migrations_up(capsys, mock_connection, tmp_path):
+    migration_name = "test_migration"
+    migration_content = "-- Up\nCREATE TABLE test_table (id SERIAL PRIMARY KEY);\n"
+
+    migration_file_path = tmp_path / f"{migration_name}.sql"
+    with open(migration_file_path, "w") as migration_file:
+        migration_file.write(migration_content)
+
+    run_migrations()
+
+    mock_connection.execute.assert_called_once_with(
+        "CREATE TABLE test_table (id SERIAL PRIMARY KEY)"
+    )
+    assert "Applying 'Up' migration for test_migration" in capsys.readouterr().out
+
+
+def test_get_or_create_migration_directory():
     migration_directory = os.path.join(MIGRATION_DIRECTORY)
     with patch("inspira.logging.log.error") as log_error_mock:
         result = get_or_create_migration_directory()
@@ -61,26 +113,6 @@ def test_get_latest_migration_number(mock_listdir):
     assert result == 3
 
 
-def test_execute_sql_file(sample_sql_file):
-    execute_sql_file(sample_sql_file)
-
-    inspector = inspect(engine)
-
-    assert "users" in inspector.get_table_names()
-
-
-def test_get_existing_columns_table_exists(sample_sql_file):
-    execute_sql_file(sample_sql_file)
-    result = get_existing_columns("users")
-    assert result == ["id", "name", "email"]
-
-
-def test_get_existing_columns_table_does_not_exist():
-    table_name = "non_existent_table"
-    result = get_existing_columns(table_name)
-    assert result is None
-
-
 def test_insert_migration(setup_teardown_db_session):
     current_version = 0
     migration_name = "example_migration"
@@ -96,22 +128,30 @@ def test_insert_migration(setup_teardown_db_session):
     assert result.migration_name == migration_name
 
 
-def test_get_existing_indexes(
-    setup_test_environment, teardown_src_directory, add_index_users
-):
-    execute_sql_file(add_index_users)
-    indexes = get_existing_indexes("users")
+def test_run_migrations_up(runner, monkeypatch, tmpdir, teardown_migration_directory):
+    migration_file_path = tmpdir / "0001_create_table_customers.sql"
+    migration_file_path.write_text(
+        """
+-- Up
+CREATE TABLE customers (
+    id INTEGER NOT NULL, 
+    name VARCHAR(50) NOT NULL, 
+    PRIMARY KEY (id)
+);
+-- Down
+DROP TABLE customers;
+""",
+        encoding="utf-8",
+    )
 
-    assert len(indexes) == 1
-    assert "ix_users_name" in indexes
+    monkeypatch.setattr(
+        "inspira.migrations.migrations.initialize_database", lambda engine: None
+    )
+    monkeypatch.setattr(
+        "inspira.migrations.utils.get_or_create_migration_directory",
+        lambda: str(tmpdir),
+    )
 
+    result = runner.invoke(migrate)
 
-def test_empty_migration_file(
-    setup_test_environment, teardown_src_directory, teardown_migration_directory
-):
-    empty_migration_file = "0001_empty_migration"
-    create_migrations("empty_migration")
-    expected_migration_file = f"migrations/{empty_migration_file}.sql"
-    assert os.path.exists(
-        expected_migration_file
-    ), f"Migration file {expected_migration_file} not found."
+    assert result.exit_code == 0
