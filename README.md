@@ -88,7 +88,7 @@ Base.query = db_session.query_property()
 To generate necessary controller for your project, run the following command:
 
 ```bash
-$ inspira new controller orders
+$ inspira new controller order
 ```
 
 ## Generating Repository
@@ -96,7 +96,7 @@ $ inspira new controller orders
 To generate repository file, run the following command:
 
 ```bash
-$ inspira new repository orders
+$ inspira new repository order
 ```
 
 ## Generating Service
@@ -104,7 +104,7 @@ $ inspira new repository orders
 To generate service file, run the following command:
 
 ```bash
-$ inspira new service orders
+$ inspira new service order
 ```
 
 ## Generating Model
