@@ -6,8 +6,7 @@ from inspira.cli.generate_database_file import create_database_file
 from inspira.cli.generate_model_file import generate_model_file
 from inspira.cli.generate_repository_file import generate_repository_file
 from inspira.cli.generate_service_file import generate_service_file
-
-from inspira.migrations.migrations import run_migrations, create_migrations
+from inspira.migrations.migrations import create_migrations, run_migrations
 
 DATABASE_TYPES = ["postgres", "mysql", "sqlite", "mssql"]
 

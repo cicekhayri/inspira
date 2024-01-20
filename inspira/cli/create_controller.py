@@ -5,7 +5,7 @@ import click
 from inspira.cli.create_app import generate_project
 from inspira.cli.init_file import create_init_file
 from inspira.constants import SRC_DIRECTORY
-from inspira.utils import singularize, pluralize_word
+from inspira.utils import pluralize_word, singularize
 
 
 def create_src_directory():

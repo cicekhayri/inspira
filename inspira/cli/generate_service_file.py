@@ -1,4 +1,5 @@
 import os
+
 import click
 
 from inspira.constants import SRC_DIRECTORY

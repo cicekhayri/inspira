@@ -7,7 +7,7 @@ from click.testing import CliRunner
 
 from inspira import Inspira
 from inspira.config import Config
-from inspira.constants import SRC_DIRECTORY, MIGRATION_DIRECTORY
+from inspira.constants import MIGRATION_DIRECTORY, SRC_DIRECTORY
 from inspira.requests import Request
 from inspira.testclient import TestClient
 

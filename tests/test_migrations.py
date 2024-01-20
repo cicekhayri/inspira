@@ -6,9 +6,9 @@ from inspira.constants import MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
     Migration,
     db_session,
-    insert_migration,
     execute_down_migration,
     execute_up_migration,
+    insert_migration,
     run_migrations,
 )
 from inspira.migrations.utils import (
