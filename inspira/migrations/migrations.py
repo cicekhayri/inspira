@@ -146,7 +146,9 @@ def insert_migration(current_version, migration_name):
 
 
 def remove_migration(migration_name):
-    migration = db_session.query(Migration).filter_by(migration_name=migration_name).first()
+    migration = (
+        db_session.query(Migration).filter_by(migration_name=migration_name).first()
+    )
 
     if migration:
         try:
