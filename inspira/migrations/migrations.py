@@ -146,8 +146,14 @@ def insert_migration(current_version, migration_name):
 
 
 def remove_migration(migration_name):
-    migration = (
-        db_session.query(Migration).filter_by(migration_name=migration_name).first()
-    )
-    db_session.delete(migration)
-    db_session.commit()
+    migration = db_session.query(Migration).filter_by(migration_name=migration_name).first()
+
+    if migration:
+        try:
+            db_session.delete(migration)
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            log.error(f"Error deleting migration {migration_name}: {e}")
+    else:
+        log.error(f"Migration {migration_name} not found.")
