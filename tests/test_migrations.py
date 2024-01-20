@@ -68,7 +68,7 @@ def test_insert_migration(setup_teardown_db_session):
     assert result.migration_name == migration_name
 
 
-def test_run_migrations_up(runner, monkeypatch, tmpdir):
+def test_run_migrations_up(runner, monkeypatch, tmpdir, teardown_migration_directory):
     migration_file_path = tmpdir / "0001_create_table_customers.sql"
     migration_file_path.write_text(
         """

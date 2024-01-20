@@ -54,6 +54,12 @@ def teardown_migration_directory():
 
 
 @pytest.fixture
+def teardown_main_file():
+    yield
+    os.remove("main.py")
+
+
+@pytest.fixture
 def teardown_database_file():
     yield
     os.remove("database.py")
@@ -110,5 +116,5 @@ def setup_teardown_db_session():
 
 
 @pytest.fixture
-def runner(teardown_migration_directory):
+def runner():
     return CliRunner()
