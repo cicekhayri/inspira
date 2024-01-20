@@ -3,6 +3,7 @@ import shutil
 from unittest.mock import AsyncMock
 
 import pytest
+from click.testing import CliRunner
 
 from inspira import Inspira
 from inspira.config import Config
@@ -163,3 +164,7 @@ def setup_test_environment():
         os.makedirs(migrations_dir)
 
     yield SRC_DIRECTORY
+
+@pytest.fixture
+def runner():
+    return CliRunner()

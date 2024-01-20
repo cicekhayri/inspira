@@ -115,12 +115,13 @@ def migration(migration_name):
 
 
 @cli.command()
-def migrate():
+@click.option('--down', is_flag=True, help='Run Down migrations.')
+def migrate(down):
     """
     Run migrations from the migrations folder.
     """
     try:
-        run_migrations()
+        run_migrations(down=down)
     except Exception as e:
         click.echo(f"Error: {e}")
         click.echo("Migration failed. Check logs for more details.")
