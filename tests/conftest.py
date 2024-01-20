@@ -1,6 +1,6 @@
 import os
 import shutil
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from click.testing import CliRunner
@@ -30,6 +30,11 @@ def client(app):
 @pytest.fixture
 def client_session(app):
     return TestClient(app)
+
+
+@pytest.fixture
+def mock_connection():
+    return MagicMock()
 
 
 @pytest.fixture

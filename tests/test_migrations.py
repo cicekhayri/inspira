@@ -1,19 +1,81 @@
 import os
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+
+import pytest
 
 from inspira.cli.cli import migrate
 from inspira.constants import MIGRATION_DIRECTORY
 from inspira.migrations.migrations import (
     Migration,
-    create_migrations,
     db_session,
     insert_migration,
+    execute_down_migration,
+    execute_up_migration,
+    run_migrations,
 )
 from inspira.migrations.utils import (
     get_latest_migration_number,
     get_migration_files,
     get_or_create_migration_directory,
 )
+
+
+def test_execute_up_migration(capsys, mock_connection, tmp_path):
+    migration_name = "test_migration"
+    migration_content = "-- Up\nCREATE TABLE test_table (id SERIAL PRIMARY KEY);\n"
+
+    migration_file_path = tmp_path / f"{migration_name}.sql"
+    with open(migration_file_path, "w") as migration_file:
+        migration_file.write(migration_content)
+
+    execute_up_migration(mock_connection, migration_file_path, migration_name)
+
+    expected_sql = "CREATE TABLE test_table (id SERIAL PRIMARY KEY)"
+
+    # Extract SQL string from the call and compare as a string
+    actual_calls = [
+        call_args[0][0].text for call_args in mock_connection.execute.call_args_list
+    ]
+
+    assert expected_sql in actual_calls
+    assert "Applying 'Up' migration for test_migration" in capsys.readouterr().out
+
+
+def test_execute_down_migration(capsys, mock_connection, tmp_path):
+    migration_name = "test_migration"
+    migration_content = "-- Down\nDROP TABLE test_table;\n"
+
+    migration_file_path = tmp_path / f"{migration_name}.sql"
+    with open(migration_file_path, "w") as migration_file:
+        migration_file.write(migration_content)
+
+    execute_down_migration(mock_connection, migration_file_path, migration_name)
+
+    expected_sql = "DROP TABLE test_table"
+
+    # Extract SQL string from the call and compare as a string
+    actual_calls = [
+        call_args[0][0].text for call_args in mock_connection.execute.call_args_list
+    ]
+
+    assert expected_sql in actual_calls
+    assert "Applying 'Down' migration for test_migration" in capsys.readouterr().out
+
+
+def test_run_migrations_up(capsys, mock_connection, tmp_path):
+    migration_name = "test_migration"
+    migration_content = "-- Up\nCREATE TABLE test_table (id SERIAL PRIMARY KEY);\n"
+
+    migration_file_path = tmp_path / f"{migration_name}.sql"
+    with open(migration_file_path, "w") as migration_file:
+        migration_file.write(migration_content)
+
+    run_migrations()
+
+    mock_connection.execute.assert_called_once_with(
+        "CREATE TABLE test_table (id SERIAL PRIMARY KEY)"
+    )
+    assert "Applying 'Up' migration for test_migration" in capsys.readouterr().out
 
 
 def test_get_or_create_migration_directory():
