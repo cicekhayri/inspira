@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 
 from inspira.cli.cli import migrate
 from inspira.constants import MIGRATION_DIRECTORY
@@ -15,6 +15,8 @@ from inspira.migrations.utils import (
     get_latest_migration_number,
     get_migration_files,
     get_or_create_migration_directory,
+    migration_file_exist,
+    generate_migration_file,
 )
 
 
@@ -155,3 +157,41 @@ DROP TABLE customers;
     result = runner.invoke(migrate)
 
     assert result.exit_code == 0
+
+
+def test_migration_file_exist_when_file_exists(caplog):
+    with patch("inspira.migrations.utils.get_or_create_migration_directory"), patch(
+        "inspira.migrations.utils.get_migration_files",
+        return_value=["existing_migration_file.sql"],
+    ):
+        result = migration_file_exist("existing_migration_file.sql")
+
+        assert result is True
+
+
+def test_migration_file_exist_when_file_does_not_exist():
+    with patch("inspira.migrations.utils.get_or_create_migration_directory"), patch(
+        "inspira.migrations.utils.get_migration_files",
+        return_value=["other_migration_file.sql"],
+    ):
+        result = migration_file_exist("non_existing_migration_file.sql")
+        assert result is False
+
+
+def test_migration_file_exist_handles_empty_migration_list():
+    with patch("inspira.migrations.utils.get_or_create_migration_directory"), patch(
+        "inspira.migrations.utils.get_migration_files", return_value=[]
+    ):
+        result = migration_file_exist("non_existing_migration_file.sql")
+        assert result is False
+
+
+def test_generate_migration_file_creates_file():
+    with patch("inspira.migrations.utils.get_or_create_migration_directory"), patch(
+        "inspira.migrations.utils.get_latest_migration_number", return_value=42
+    ):
+        migration_name = "example_migration"
+        with patch("builtins.open", mock_open()):
+            result = generate_migration_file(migration_name)
+
+            assert os.path.exists(result.name)

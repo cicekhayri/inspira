@@ -1,9 +1,11 @@
 import os
+from unittest.mock import patch
 
 from click.testing import CliRunner
 
 from inspira.cli import cli
 from inspira.cli.cli import controller
+from inspira.cli.generate_model_file import database_file_exists, generate_model_file
 
 
 def test_database_command(teardown_database_file):
@@ -93,3 +95,17 @@ def test_service_command_without_name(
     result = runner.invoke(cli, ["new", "service"])
     assert "Error: Missing argument 'NAME'." in result.output
     assert result.exit_code == 2
+
+
+def test_database_file_exists_when_file_exists():
+    with patch("os.path.isfile", return_value=True):
+        assert database_file_exists() is True
+
+
+def test_database_file_exists_prints_error_message():
+    with patch("click.echo") as mock_echo, patch(
+        "os.path.isfile", return_value=False
+    ):
+        database_file_exists()
+
+        mock_echo.assert_called_once_with("Main script (database.py) not found.")
