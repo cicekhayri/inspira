@@ -98,13 +98,14 @@ def test_service_command_without_name(
 
 
 def test_database_file_exists_when_file_exists():
-    with patch('os.path.isfile', return_value=True):
+    with patch("os.path.isfile", return_value=True):
         assert database_file_exists() is True
 
+
 def test_database_file_exists_prints_error_message():
-    with patch('inspira.cli.cli.click.echo') as mock_echo, \
-         patch('os.path.isfile', return_value=False):
+    with patch("inspira.cli.cli.click.echo") as mock_echo, patch(
+        "os.path.isfile", return_value=False
+    ):
         database_file_exists()
 
         mock_echo.assert_called_once_with("Main script (database.py) not found.")
-
