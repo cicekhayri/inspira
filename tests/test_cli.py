@@ -103,7 +103,7 @@ def test_database_file_exists_when_file_exists():
 
 
 def test_database_file_exists_prints_error_message():
-    with patch("inspira.cli.cli.click.echo") as mock_echo, patch(
+    with patch("click.echo") as mock_echo, patch(
         "os.path.isfile", return_value=False
     ):
         database_file_exists()
