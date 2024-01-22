@@ -1,6 +1,7 @@
 import os
 
 import click
+from jinja2 import Template
 
 from inspira.cli.create_app import generate_project
 from inspira.cli.init_file import create_init_file
@@ -22,7 +23,7 @@ def create_controller_file(name, is_websocket):
     controller_directory = os.path.join(SRC_DIRECTORY, "controller")
     singularize_name = singularize(name.lower())
     controller_file_name = f"{singularize_name}_controller.py"
-    controller_template_file = "controller_template.txt"
+    controller_template_file = "controller_template.jinja2"
 
     controller_file_path = os.path.join(controller_directory, controller_file_name)
 
@@ -31,7 +32,7 @@ def create_controller_file(name, is_websocket):
         return
 
     if is_websocket:
-        controller_template_file = "websocket_controller_template.txt"
+        controller_template_file = "websocket_controller_template.jinja2"
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", controller_template_file
@@ -40,11 +41,15 @@ def create_controller_file(name, is_websocket):
     with open(template_path, "r") as template_file, open(
         controller_file_path, "w"
     ) as output_file:
-        content = (
-            template_file.read()
-            .replace("{{controller_name}}", singularize_name.capitalize())
-            .replace("{{root_path}}", pluralize_word(name.lower()))
-        )
+        template_content = template_file.read()
+        template = Template(template_content)
+
+        context = {
+            "controller_name": singularize_name.capitalize(),
+            "root_path": pluralize_word(name.lower()),
+        }
+
+        content = template.render(context)
         output_file.write(content)
 
     click.echo(f"Controller '{singularize_name}' created successfully.")
