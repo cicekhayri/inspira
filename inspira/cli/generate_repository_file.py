@@ -8,13 +8,13 @@ from inspira.utils import singularize
 
 
 def generate_repository_file(module_name):
-    model_directory = os.path.join(SRC_DIRECTORY, "repository")
+    repository_directory = os.path.join(SRC_DIRECTORY, "repository")
     repository_file_name = f"{singularize(module_name.lower())}_repository.py"
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "repository_template.jinja2"
     )
-    repository_file_path = os.path.join(model_directory, repository_file_name)
+    repository_file_path = os.path.join(repository_directory, repository_file_name)
 
     if os.path.exists(repository_file_path):
         click.echo(f"Repository '{repository_file_name}' already exists.")

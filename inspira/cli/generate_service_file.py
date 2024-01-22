@@ -8,13 +8,13 @@ from inspira.utils import singularize
 
 
 def generate_service_file(module_name):
-    model_directory = os.path.join(SRC_DIRECTORY, "service")
+    service_directory = os.path.join(SRC_DIRECTORY, "service")
     service_file_name = f"{singularize(module_name.lower())}_service.py"
 
     template_path = os.path.join(
         os.path.dirname(__file__), "templates", "service_template.jinja2"
     )
-    service_file_path = os.path.join(model_directory, service_file_name)
+    service_file_path = os.path.join(service_directory, service_file_name)
 
     if os.path.exists(service_file_path):
         click.echo(f"Service '{service_file_name}' already exists.")
