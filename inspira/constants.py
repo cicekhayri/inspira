@@ -15,3 +15,4 @@ WEBSOCKET_TYPE = "websocket"
 
 SRC_DIRECTORY = "src"
 MIGRATION_DIRECTORY = "migrations"
+INIT_DOT_PY = "__init__.py"
