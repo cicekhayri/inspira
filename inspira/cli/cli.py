@@ -127,8 +127,9 @@ def migrate(down):
 
 
 @cli.command()
-def init():
-    generate_project()
+@click.option("--only-controller",  "only_controller", is_flag=True, required=False, help="Generates only controller module")
+def init(only_controller):
+    generate_project(only_controller)
     click.echo("App file created successfully.")
 
 

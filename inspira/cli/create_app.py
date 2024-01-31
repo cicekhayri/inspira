@@ -3,13 +3,13 @@ import os
 import click
 
 from inspira.cli.init_file import create_init_file
-from inspira.constants import SRC_DIRECTORY
+from inspira.constants import SRC_DIRECTORY, INIT_DOT_PY
 from inspira.utils import get_random_secret_key
 
 
-def generate_project():
+def generate_project(only_controller):
     create_app_file()
-    create_directory_structure()
+    create_directory_structure(only_controller)
     create_test_directory()
     click.echo("Project created successfully")
 
@@ -21,20 +21,20 @@ def create_test_directory():
     create_init_file(test_directory)
 
 
-def create_directory_structure():
+def create_directory_structure(only_controller):
     base_dir = SRC_DIRECTORY
     dirs = [
         base_dir,
-        os.path.join(base_dir, "__init__.py"),
+        os.path.join(base_dir, INIT_DOT_PY),
         os.path.join(base_dir, "controller"),
-        os.path.join(base_dir, "controller", "__init__.py"),
-        os.path.join(base_dir, "model"),
-        os.path.join(base_dir, "model", "__init__.py"),
-        os.path.join(base_dir, "repository"),
-        os.path.join(base_dir, "repository", "__init__.py"),
-        os.path.join(base_dir, "service"),
-        os.path.join(base_dir, "service", "__init__.py"),
+        os.path.join(base_dir, "controller", INIT_DOT_PY),
     ]
+
+    if not only_controller:
+        subdirectories = ["model", "repository", "service"]
+        for subdirectory in subdirectories:
+            dirs.append(os.path.join(base_dir, subdirectory))
+            dirs.append(os.path.join(base_dir, subdirectory, INIT_DOT_PY))
 
     for dir_path in dirs:
         if not os.path.exists(dir_path):
